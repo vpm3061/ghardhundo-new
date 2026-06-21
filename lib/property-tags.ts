@@ -61,7 +61,7 @@ export function generatePropertyTags(p: Property): string[] {
   if (p.is_featured) tags.push('#FeaturedProperty')
 
   // Brand
-  tags.push('#GharDhundo', '#RealEstateIndia')
+  tags.push('#Orenzaa', '#RealEstateIndia')
 
   return tags
 }
@@ -74,7 +74,7 @@ export function getShareTags(p: Property): string[] {
   if (p.rera_number)   tags.push('#RERAVerified')
   if (p.status === 'Ready to Move') tags.push('#ReadyToMove')
   if (p.status === 'New Launch')    tags.push('#NewLaunch')
-  tags.push('#GharDhundo')
+  tags.push('#Orenzaa')
   return tags.slice(0, 6)
 }
 

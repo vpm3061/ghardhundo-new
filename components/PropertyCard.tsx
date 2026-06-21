@@ -1,8 +1,9 @@
 'use client'
 import Link from 'next/link'
 import WhatsAppButton from './WhatsAppButton'
+import HeartButton from './HeartButton'
 import type { Property } from '@/lib/supabase/types'
-import { getShareTags } from '@/lib/property-tags'
+import { getShareTags, getCardTags } from '@/lib/property-tags'
 
 const AMENITY_ICONS: Record<string, string> = {
   'Swimming Pool': '🏊',
@@ -34,23 +35,24 @@ function priceRange(min: number | null, max: number | null): string {
   return 'Price on request'
 }
 
-export default function PropertyCard({ property, userId }: { property: Property; userId?: string }) {
+export default function PropertyCard({ property, userId, savedIds }: { property: Property; userId?: string; savedIds?: Set<string> }) {
   const photo = property.photos?.[0]
   const price = priceRange(property.price_min, property.price_max)
   const location = [property.sector, property.city].filter(Boolean).join(', ')
   const bhkStr = property.bhk?.length ? property.bhk.join('/') + ' BHK' : null
   const statusText = property.status ? STATUS_LABEL[property.status] : null
   const shareTags = getShareTags(property)
+  const cardTags = getCardTags(property)
 
   return (
     <div
-      className="glass overflow-hidden rounded-2xl group flex flex-col"
+      className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden group flex flex-col hover:shadow-lg hover:border-[#FB923C]/30 transition-all property-card"
       style={property.is_featured
-        ? { boxShadow: '0 0 0 1.5px rgba(245,158,11,0.45), 0 0 28px rgba(245,158,11,0.08)' }
+        ? { border: '1.5px solid #FED7AA', boxShadow: '0 0 20px rgba(251,146,60,0.08)' }
         : {}}
     >
-      {/* ── Photo ── */}
-      <Link href={`/property/${property.id}`} className="block relative h-52 overflow-hidden bg-[#12121A] shrink-0">
+      {/* Photo */}
+      <Link href={`/property/${property.id}`} className="block relative h-52 overflow-hidden bg-[#F5F5F4] shrink-0">
         {photo ? (
           <img
             src={photo}
@@ -59,7 +61,7 @@ export default function PropertyCard({ property, userId }: { property: Property;
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="1.5">
               <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
               <polyline points="9,22 9,12 15,12 15,22"/>
             </svg>
@@ -67,76 +69,79 @@ export default function PropertyCard({ property, userId }: { property: Property;
         )}
 
         {/* Scrim */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#12121A]/65 via-[#12121A]/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
 
-        {/* Stacked badges — top-right */}
+        {/* Heart button */}
+        <div className="absolute top-3 left-3">
+          <HeartButton propertyId={property.id} userId={userId} initialSaved={savedIds?.has(property.id)} />
+        </div>
+
+        {/* Badges */}
         <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5">
           {property.is_featured && (
-            <span
-              className="text-[10px] font-800 tracking-wider px-2.5 py-1 rounded-full"
-              style={{
-                background: 'rgba(245,158,11,0.18)',
-                color: '#F59E0B',
-                border: '1px solid rgba(245,158,11,0.45)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-              }}
-            >
+            <span className="text-[10px] font-800 tracking-wider px-2.5 py-1 rounded-full bg-[#FB923C] text-white">
               ⭐ FEATURED
             </span>
           )}
           {property.rera_number && (
-            <span
-              className="text-[10px] font-700 px-2.5 py-1 rounded-full"
-              style={{
-                background: 'rgba(16,185,129,0.14)',
-                color: '#10B981',
-                border: '1px solid rgba(16,185,129,0.35)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-              }}
-            >
+            <span className="text-[10px] font-700 px-2.5 py-1 rounded-full bg-white/90 text-[#22C55E] border border-green-100">
               ✓ RERA
             </span>
           )}
         </div>
       </Link>
 
-      {/* ── Content ── */}
+      {/* Content */}
       <div className="p-4 flex flex-col flex-1 gap-0">
 
         {/* Title */}
         <Link href={`/property/${property.id}`}>
-          <h3 className="font-heading font-800 text-base leading-snug line-clamp-1 mb-1 transition-colors"
-            style={{ color: '#F1F0FF' }}
-            onMouseEnter={e => ((e.target as HTMLElement).style.color = '#A78BFA')}
-            onMouseLeave={e => ((e.target as HTMLElement).style.color = '#F1F0FF')}>
+          <h3 className="font-heading font-700 text-base leading-snug line-clamp-1 mb-1 text-[#111827] hover:text-[#FB923C] transition-colors">
             {property.title}
           </h3>
         </Link>
 
         {/* Location */}
         {location && (
-          <p className="text-xs mb-3 flex items-center gap-1 truncate" style={{ color: '#8B8BA8' }}>
+          <p className="text-xs mb-3 flex items-center gap-1 truncate text-[#6B7280]">
             <span className="shrink-0">📍</span>
             <span className="truncate">{location}</span>
           </p>
         )}
 
         {/* Price */}
-        <p className="font-heading font-800 text-lg mb-0.5 leading-tight" style={{ color: '#A78BFA' }}>
+        <p className="font-heading font-800 text-lg mb-0.5 leading-tight text-[#111827]">
           {price}
         </p>
 
         {/* BHK */}
         {bhkStr && (
-          <p className="text-xs mb-3" style={{ color: '#8B8BA8' }}>{bhkStr}</p>
+          <p className="text-xs mb-2 text-[#6B7280]">{bhkStr}</p>
         )}
 
-        {/* Status + amenity emojis */}
+        {/* Hashtag chips */}
+        {cardTags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {cardTags.map(tag => (
+              <a
+                key={tag}
+                href={`/properties?tag=${encodeURIComponent(tag.replace('#', ''))}`}
+                onClick={e => e.stopPropagation()}
+                className="text-[10px] font-600 px-2 py-0.5 rounded-full transition-all bg-orange-50 text-orange-600 border border-orange-100 hover:border-orange-300"
+              >
+                {tag}
+              </a>
+            ))}
+          </div>
+        )}
+
+        {/* Status + amenities */}
         <div className="flex items-center justify-between mt-auto pt-3 mb-3">
-          <span className="text-[11px]" style={{ color: '#4A4A6A' }}>
-            {statusText || ''}
+          <span className="text-[11px] text-[#22C55E] font-medium">
+            {statusText === 'Ready to Move' ? statusText : ''}
+          </span>
+          <span className="text-[11px] text-[#F59E0B] font-medium">
+            {statusText && statusText !== 'Ready to Move' ? statusText : ''}
           </span>
           {property.amenities && property.amenities.length > 0 && (
             <div className="flex items-center gap-1">
@@ -155,12 +160,7 @@ export default function PropertyCard({ property, userId }: { property: Property;
         <div className="flex gap-2">
           <Link
             href={`/property/${property.id}`}
-            className="flex-1 text-center py-2 rounded-xl text-xs font-700 transition-all"
-            style={{
-              background: 'rgba(124,58,237,0.1)',
-              border: '1px solid rgba(124,58,237,0.25)',
-              color: '#A78BFA',
-            }}
+            className="flex-1 text-center py-2 rounded-xl text-xs font-700 transition-all bg-[#FB923C] hover:bg-[#F59E0B] text-white"
           >
             Site Visit
           </Link>

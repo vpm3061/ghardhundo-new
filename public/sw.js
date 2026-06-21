@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ghardhundo-v1'
+const CACHE_NAME = 'orenzaa-v1'
 const STATIC_ASSETS = ['/', '/properties', '/manifest.json']
 
 self.addEventListener('install', event => {

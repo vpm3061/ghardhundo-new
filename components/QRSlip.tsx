@@ -15,7 +15,7 @@ export default function QRSlip({ leadId, buyerName, buyerPhone, propertyTitle, v
 
   const handlePrint = () => window.print()
 
-  const qrValue = `GharDhundo Lead: ${leadId} | ${buyerName} | ${propertyTitle} | ${visitDate}`
+  const qrValue = `Orenzaa Lead: ${leadId} | ${buyerName} | ${propertyTitle} | ${visitDate}`
 
   return (
     <div>
@@ -27,7 +27,7 @@ export default function QRSlip({ leadId, buyerName, buyerPhone, propertyTitle, v
         {/* Header */}
         <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
           <div>
-            <h2 className="font-heading font-800 text-xl text-black">GharDhundo</h2>
+            <h2 className="font-heading font-800 text-xl text-black">Orenzaa</h2>
             <p className="text-gray-500 text-xs">Channel Partner Slip</p>
           </div>
           <div className="text-right">
@@ -67,7 +67,7 @@ export default function QRSlip({ leadId, buyerName, buyerPhone, propertyTitle, v
           </div>
           <div className="flex justify-between">
             <span className="text-gray-500">CP Name</span>
-            <span className="font-600">GharDhundo</span>
+            <span className="font-600">Orenzaa</span>
           </div>
         </div>
 

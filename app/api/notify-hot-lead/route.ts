@@ -23,7 +23,7 @@ function buildMessage(lead: {
     `Property Interest: ${propertyTitle}`,
     `Time: ${IST}`,
     '',
-    `Open Dashboard: https://ghardhundo.com/admin/leads/${lead.id}`,
+    `Open Dashboard: https://orenzaa.com/admin/leads/${lead.id}`,
   ].join('\n')
 }
 

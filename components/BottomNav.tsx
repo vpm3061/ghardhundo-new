@@ -57,7 +57,7 @@ export default function BottomNav() {
           background: 'rgba(18,18,26,0.92)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          border: '1px solid rgba(0,0,0,0.06)',
           boxShadow: '0 -8px 32px rgba(0,0,0,0.4)',
         }}
       >
@@ -68,23 +68,23 @@ export default function BottomNav() {
               return (
                 <Link key={tab.href} href={tab.href} className="flex-1 flex flex-col items-center py-3 gap-0.5">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ background: 'linear-gradient(135deg, #7C3AED, #6D28D9)', boxShadow: '0 4px 12px rgba(124,58,237,0.4)' }}>
+                    style={{ background: 'linear-gradient(135deg, #FB923C, #F59E0B)', boxShadow: '0 4px 12px rgba(251,146,60,0.35)' }}>
                     <span className="text-white">{tab.icon(true)}</span>
                   </div>
-                  <span className="text-[10px] font-600 text-[#8B8BA8] mt-0.5">{tab.label}</span>
+                  <span className="text-[10px] font-600 text-[#6B7280] mt-0.5">{tab.label}</span>
                 </Link>
               )
             }
             return (
               <Link key={tab.href} href={tab.href} className="flex-1 flex flex-col items-center py-3.5 gap-1 relative">
-                <span className={active ? 'text-[#A78BFA]' : 'text-[#4A4A6A]'}>
+                <span className={active ? 'text-[#FB923C]' : 'text-[#9CA3AF]'}>
                   {tab.icon(active)}
                 </span>
-                <span className={`text-[10px] font-600 transition-colors ${active ? 'text-[#A78BFA]' : 'text-[#4A4A6A]'}`}>
+                <span className={`text-[10px] font-600 transition-colors ${active ? 'text-[#FB923C]' : 'text-[#9CA3AF]'}`}>
                   {tab.label}
                 </span>
                 {active && (
-                  <span className="absolute top-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#7C3AED]" />
+                  <span className="absolute top-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#FB923C]" />
                 )}
               </Link>
             )

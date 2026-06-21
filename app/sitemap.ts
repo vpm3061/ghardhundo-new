@@ -1,29 +1,37 @@
-import type { MetadataRoute } from 'next'
 import { createClient } from '@supabase/supabase-js'
+import type { MetadataRoute } from 'next'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-
-  const { data: properties } = await supabase
-    .from('properties')
-    .select('id, created_at')
-    .eq('is_active', true)
-    .order('created_at', { ascending: false })
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'https://orenzaa.com'
 
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: 'https://ghardhundo.com', lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
-    { url: 'https://ghardhundo.com/properties', lastModified: new Date(), changeFrequency: 'hourly', priority: 0.9 },
+    { url: origin,                  lastModified: new Date(), changeFrequency: 'daily',   priority: 1   },
+    { url: `${origin}/properties`,  lastModified: new Date(), changeFrequency: 'daily',   priority: 0.9 },
+    { url: `${origin}/pricing`,     lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${origin}/ai`,          lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
   ]
 
-  const propertyRoutes: MetadataRoute.Sitemap = (properties || []).map(p => ({
-    url: `https://ghardhundo.com/property/${p.id}`,
-    lastModified: new Date(p.created_at),
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }))
+  try {
+    const url  = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const key  = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    if (!url || !key) return staticRoutes
 
-  return [...staticRoutes, ...propertyRoutes]
+    const supabase = createClient(url, key)
+    const { data: properties } = await supabase
+      .from('properties')
+      .select('id, updated_at')
+      .eq('is_active', true)
+      .order('updated_at', { ascending: false })
+
+    const propertyUrls: MetadataRoute.Sitemap = (properties || []).map(p => ({
+      url: `${origin}/property/${p.id}`,
+      lastModified: new Date(p.updated_at || Date.now()),
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    }))
+
+    return [...staticRoutes, ...propertyUrls]
+  } catch {
+    return staticRoutes
+  }
 }

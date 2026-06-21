@@ -16,9 +16,9 @@ const TABS = [
   },
   {
     href: '/properties',
-    label: 'Search',
+    label: 'Properties',
     exact: false,
-    icon: (active: boolean) => (
+    icon: (_active: boolean) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="11" cy="11" r="8"/>
         <line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -26,13 +26,23 @@ const TABS = [
     ),
   },
   {
-    href: '/ai',
-    label: 'AI Match',
+    href: '/share-earn',
+    label: '✨ Earn',
     exact: false,
     isPrimary: true,
     icon: (_active: boolean) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
+      </svg>
+    ),
+  },
+  {
+    href: '/list',
+    label: 'List',
+    exact: false,
+    icon: (active: boolean) => (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 5v14M5 12h14"/>
       </svg>
     ),
   },
@@ -54,62 +64,51 @@ export default function MobileNav() {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#E5E7EB]"
       style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}
       suppressHydrationWarning
     >
-      <div
-        className="mx-3 mb-2 rounded-2xl overflow-hidden"
-        style={{
-          background: 'rgba(18,18,26,0.94)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 -4px 32px rgba(0,0,0,0.45), 0 0 0 0.5px rgba(255,255,255,0.04)',
-        }}
-      >
-        <div className="flex items-center">
-          {TABS.map(tab => {
-            const active = tab.exact ? pathname === tab.href : pathname.startsWith(tab.href)
+      <div className="flex items-center">
+        {TABS.map(tab => {
+          const active = tab.exact ? pathname === tab.href : pathname.startsWith(tab.href)
 
-            if (tab.isPrimary) {
-              return (
-                <Link key={tab.href} href={tab.href} className="flex-1 flex flex-col items-center py-2.5 gap-1">
-                  <div
-                    className="w-11 h-11 rounded-2xl flex items-center justify-center"
-                    style={{
-                      background: 'linear-gradient(135deg, #7C3AED, #6D28D9)',
-                      boxShadow: '0 4px 16px rgba(124,58,237,0.45)',
-                    }}
-                  >
-                    <span className="text-white">{tab.icon(true)}</span>
-                  </div>
-                  <span className="text-[10px] font-600" style={{ color: '#8B8BA8' }}>{tab.label}</span>
-                </Link>
-              )
-            }
-
+          if (tab.isPrimary) {
             return (
-              <Link key={tab.href} href={tab.href} className="flex-1 flex flex-col items-center py-3 gap-1 relative">
-                {active && (
-                  <span
-                    className="absolute top-1.5 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
-                    style={{ background: '#7C3AED', boxShadow: '0 0 6px rgba(124,58,237,0.6)' }}
-                  />
-                )}
-                <span style={{ color: active ? '#A78BFA' : '#4A4A6A' }}>
-                  {tab.icon(active)}
-                </span>
-                <span
-                  className="text-[10px] font-600 transition-colors"
-                  style={{ color: active ? '#A78BFA' : '#4A4A6A' }}
+              <Link key={tab.href} href={tab.href} className="flex-1 flex flex-col items-center py-2.5 gap-1">
+                <div
+                  className="w-11 h-11 rounded-2xl flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, #FB923C, #F59E0B)',
+                    boxShadow: '0 4px 16px rgba(251,146,60,0.35)',
+                  }}
                 >
-                  {tab.label}
-                </span>
+                  <span className="text-white">{tab.icon(true)}</span>
+                </div>
+                <span className="text-[10px] font-600" style={{ color: '#FB923C' }}>{tab.label}</span>
               </Link>
             )
-          })}
-        </div>
+          }
+
+          return (
+            <Link key={tab.href} href={tab.href} className="flex-1 flex flex-col items-center py-3 gap-1 relative">
+              {active && (
+                <span
+                  className="absolute top-1.5 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
+                  style={{ background: '#FB923C' }}
+                />
+              )}
+              <span style={{ color: active ? '#FB923C' : '#9CA3AF' }}>
+                {tab.icon(active)}
+              </span>
+              <span
+                className="text-[10px] font-600 transition-colors"
+                style={{ color: active ? '#FB923C' : '#9CA3AF' }}
+              >
+                {tab.label}
+              </span>
+            </Link>
+          )
+        })}
       </div>
     </nav>
   )

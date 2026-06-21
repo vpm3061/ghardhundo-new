@@ -13,7 +13,7 @@ export default async function ShareLinkPage({
 
   if (ref) {
     const cookieStore = await cookies()
-    cookieStore.set('ghardhundo_ref', ref, {
+    cookieStore.set('orenzaa_ref', ref, {
       maxAge: 60 * 60 * 24,
       path: '/',
       httpOnly: false,

@@ -7,10 +7,10 @@ const STATUS_OPTIONS = ['New', 'Called', 'Visit Fixed', 'Deal Done', 'Not Intere
 type LeadStatus = typeof STATUS_OPTIONS[number]
 
 const STATUS_STYLES: Record<LeadStatus, { bg: string; color: string; border: string }> = {
-  'New':            { bg: 'rgba(255,255,255,0.04)', color: '#8B8BA8', border: 'rgba(255,255,255,0.08)' },
+  'New':            { bg: 'rgba(0,0,0,0.03)', color: '#6B7280', border: 'rgba(0,0,0,0.06)' },
   'Called':         { bg: 'rgba(59,130,246,0.1)',   color: '#3B82F6', border: 'rgba(59,130,246,0.3)'   },
-  'Visit Fixed':    { bg: 'rgba(124,58,237,0.1)',   color: '#A78BFA', border: 'rgba(124,58,237,0.3)'   },
-  'Deal Done':      { bg: 'rgba(16,185,129,0.1)',   color: '#10B981', border: 'rgba(16,185,129,0.3)'   },
+  'Visit Fixed':    { bg: 'rgba(251,146,60,0.08)',   color: '#FB923C', border: 'rgba(251,146,60,0.25)'   },
+  'Deal Done':      { bg: 'rgba(16,185,129,0.1)',   color: '#22C55E', border: 'rgba(16,185,129,0.3)'   },
   'Not Interested': { bg: 'rgba(239,68,68,0.08)',   color: '#EF4444', border: 'rgba(239,68,68,0.25)'   },
 }
 
@@ -29,7 +29,7 @@ export default function LeadDetailClient({ leadId, currentStatus }: { leadId: st
 
   return (
     <div>
-      <div className="text-xs text-[#8B8BA8] mb-3 font-600 uppercase tracking-wider">Update Status</div>
+      <div className="text-xs text-[#6B7280] mb-3 font-600 uppercase tracking-wider">Update Status</div>
       <div className="flex flex-wrap gap-2">
         {STATUS_OPTIONS.map(s => {
           const ss = STATUS_STYLES[s]
@@ -39,8 +39,8 @@ export default function LeadDetailClient({ leadId, currentStatus }: { leadId: st
               className="text-xs px-3.5 py-1.5 rounded-full font-600 border transition-all disabled:opacity-40"
               style={{
                 background: active ? ss.bg : 'transparent',
-                color: active ? ss.color : '#4A4A6A',
-                borderColor: active ? ss.border : 'rgba(255,255,255,0.06)',
+                color: active ? ss.color : '#9CA3AF',
+                borderColor: active ? ss.border : 'rgba(0,0,0,0.05)',
               }}>
               {active && '✓ '}{s}
             </button>

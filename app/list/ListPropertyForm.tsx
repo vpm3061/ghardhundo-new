@@ -22,7 +22,7 @@ const EMPTY: FormState = {
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <div className="glass p-5">
-    <p className="text-xs font-700 uppercase tracking-wider mb-4" style={{ color: '#A78BFA' }}>{title}</p>
+    <p className="text-xs font-700 uppercase tracking-wider mb-4" style={{ color: '#FB923C' }}>{title}</p>
     {children}
   </div>
 )
@@ -63,13 +63,13 @@ export default function ListPropertyForm({ userId }: { userId: string }) {
     return (
       <div className="glass p-10 text-center">
         <div className="text-6xl mb-5">🎉</div>
-        <h2 className="font-heading text-2xl font-800 text-[#F1F0FF] mb-2">Property Submitted!</h2>
-        <p className="text-[#8B8BA8] text-sm mb-5">Our team will review and publish it within 24 hours.</p>
+        <h2 className="font-heading text-2xl font-800 text-[#111827] mb-2">Property Submitted!</h2>
+        <p className="text-[#6B7280] text-sm mb-5">Our team will review and publish it within 24 hours.</p>
         <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full"
-          style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.3)' }}>
+          style={{ background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.25)' }}>
           <span>🪙</span>
-          <span className="font-heading font-800 text-lg" style={{ color: '#A78BFA' }}>+50 coins</span>
-          <span className="text-[#8B8BA8] text-sm">credited to your account</span>
+          <span className="font-heading font-800 text-lg" style={{ color: '#FB923C' }}>+50 coins</span>
+          <span className="text-[#6B7280] text-sm">credited to your account</span>
         </div>
       </div>
     )
@@ -110,7 +110,7 @@ export default function ListPropertyForm({ userId }: { userId: string }) {
           {BHK_OPTIONS.map(b => (
             <button key={b} type="button" suppressHydrationWarning onClick={() => toggle('bhk', b)}
               className="px-4 py-2 rounded-full text-sm font-700 border transition-all"
-              style={form.bhk.includes(b) ? { background: 'rgba(124,58,237,0.2)', color: '#A78BFA', borderColor: 'rgba(124,58,237,0.5)' } : { background: 'transparent', color: '#8B8BA8', borderColor: 'rgba(255,255,255,0.06)' }}>
+              style={form.bhk.includes(b) ? { background: 'rgba(251,146,60,0.15)', color: '#FB923C', borderColor: 'rgba(124,58,237,0.5)' } : { background: 'transparent', color: '#6B7280', borderColor: 'rgba(0,0,0,0.05)' }}>
               {b} BHK
             </button>
           ))}
@@ -120,11 +120,11 @@ export default function ListPropertyForm({ userId }: { userId: string }) {
       <Section title="Pricing">
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="text-xs text-[#4A4A6A] mb-1.5 block">Min Price (₹)</label>
+            <label className="text-xs text-[#9CA3AF] mb-1.5 block">Min Price (₹)</label>
             <input className="input-dark text-sm" type="number" placeholder="e.g. 4500000" value={form.price_min} onChange={e => set('price_min', e.target.value)} suppressHydrationWarning />
           </div>
           <div>
-            <label className="text-xs text-[#4A4A6A] mb-1.5 block">Max Price (₹)</label>
+            <label className="text-xs text-[#9CA3AF] mb-1.5 block">Max Price (₹)</label>
             <input className="input-dark text-sm" type="number" placeholder="e.g. 8500000" value={form.price_max} onChange={e => set('price_max', e.target.value)} suppressHydrationWarning />
           </div>
         </div>
@@ -138,8 +138,8 @@ export default function ListPropertyForm({ userId }: { userId: string }) {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {AMENITY_OPTIONS.map(a => (
             <label key={a} className="flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer transition-all text-sm"
-              style={form.amenities.includes(a) ? { background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.3)', color: '#F1F0FF' } : { border: '1px solid rgba(255,255,255,0.06)', color: '#8B8BA8' }}>
-              <input type="checkbox" className="w-3.5 h-3.5 shrink-0" checked={form.amenities.includes(a)} onChange={() => toggle('amenities', a)} style={{ accentColor: '#7C3AED' }} suppressHydrationWarning />
+              style={form.amenities.includes(a) ? { background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.25)', color: '#111827' } : { border: '1px solid rgba(0,0,0,0.05)', color: '#6B7280' }}>
+              <input type="checkbox" className="w-3.5 h-3.5 shrink-0" checked={form.amenities.includes(a)} onChange={() => toggle('amenities', a)} style={{ accentColor: '#FB923C' }} suppressHydrationWarning />
               <span className="leading-tight">{a}</span>
             </label>
           ))}
@@ -154,13 +154,13 @@ export default function ListPropertyForm({ userId }: { userId: string }) {
               {form.photos.length > 1 && (
                 <button type="button" onClick={() => set('photos', form.photos.filter((_, idx) => idx !== i))} suppressHydrationWarning
                   className="w-9 h-9 shrink-0 rounded-xl flex items-center justify-center transition-all"
-                  style={{ border: '1px solid rgba(255,255,255,0.06)', color: '#4A4A6A' }}>✕</button>
+                  style={{ border: '1px solid rgba(0,0,0,0.05)', color: '#9CA3AF' }}>✕</button>
               )}
             </div>
           ))}
           <button type="button" onClick={() => set('photos', [...form.photos, ''])} suppressHydrationWarning
             className="text-sm py-2.5 rounded-xl transition-all"
-            style={{ border: '1px dashed rgba(255,255,255,0.1)', color: '#8B8BA8' }}>
+            style={{ border: '1px dashed rgba(255,255,255,0.1)', color: '#6B7280' }}>
             + Add photo
           </button>
         </div>

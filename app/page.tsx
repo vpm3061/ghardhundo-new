@@ -1,5 +1,6 @@
-﻿import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import MobileNav from '@/components/MobileNav'
 import PropertyCard from '@/components/PropertyCard'
@@ -27,115 +28,232 @@ export default async function HomePage() {
       {profile && !profile.phone && <PhoneModal userId={user.id} />}
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-28 md:pb-12">
-        {/* Hero */}
-        <section className="relative mb-14 pt-6">
-          {/* Background orbs */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-            <div className="absolute top-0 left-0 w-96 h-96 rounded-full opacity-25"
-              style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.4) 0%, transparent 70%)', filter: 'blur(60px)', animation: 'float-orb 12s ease-in-out infinite' }} />
-            <div className="absolute top-20 right-0 w-72 h-72 rounded-full opacity-15"
-              style={{ background: 'radial-gradient(circle, rgba(109,40,217,0.5) 0%, transparent 70%)', filter: 'blur(80px)', animation: 'float-orb 15s ease-in-out infinite 3s' }} />
+      {/* Hero */}
+      <section className="bg-white pt-20 pb-16 px-6">
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 bg-orange-50 border border-orange-200 rounded-full px-4 py-1.5 text-sm text-orange-600 font-medium mb-8">
+            <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
+            AI-Powered Property Platform
           </div>
-
-          <div className="mb-4">
-            <span className="inline-flex items-center gap-2 text-xs font-700 tracking-wider uppercase px-3 py-1.5 rounded-full"
-              style={{ background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.25)', color: '#A78BFA' }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#A78BFA] animate-pulse" />
-              AI-Powered Property Search
-            </span>
-          </div>
-
-          <h1 className="font-heading text-5xl sm:text-6xl font-800 leading-[1.1] mb-4 text-[#F1F0FF]">
-            Find your dream<br />
-            <span style={{ background: 'linear-gradient(135deg, #A78BFA, #7C3AED)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              home faster
-            </span>
+          <h1 className="text-5xl md:text-7xl font-heading font-800 text-[#111827] leading-tight mb-6">
+            Find Where<br />
+            <span className="text-[#FB923C]">Life Belongs.</span>
           </h1>
-          <p className="text-[#8B8BA8] text-base max-w-lg leading-relaxed">
-            Our AI matches you with verified properties based on your preferences, budget, and timeline. 500+ listings. 4 cities.
+          <p className="text-xl text-[#6B7280] max-w-2xl mx-auto mb-10 leading-relaxed">
+            Discover homes, plots, apartments, and investment opportunities with confidence. AI-matched. RERA verified. Zero pressure.
           </p>
-        </section>
-
-        {/* Two-col */}
-        <div className="grid lg:grid-cols-5 gap-8 mb-16">
-          <div className="lg:col-span-2">
-            <AIQuestionnaire userId={user.id} />
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/properties" className="px-8 py-4 bg-[#FB923C] hover:bg-[#F59E0B] text-white font-semibold rounded-xl transition-all shadow-lg shadow-orange-200">
+              Explore Properties →
+            </Link>
+            <Link href="/list" className="px-8 py-4 bg-white border border-[#E5E7EB] hover:border-[#FB923C] text-[#374151] font-semibold rounded-xl transition-all">
+              List Your Property
+            </Link>
           </div>
+        </div>
+      </section>
 
-          <div className="lg:col-span-3 grid grid-cols-2 sm:grid-cols-3 gap-4 content-start">
+      {/* Search bar */}
+      <section className="bg-[#FAFAF9] py-10 px-6 border-y border-[#E5E7EB]">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-2 flex gap-2 flex-wrap md:flex-nowrap">
+            <select className="flex-1 px-4 py-3 text-[#374151] bg-transparent border-r border-[#E5E7EB] outline-none text-sm min-w-0">
+              <option>All Cities</option>
+              <option>Lucknow</option>
+              <option>Noida</option>
+              <option>Greater Noida</option>
+              <option>Ayodhya</option>
+            </select>
+            <select className="flex-1 px-4 py-3 text-[#374151] bg-transparent border-r border-[#E5E7EB] outline-none text-sm min-w-0">
+              <option>Any BHK</option>
+              <option>1 BHK</option>
+              <option>2 BHK</option>
+              <option>3 BHK</option>
+              <option>4+ BHK</option>
+            </select>
+            <select className="flex-1 px-4 py-3 text-[#374151] bg-transparent border-r border-[#E5E7EB] outline-none text-sm min-w-0">
+              <option>Any Budget</option>
+              <option>Under ₹40L</option>
+              <option>₹40L – ₹60L</option>
+              <option>₹60L – ₹1Cr</option>
+              <option>₹1Cr+</option>
+            </select>
+            <Link href="/properties" className="px-6 py-3 bg-[#FB923C] hover:bg-[#F59E0B] text-white font-semibold rounded-xl transition-all whitespace-nowrap">
+              Search Properties
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="bg-white py-16 px-6">
+        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          {[
+            { num: '500+', label: 'RERA Verified Properties' },
+            { num: '2,000+', label: 'Happy Buyers' },
+            { num: '50+', label: 'Trusted Builders' },
+            { num: '₹0', label: 'Buyer Fee' },
+          ].map(stat => (
+            <div key={stat.label}>
+              <p className="text-4xl font-heading font-800 text-[#111827]">{stat.num}</p>
+              <p className="text-sm text-[#6B7280] mt-1">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* AI Questionnaire */}
+      <section className="bg-[#FAFAF9] py-12 px-6 border-y border-[#E5E7EB]">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-8">
+            <p className="text-sm font-medium text-[#FB923C] mb-2">AI Property Match</p>
+            <h2 className="text-3xl font-heading font-800 text-[#111827]">Find Your Perfect Home</h2>
+            <p className="text-[#6B7280] mt-2 text-sm">Answer 5 questions. Get matched instantly.</p>
+          </div>
+          <AIQuestionnaire userId={user.id} />
+        </div>
+      </section>
+
+      {/* Featured Properties */}
+      <section className="bg-white py-16 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <p className="text-sm font-medium text-[#FB923C] mb-2">Featured Listings</p>
+              <h2 className="text-3xl font-heading font-800 text-[#111827]">Handpicked for You</h2>
+            </div>
+            <Link href="/properties" className="text-sm text-[#FB923C] font-medium hover:underline">View all →</Link>
+          </div>
+          {properties && properties.length > 0 ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {(properties as Property[]).map(p => <PropertyCard key={p.id} property={p} userId={user.id} />)}
+            </div>
+          ) : (
+            <div className="text-center py-20 bg-[#FAFAF9] rounded-2xl border border-[#E5E7EB]">
+              <div className="text-5xl mb-4">🏗️</div>
+              <h3 className="font-heading text-xl font-700 mb-2 text-[#111827]">Properties Coming Soon</h3>
+              <p className="text-[#6B7280] text-sm">We're adding new properties daily. Check back soon!</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="bg-[#FAFAF9] py-16 px-6 border-y border-[#E5E7EB]">
+        <div className="max-w-5xl mx-auto text-center mb-12">
+          <h2 className="text-3xl font-heading font-800 text-[#111827]">How Orenzaa Works</h2>
+          <p className="text-[#6B7280] mt-3">Simple. Transparent. Smart.</p>
+        </div>
+        <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-8">
+          {[
+            { step: '01', icon: '🤖', title: 'AI Match', desc: 'Answer 5 questions. Get your property match score instantly.' },
+            { step: '02', icon: '🏠', title: 'Site Visit', desc: 'Book a free site visit. We arrange everything for you.' },
+            { step: '03', icon: '✅', title: 'Move In', desc: 'RERA verified purchase. Plus 2 years after-sale support.' },
+          ].map(item => (
+            <div key={item.step} className="bg-white border border-[#E5E7EB] rounded-2xl p-8 hover:border-[#FB923C] hover:shadow-lg transition-all">
+              <p className="text-xs font-bold text-[#FB923C] mb-4">{item.step}</p>
+              <p className="text-3xl mb-4">{item.icon}</p>
+              <h3 className="font-heading font-700 text-[#111827] text-lg mb-2">{item.title}</h3>
+              <p className="text-sm text-[#6B7280] leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="bg-white py-16 px-6">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-heading font-800 text-[#111827] text-center mb-12">What Our Buyers Say</h2>
+          <div className="grid md:grid-cols-3 gap-6">
             {[
-              { label: 'Properties', value: '500+', icon: '🏢', color: 'rgba(124,58,237,0.15)', border: 'rgba(124,58,237,0.25)' },
-              { label: 'Happy Buyers', value: '1,200+', icon: '🎉', color: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.2)' },
-              { label: 'Cities', value: '4', icon: '🗺️', color: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.2)' },
-              { label: 'AI Match Rate', value: '92%', icon: '🤖', color: 'rgba(124,58,237,0.15)', border: 'rgba(124,58,237,0.25)' },
-              { label: 'RERA Verified', value: '100%', icon: '✅', color: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.2)' },
-              { label: 'Response Time', value: '< 2hrs', icon: '⚡', color: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.2)' },
-            ].map(s => (
-              <div key={s.label} className="glass p-4 hover:scale-[1.02] transition-transform">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3 text-lg"
-                  style={{ background: s.color, border: `1px solid ${s.border}` }}>
-                  {s.icon}
+              { name: 'Rahul S.', city: 'Lucknow', text: 'Found my dream 3BHK in 2 weeks. The AI matching was spot on.', rating: 5 },
+              { name: 'Priya M.', city: 'Noida', text: 'Zero pressure. The team guided me through the entire process.', rating: 5 },
+              { name: 'Amit K.', city: 'Ayodhya', text: 'RERA verified listing gave me confidence. Great experience!', rating: 5 },
+            ].map(t => (
+              <div key={t.name} className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm">
+                <div className="flex gap-0.5 mb-4">{'⭐'.repeat(t.rating)}</div>
+                <p className="text-[#374151] text-sm leading-relaxed mb-4">&ldquo;{t.text}&rdquo;</p>
+                <div>
+                  <p className="font-semibold text-[#111827] text-sm">{t.name}</p>
+                  <p className="text-xs text-[#9CA3AF]">{t.city}</p>
                 </div>
-                <div className="font-heading text-xl font-800 text-[#F1F0FF]">{s.value}</div>
-                <div className="text-[#8B8BA8] text-xs mt-0.5">{s.label}</div>
               </div>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Featured Properties */}
-        {properties && properties.length > 0 && (
-          <section>
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="font-heading text-2xl font-800 text-[#F1F0FF]">Featured Properties</h2>
-                <p className="text-[#8B8BA8] text-xs mt-0.5">Curated picks from top builders</p>
-              </div>
-              <a href="/properties"
-                className="text-sm font-600 px-4 py-2 rounded-full transition-all"
-                style={{ color: '#A78BFA', background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)' }}>
-                View all →
-              </a>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {(properties as Property[]).map(p => <PropertyCard key={p.id} property={p} />)}
-            </div>
-          </section>
-        )}
-
-        {(!properties || properties.length === 0) && (
-          <div className="text-center py-20 glass">
-            <div className="text-5xl mb-4">🏗️</div>
-            <h3 className="font-heading text-xl font-700 mb-2 text-[#F1F0FF]">Properties Coming Soon</h3>
-            <p className="text-[#8B8BA8] text-sm">We're adding new properties daily. Check back soon!</p>
-          </div>
-        )}
-
-        {/* Pricing teaser */}
-        <section className="mt-14">
-          <div className="relative overflow-hidden rounded-2xl px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-6"
-            style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.12), rgba(109,40,217,0.06))', border: '1px solid rgba(124,58,237,0.25)' }}>
-            <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full pointer-events-none"
-              style={{ background: '#7C3AED', filter: 'blur(70px)', opacity: 0.08 }} />
+      {/* Pricing teaser */}
+      <section className="bg-[#FAFAF9] py-16 px-6 border-t border-[#E5E7EB]">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
             <div>
-              <div className="text-xs font-700 uppercase tracking-wider mb-2" style={{ color: '#A78BFA' }}>
+              <div className="text-xs font-700 uppercase tracking-wider mb-2 text-[#FB923C]">
                 For Dealers & Brokers
               </div>
-              <h3 className="font-heading text-2xl font-800 mb-1" style={{ color: '#F1F0FF' }}>
-                Get AI-scored buyer leads from <span style={{ color: '#A78BFA' }}>₹299</span>
+              <h3 className="font-heading text-2xl font-800 mb-1 text-[#111827]">
+                Get AI-scored buyer leads from <span className="text-[#FB923C]">₹299</span>
               </h3>
-              <p className="text-sm" style={{ color: '#8B8BA8' }}>
+              <p className="text-sm text-[#6B7280]">
                 COLD · WARM · HOT — pay only for leads you want. Monthly plans from ₹2,999.
               </p>
             </div>
-            <a href="/pricing"
-              className="shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-xl font-700 text-sm transition-all btn-accent whitespace-nowrap">
+            <Link href="/pricing"
+              className="shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-xl font-700 text-sm transition-all bg-[#FB923C] hover:bg-[#F59E0B] text-white whitespace-nowrap">
               💎 See Pricing →
-            </a>
+            </Link>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-[#111827] text-white py-16 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-10 mb-12">
+            <div>
+              <p className="font-heading font-800 text-xl mb-3">ORENZ<span className="text-[#FB923C]">AA</span></p>
+              <p className="text-gray-400 text-sm leading-relaxed">Premium PropTech platform for home buyers, builders, agents and investors.</p>
+            </div>
+            <div>
+              <p className="font-semibold text-sm mb-4">Platform</p>
+              <div className="space-y-2">
+                {[
+                  { label: 'Properties', href: '/properties' },
+                  { label: 'Pricing', href: '/pricing' },
+                  { label: 'Share & Earn', href: '/share-earn' },
+                  { label: 'List Property', href: '/list' },
+                  { label: 'Find Buyers', href: '/find-buyers' },
+                ].map(l => (
+                  <Link key={l.href} href={l.href} className="block text-gray-400 text-sm hover:text-white transition-colors">{l.label}</Link>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="font-semibold text-sm mb-4">For Professionals</p>
+              <div className="space-y-2">
+                {[
+                  { label: 'Builder Dashboard', href: '/builder' },
+                  { label: 'Dealer Dashboard', href: '/dealer' },
+                  { label: 'Owner Listing', href: '/owner' },
+                  { label: 'Channel Partner', href: '/list' },
+                ].map(l => (
+                  <Link key={l.href} href={l.href} className="block text-gray-400 text-sm hover:text-white transition-colors">{l.label}</Link>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="font-semibold text-sm mb-4">Contact</p>
+              <p className="text-gray-400 text-sm">WhatsApp: +91 96436 93090</p>
+              <p className="text-gray-400 text-sm mt-1">hello@orenzaa.com</p>
+              <p className="text-gray-400 text-sm mt-4">RERA Verified Platform</p>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-gray-500 text-xs">© 2025 Orenzaa. All rights reserved.</p>
+            <p className="text-gray-500 text-xs">AI-Powered · RERA Verified · Zero Pressure</p>
+          </div>
+        </div>
+      </footer>
 
       <MobileNav />
     </>

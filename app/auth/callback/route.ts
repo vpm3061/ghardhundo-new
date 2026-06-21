@@ -11,9 +11,16 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
       const { data: { user } } = await supabase.auth.getUser()
-      if (user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
+      const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'tellitorg1@gmail.com'
+      if (user?.email === adminEmail) {
         return NextResponse.redirect(`${origin}/admin`)
       }
+      // Role-based redirect
+      const { data: profile } = await supabase
+        .from('profiles').select('role').eq('id', user!.id).single()
+      if (profile?.role === 'builder') return NextResponse.redirect(`${origin}/builder`)
+      if (profile?.role === 'dealer')  return NextResponse.redirect(`${origin}/dealer`)
+      if (profile?.role === 'owner')   return NextResponse.redirect(`${origin}/owner`)
       return NextResponse.redirect(`${origin}${next}`)
     }
   }

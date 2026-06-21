@@ -17,50 +17,31 @@ function LoginContent() {
   }
 
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center px-4 relative overflow-hidden">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full opacity-30"
-          style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%)', animation: 'float-orb 8s ease-in-out infinite', filter: 'blur(40px)' }} />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full opacity-20"
-          style={{ background: 'radial-gradient(circle, rgba(109,40,217,0.4) 0%, transparent 70%)', animation: 'float-orb 10s ease-in-out infinite 2s', filter: 'blur(60px)' }} />
-        <div className="absolute top-1/2 right-1/3 w-64 h-64 rounded-full opacity-15"
-          style={{ background: 'radial-gradient(circle, rgba(79,70,229,0.5) 0%, transparent 70%)', animation: 'float-orb 12s ease-in-out infinite 4s', filter: 'blur(50px)' }} />
-      </div>
-
-      <div className="relative w-full max-w-sm animate-fade-in-up">
+    <div className="min-h-dvh flex flex-col items-center justify-center px-4 bg-[#FAFAF9]">
+      <div className="w-full max-w-sm animate-fade-in-up">
         {/* Logo */}
         <div className="text-center mb-10">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #7C3AED, #6D28D9)', boxShadow: '0 0 32px rgba(124,58,237,0.5)' }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
-                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-              </svg>
-            </div>
-          </div>
-          <h1 className="font-heading text-4xl font-800 tracking-tight text-[#F1F0FF] mb-2">GharDhundo</h1>
-          <p className="text-[#8B8BA8] text-sm">AI-powered real estate for India</p>
+          <h1 className="font-heading text-4xl font-800 tracking-tight text-[#111827] mb-2">
+            ORENZ<span className="text-[#FB923C]">AA</span>
+          </h1>
+          <p className="text-[#6B7280] text-sm">Premium AI-powered property platform</p>
         </div>
 
         {/* Card */}
-        <div style={{ background: 'rgba(18,18,26,0.85)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '32px' }}>
-          <h2 className="font-heading text-xl font-800 mb-1 text-[#F1F0FF]">Welcome back</h2>
-          <p className="text-[#8B8BA8] text-sm mb-7">Sign in to continue your property search</p>
+        <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm p-8">
+          <h2 className="font-heading text-xl font-800 mb-1 text-[#111827]">Welcome back</h2>
+          <p className="text-[#6B7280] text-sm mb-7">Sign in to continue your property search</p>
 
           {error && (
-            <div className="mb-5 p-3 rounded-xl text-sm text-red-400"
-              style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+            <div className="mb-5 p-3 rounded-xl text-sm text-red-600 bg-red-50 border border-red-200">
               Authentication failed. Please try again.
             </div>
           )}
 
           <button
             onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 rounded-xl py-3.5 px-4 font-600 text-sm transition-all"
-            style={{ background: '#fff', color: '#0A0A0F', boxShadow: '0 2px 12px rgba(0,0,0,0.2)' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f5f5f5' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#fff' }}
+            className="w-full flex items-center justify-center gap-3 rounded-xl py-3.5 px-4 font-600 text-sm transition-all bg-white border border-[#E5E7EB] text-[#111827] hover:border-[#D1D5DB] hover:shadow-sm"
+            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -73,21 +54,21 @@ function LoginContent() {
 
           <div className="relative my-5">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/[0.06]" />
+              <div className="w-full border-t border-[#E5E7EB]" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-3 text-[#4A4A6A]" style={{ background: 'rgba(18,18,26,0.85)' }}>Secure sign-in</span>
+              <span className="px-3 text-[#9CA3AF] bg-white">Secure sign-in</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-xs text-[#4A4A6A]">
+          <div className="flex items-center gap-3 text-xs text-[#9CA3AF] flex-wrap">
             {['🔒 256-bit encryption', '✓ GDPR compliant', '🇮🇳 India-first'].map(t => (
               <span key={t}>{t}</span>
             ))}
           </div>
         </div>
 
-        <p className="text-center text-[#4A4A6A] text-xs mt-5">
+        <p className="text-center text-[#9CA3AF] text-xs mt-5">
           By continuing, you agree to our Terms of Service & Privacy Policy
         </p>
       </div>

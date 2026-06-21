@@ -21,13 +21,13 @@ export default async function AIMatchPage() {
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 pb-28 md:pb-12">
         <div className="mb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-700 tracking-wider uppercase mb-4"
-            style={{ background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.25)', color: '#A78BFA' }}>
+            style={{ background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.15)', color: '#FB923C' }}>
             AI Property Matching
           </div>
-          <h1 className="font-heading text-3xl font-800 text-[#F1F0FF] mb-2">
+          <h1 className="font-heading text-3xl font-800 text-[#111827] mb-2">
             Find your perfect home
           </h1>
-          <p className="text-[#8B8BA8] text-sm">
+          <p className="text-[#6B7280] text-sm">
             60 seconds · 5 questions · Personalised property matches
           </p>
         </div>

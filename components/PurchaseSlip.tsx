@@ -14,7 +14,7 @@ interface PurchaseSlipProps {
 export default function PurchaseSlip({
   leadId, buyerName, buyerPhone, propertyTitle, propertyCity, dealAmount, dealDate,
 }: PurchaseSlipProps) {
-  const refNumber = `GD-${leadId.slice(0, 6).toUpperCase()}-${new Date().getFullYear()}`
+  const refNumber = `ORZ-${leadId.slice(0, 6).toUpperCase()}-${new Date().getFullYear()}`
   const slipUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/admin/leads/${leadId}`
 
   const fmt = (n: number) =>
@@ -34,7 +34,7 @@ export default function PurchaseSlip({
         {/* Header */}
         <div className="flex items-center justify-between border-b-2 border-gray-900 pb-4 mb-4">
           <div>
-            <div className="font-bold text-xl text-[#0c0c0c]" style={{ fontFamily: 'Syne, sans-serif' }}>GharDhundo</div>
+            <div className="font-bold text-xl text-[#0c0c0c]" style={{ fontFamily: 'Syne, sans-serif' }}>Orenzaa</div>
             <div className="text-xs text-gray-500 mt-0.5">Deal Confirmation Slip</div>
           </div>
           <div className="text-right">
@@ -78,12 +78,12 @@ export default function PurchaseSlip({
         <div className="flex items-center gap-4 mt-4">
           <QRCode value={slipUrl} size={80} bgColor="white" fgColor="#0c0c0c" level="M" />
           <div className="text-xs text-gray-400 leading-relaxed">
-            Scan to verify this deal record on GharDhundo. Reference: <span className="font-mono font-bold text-gray-700">{refNumber}</span>
+            Scan to verify this deal record on Orenzaa. Reference: <span className="font-mono font-bold text-gray-700">{refNumber}</span>
           </div>
         </div>
 
         <div className="mt-5 pt-4 border-t border-gray-100 text-center text-[10px] text-gray-400">
-          This is a GharDhundo internal deal confirmation. Not a legal document of sale.
+          This is a Orenzaa internal deal confirmation. Not a legal document of sale.
         </div>
       </div>
 

@@ -25,22 +25,22 @@ export default function EMICalculator({ defaultAmount = 5000000 }: { defaultAmou
       onChange={e => onChange(+e.target.value)}
       className="w-full h-1.5 rounded-full cursor-pointer appearance-none"
       style={{
-        background: `linear-gradient(to right, #7C3AED ${((value - min) / (max - min)) * 100}%, rgba(255,255,255,0.06) ${((value - min) / (max - min)) * 100}%)`,
-        accentColor: '#7C3AED',
+        background: `linear-gradient(to right, #FB923C ${((value - min) / (max - min)) * 100}%, rgba(0,0,0,0.04) ${((value - min) / (max - min)) * 100}%)`,
+        accentColor: '#FB923C',
       }}
     />
   )
 
   return (
-    <div className="glass p-5">
+    <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5">
       <div className="flex items-center gap-2.5 mb-5">
         <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-          style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.25)' }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2">
+          style={{ background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.15)' }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FB923C" strokeWidth="2">
             <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
           </svg>
         </div>
-        <h3 className="font-heading font-700 text-[#F1F0FF]">EMI Calculator</h3>
+        <h3 className="font-heading font-700 text-[#111827]">EMI Calculator</h3>
       </div>
 
       <div className="space-y-5">
@@ -51,35 +51,35 @@ export default function EMICalculator({ defaultAmount = 5000000 }: { defaultAmou
         ].map(({ label, display, slider }) => (
           <div key={label}>
             <div className="flex justify-between text-sm mb-2.5">
-              <span className="text-[#8B8BA8]">{label}</span>
-              <span className="font-700 text-[#A78BFA]">{display}</span>
+              <span className="text-[#6B7280]">{label}</span>
+              <span className="font-700 text-[#FB923C]">{display}</span>
             </div>
             <Slider {...slider} />
           </div>
         ))}
       </div>
 
-      <div className="mt-5 pt-5 border-t border-white/[0.06]">
+      <div className="mt-5 pt-5 border-t border-[#E5E7EB]">
         {/* EMI display */}
         <div className="text-center mb-5 py-4 rounded-2xl"
-          style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.12), rgba(109,40,217,0.06))', border: '1px solid rgba(124,58,237,0.2)' }}>
-          <div className="text-[#8B8BA8] text-xs mb-1">Monthly EMI</div>
-          <div className="font-heading text-3xl font-800" style={{ color: '#A78BFA' }}>
+          style={{ background: '#FFF7ED', border: '1px solid #FED7AA' }}>
+          <div className="text-[#6B7280] text-xs mb-1">Monthly EMI</div>
+          <div className="font-heading text-3xl font-800" style={{ color: '#FB923C' }}>
             ₹{Math.round(emi).toLocaleString('en-IN')}
           </div>
         </div>
 
         {/* Principal vs Interest bar */}
         <div className="mb-4">
-          <div className="h-2 rounded-full overflow-hidden flex" style={{ background: 'rgba(255,255,255,0.04)' }}>
-            <div className="h-full rounded-l-full transition-all duration-500" style={{ width: `${principalPct}%`, background: '#7C3AED' }} />
+          <div className="h-2 rounded-full overflow-hidden flex" style={{ background: 'rgba(0,0,0,0.03)' }}>
+            <div className="h-full rounded-l-full transition-all duration-500" style={{ width: `${principalPct}%`, background: '#FB923C' }} />
             <div className="h-full flex-1 rounded-r-full" style={{ background: '#F59E0B' }} />
           </div>
           <div className="flex justify-between mt-1.5">
-            <span className="text-[10px] text-[#8B8BA8] flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-[#7C3AED] inline-block" /> Principal
+            <span className="text-[10px] text-[#6B7280] flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-[#FB923C] inline-block" /> Principal
             </span>
-            <span className="text-[10px] text-[#8B8BA8] flex items-center gap-1">
+            <span className="text-[10px] text-[#6B7280] flex items-center gap-1">
               Interest <span className="w-2 h-2 rounded-full bg-[#F59E0B] inline-block" />
             </span>
           </div>
@@ -91,9 +91,9 @@ export default function EMICalculator({ defaultAmount = 5000000 }: { defaultAmou
             { label: 'Interest', val: fmt(totalInterest) },
             { label: 'Total', val: fmt(totalAmount) },
           ].map(({ label, val }) => (
-            <div key={label} className="text-center p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <div className="text-[#4A4A6A] text-[10px] mb-1">{label}</div>
-              <div className="font-700 text-xs text-[#F1F0FF]">{val}</div>
+            <div key={label} className="text-center p-3 rounded-xl" style={{ background: '#FAFAF9', border: '1px solid #E5E7EB' }}>
+              <div className="text-[#9CA3AF] text-[10px] mb-1">{label}</div>
+              <div className="font-700 text-xs text-[#111827]">{val}</div>
             </div>
           ))}
         </div>

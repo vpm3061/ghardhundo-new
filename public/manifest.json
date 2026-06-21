@@ -1,11 +1,11 @@
 {
-  "name": "GharDhundo",
-  "short_name": "GharDhundo",
-  "description": "Find your dream property with AI-powered matching",
+  "name": "Orenzaa",
+  "short_name": "Orenzaa",
+  "description": "Premium AI-Powered Property Platform",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0c0c0c",
-  "theme_color": "#0c0c0c",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FB923C",
   "orientation": "portrait-primary",
   "categories": ["real estate", "lifestyle"],
   "icons": [

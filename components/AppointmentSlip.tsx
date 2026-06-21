@@ -29,7 +29,7 @@ export default function AppointmentSlip({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-4">
           <div>
-            <div className="font-bold text-xl text-[#0c0c0c]" style={{ fontFamily: 'Syne, sans-serif' }}>GharDhundo</div>
+            <div className="font-bold text-xl text-[#0c0c0c]" style={{ fontFamily: 'Syne, sans-serif' }}>Orenzaa</div>
             <div className="text-xs text-gray-500 mt-0.5">Site Visit Appointment</div>
           </div>
           <div className="text-right">
@@ -75,7 +75,7 @@ export default function AppointmentSlip({
         </div>
 
         <div className="mt-4 text-center text-[10px] text-gray-400">
-          This slip is valid for the scheduled visit only · GharDhundo · Real Estate Advisory
+          This slip is valid for the scheduled visit only · Orenzaa · Real Estate Advisory
         </div>
       </div>
 

@@ -23,7 +23,7 @@ export default function WhatsAppButton({
       : `/property/${propertyId}`
     const url = window.location.origin + path
     const tagLine = tags?.length ? `\n\n${tags.join(' ')}` : ''
-    const text = `Dekho ye property GharDhundo pe — ${propertyTitle}, ${price}, ${location}: ${url}${tagLine}`
+    const text = `Dekho ye property Orenzaa pe — ${propertyTitle}, ${price}, ${location}: ${url}${tagLine}`
     setHref('https://wa.me/?text=' + encodeURIComponent(text))
   }, [propertyTitle, price, location, propertyId, referralUserId, tags])
 

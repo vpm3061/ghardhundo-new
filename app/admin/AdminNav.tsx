@@ -4,64 +4,70 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 const NAV_ITEMS = [
-  { href: '/admin',               label: 'Leads',       icon: '👥' },
-  { href: '/admin/properties',    label: 'Properties',  icon: '🏢' },
-  { href: '/admin/commissions',   label: 'Commissions', icon: '💰' },
+  { href: '/admin',              label: 'Overview',     icon: '📊', exact: true  },
+  { href: '/admin/leads',        label: 'Leads',        icon: '👥', exact: false },
+  { href: '/admin/properties',   label: 'Properties',   icon: '🏢', exact: false },
+  { href: '/admin/builders',     label: 'Builders',     icon: '🏗️', exact: false },
+  { href: '/admin/dealers',      label: 'Dealers',      icon: '📈', exact: false },
+  { href: '/admin/commissions',  label: 'Commissions',  icon: '💰', exact: false },
+  { href: '/admin/donations',    label: 'Donations',    icon: '🎁', exact: false },
+  { href: '/admin/coins',        label: 'Coins',        icon: '🪙', exact: false },
+  { href: '/admin/payments',     label: 'Payments',     icon: '💳', exact: false },
 ]
+
+const MOBILE_NAV = NAV_ITEMS.slice(0, 5)
 
 export default function AdminNav({ userEmail }: { userEmail: string }) {
   const pathname = usePathname()
   const router = useRouter()
 
+  const isActive = (item: typeof NAV_ITEMS[number]) =>
+    item.exact ? pathname === item.href : pathname.startsWith(item.href)
+
   const handleSignOut = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
+    await createClient().auth.signOut()
     router.push('/login')
   }
 
   return (
-    <nav className="sticky top-0 z-40"
-      style={{ background: 'rgba(10,10,15,0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+    <nav className="sticky top-0 z-40 bg-white border-b border-[#E5E7EB] shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-        <div className="flex items-center gap-5">
-          <Link href="/admin" className="flex items-center gap-2">
-            <span className="font-heading font-800 text-[#F1F0FF] text-base">GharDhundo</span>
-            <span className="text-[10px] font-700 tracking-wider uppercase px-2 py-0.5 rounded-full"
-              style={{ background: 'rgba(124,58,237,0.15)', color: '#A78BFA', border: '1px solid rgba(124,58,237,0.3)' }}>
+        <div className="flex items-center gap-4">
+          <Link href="/admin" className="flex items-center gap-2 shrink-0">
+            <span className="font-heading font-800 text-[#111827] text-base">ORENZ<span className="text-[#FB923C]">AA</span></span>
+            <span className="text-[10px] font-700 tracking-wider uppercase px-2 py-0.5 rounded-full bg-orange-50 text-[#FB923C] border border-orange-200">
               Admin
             </span>
           </Link>
-          <div className="hidden sm:flex items-center gap-0.5">
+          <div className="hidden lg:flex items-center gap-0.5 overflow-x-auto">
             {NAV_ITEMS.map(item => (
               <Link key={item.href} href={item.href}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all whitespace-nowrap"
                 style={{
-                  background: pathname === item.href ? 'rgba(124,58,237,0.12)' : 'transparent',
-                  color: pathname === item.href ? '#A78BFA' : '#8B8BA8',
-                }}
-                onMouseEnter={e => { if (pathname !== item.href) (e.currentTarget as HTMLElement).style.color = '#F1F0FF' }}
-                onMouseLeave={e => { if (pathname !== item.href) (e.currentTarget as HTMLElement).style.color = '#8B8BA8' }}
-              >
-                <span>{item.icon}</span>
+                  background: isActive(item) ? '#FFF7ED' : 'transparent',
+                  color: isActive(item) ? '#FB923C' : '#6B7280',
+                }}>
+                <span className="text-xs">{item.icon}</span>
                 <span>{item.label}</span>
               </Link>
             ))}
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className="hidden sm:block text-xs text-[#4A4A6A]">{userEmail}</span>
-          <Link href="/" className="text-xs text-[#8B8BA8] hover:text-[#F1F0FF] transition-colors">← Site</Link>
-          <button onClick={handleSignOut} className="text-xs text-[#8B8BA8] hover:text-[#F1F0FF] transition-colors" suppressHydrationWarning>
+          <span className="hidden sm:block text-xs text-[#9CA3AF]">{userEmail}</span>
+          <Link href="/" className="text-xs text-[#6B7280] hover:text-[#111827] transition-colors">← Site</Link>
+          <button onClick={handleSignOut} suppressHydrationWarning
+            className="text-xs text-[#6B7280] hover:text-[#111827] transition-colors">
             Sign out
           </button>
         </div>
       </div>
-      {/* Mobile bottom nav */}
-      <div className="sm:hidden flex border-t border-white/[0.06]">
-        {NAV_ITEMS.map(item => (
+      {/* Mobile bottom nav (first 5 items) */}
+      <div className="lg:hidden flex border-t border-[#E5E7EB]">
+        {MOBILE_NAV.map(item => (
           <Link key={item.href} href={item.href}
-            className="flex-1 flex flex-col items-center py-2.5 text-xs gap-0.5 transition-colors"
-            style={{ color: pathname === item.href ? '#A78BFA' : '#4A4A6A' }}>
+            className="flex-1 flex flex-col items-center py-2 text-[10px] gap-0.5 transition-colors"
+            style={{ color: isActive(item) ? '#FB923C' : '#9CA3AF' }}>
             <span className="text-base">{item.icon}</span>
             <span>{item.label}</span>
           </Link>

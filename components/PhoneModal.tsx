@@ -29,29 +29,29 @@ export default function PhoneModal({ userId }: { userId: string }) {
 
   return (
     <div className="modal-overlay">
-      <div className="w-full max-w-sm animate-scale-in" style={{ background: 'rgba(18,18,26,0.95)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '28px' }}>
+      <div className="w-full max-w-sm animate-scale-in" style={{ background: 'rgba(18,18,26,0.95)', border: '1px solid rgba(0,0,0,0.06)', borderRadius: '20px', padding: '28px' }}>
         <div className="text-center mb-6">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
-            style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.2), rgba(109,40,217,0.1))', border: '1px solid rgba(124,58,237,0.3)' }}>
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2">
+            style={{ background: 'linear-gradient(135deg, rgba(251,146,60,0.15), rgba(109,40,217,0.1))', border: '1px solid rgba(251,146,60,0.25)' }}>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FB923C" strokeWidth="2">
               <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"/>
             </svg>
           </div>
-          <h2 className="font-heading text-xl font-800 text-[#F1F0FF]">One last step</h2>
-          <p className="text-[#8B8BA8] text-sm mt-1">Add your phone number to continue</p>
+          <h2 className="font-heading text-xl font-800 text-[#111827]">One last step</h2>
+          <p className="text-[#6B7280] text-sm mt-1">Add your phone number to continue</p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3" suppressHydrationWarning>
           <div>
-            <label className="text-xs text-[#8B8BA8] mb-1.5 block">Full Name <span className="text-[#4A4A6A]">(optional)</span></label>
+            <label className="text-xs text-[#6B7280] mb-1.5 block">Full Name <span className="text-[#9CA3AF]">(optional)</span></label>
             <input
               type="text" className="input-dark" placeholder="Your full name"
               value={name} onChange={e => setName(e.target.value)} suppressHydrationWarning
             />
           </div>
           <div>
-            <label className="text-xs text-[#8B8BA8] mb-1.5 block">
-              Phone Number <span className="text-[#A78BFA]">*</span>
+            <label className="text-xs text-[#6B7280] mb-1.5 block">
+              Phone Number <span className="text-[#FB923C]">*</span>
             </label>
             <input
               type="tel" className="input-dark" placeholder="+91 98765 43210" required
@@ -67,7 +67,7 @@ export default function PhoneModal({ userId }: { userId: string }) {
           </button>
         </form>
 
-        <p className="text-center text-[#4A4A6A] text-xs mt-4">
+        <p className="text-center text-[#9CA3AF] text-xs mt-4">
           Used only to contact you about properties you're interested in.
         </p>
       </div>

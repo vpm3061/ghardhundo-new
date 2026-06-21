@@ -8,8 +8,9 @@ const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/properties', label: 'Properties' },
   { href: '/pricing', label: 'Pricing', highlight: true },
+  { href: '/share-earn', label: '✨ Share & Earn', shareEarn: true },
   { href: '/list', label: 'List Property' },
-  { href: '/dealer', label: 'Find Buyers' },
+  { href: '/find-buyers', label: 'Find Buyers' },
 ]
 
 export default function Navbar() {
@@ -17,18 +18,13 @@ export default function Navbar() {
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
   const [coins, setCoins] = useState<number | null>(null)
-  const [scrolled, setScrolled] = useState(false)
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  const [user, setUser] = useState<{ id: string } | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return
+      setUser(user)
       supabase.from('coins').select('amount, type').eq('user_id', user.id).then(({ data }) => {
         if (!data) return
         setCoins(data.reduce((s, c) => s + (c.type === 'earned' ? c.amount : -c.amount), 0))
@@ -44,23 +40,11 @@ export default function Navbar() {
   }
 
   return (
-    <nav className={`sticky top-0 z-40 transition-all duration-300 ${
-      scrolled
-        ? 'bg-[#0A0A0F]/95 backdrop-blur-xl border-b border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.4)]'
-        : 'bg-[#0A0A0F]/80 backdrop-blur-md border-b border-white/[0.04]'
-    }`}>
+    <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#E5E7EB] shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, #7C3AED, #6D28D9)', boxShadow: '0 0 16px rgba(124,58,237,0.4)' }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
-              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-            </svg>
-          </div>
-          <span className="font-heading font-800 text-lg tracking-tight text-[#F1F0FF] group-hover:text-white transition-colors">
-            GharDhundo
-          </span>
+        <Link href="/" className="font-heading font-800 text-xl tracking-tight text-[#111827]">
+          ORENZ<span className="text-[#FB923C]">AA</span>
         </Link>
 
         {/* Desktop links */}
@@ -72,16 +56,27 @@ export default function Navbar() {
                 <Link key={l.href} href={l.href}
                   className="relative px-3.5 py-1.5 rounded-full text-sm font-700 transition-all"
                   style={active
-                    ? { background: 'rgba(124,58,237,0.25)', color: '#A78BFA', border: '1px solid rgba(124,58,237,0.5)' }
-                    : { background: 'rgba(124,58,237,0.08)', color: '#A78BFA', border: '1px solid rgba(124,58,237,0.25)' }}>
+                    ? { background: '#FFF7ED', color: '#FB923C', border: '1px solid #FED7AA' }
+                    : { background: '#FFF7ED', color: '#FB923C', border: '1px solid #FED7AA' }}>
                   💎 {l.label}
+                </Link>
+              )
+            }
+            if ((l as { shareEarn?: boolean }).shareEarn) {
+              return (
+                <Link key={l.href} href={l.href}
+                  className="relative px-3.5 py-1.5 rounded-full text-sm font-700 transition-all"
+                  style={active
+                    ? { background: 'rgba(245,158,11,0.12)', color: '#F59E0B', border: '1px solid rgba(245,158,11,0.35)' }
+                    : { color: '#F59E0B' }}>
+                  {l.label}
                 </Link>
               )
             }
             return (
               <Link key={l.href} href={l.href}
                 className={`relative px-3.5 py-2 rounded-lg text-sm font-500 transition-all ${
-                  active ? 'text-[#A78BFA] bg-[rgba(124,58,237,0.1)]' : 'text-[#8B8BA8] hover:text-[#F1F0FF] hover:bg-white/[0.04]'
+                  active ? 'text-[#FB923C] bg-[#FFF7ED]' : 'text-[#374151] hover:text-[#111827] hover:bg-[#FAFAF9]'
                 }`}>
                 {l.label}
               </Link>
@@ -93,30 +88,49 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3">
           {coins !== null && (
             <div className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-600"
-              style={{ background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.25)', color: '#A78BFA' }}>
+              style={{ background: '#FFF7ED', border: '1px solid #FED7AA', color: '#FB923C' }}>
               <span>🪙</span>
               <span>{coins}</span>
             </div>
           )}
-          <button
-            onClick={handleSignOut}
-            suppressHydrationWarning
-            className="text-sm text-[#8B8BA8] hover:text-[#F1F0FF] transition-colors px-3 py-2 rounded-lg hover:bg-white/[0.04]"
-          >
-            Sign out
-          </button>
+          {user ? (
+            <>
+              <Link href="/profile"
+                className="text-sm text-[#374151] hover:text-[#111827] transition-colors px-3 py-2 rounded-lg hover:bg-[#FAFAF9]">
+                Profile
+              </Link>
+              <button
+                onClick={handleSignOut}
+                suppressHydrationWarning
+                className="text-sm text-[#374151] hover:text-[#111827] transition-colors px-3 py-2 rounded-lg hover:bg-[#FAFAF9]"
+              >
+                Sign out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login"
+                className="text-sm text-[#374151] hover:text-[#111827] transition-colors px-3 py-2 rounded-lg hover:bg-[#FAFAF9]">
+                Sign in
+              </Link>
+              <Link href="/login"
+                className="px-4 py-2 bg-[#FB923C] hover:bg-[#F59E0B] text-white rounded-lg font-semibold text-sm transition-all">
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile right */}
         <div className="md:hidden flex items-center gap-2">
           {coins !== null && (
             <div className="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-600"
-              style={{ background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.25)', color: '#A78BFA' }}>
+              style={{ background: '#FFF7ED', border: '1px solid #FED7AA', color: '#FB923C' }}>
               🪙 {coins}
             </div>
           )}
           <button
-            className="text-[#8B8BA8] hover:text-[#F1F0FF] p-2 rounded-lg hover:bg-white/[0.04] transition-all"
+            className="text-[#374151] hover:text-[#111827] p-2 rounded-lg border border-[#E5E7EB] bg-white transition-all"
             onClick={() => setMenuOpen(v => !v)}
             suppressHydrationWarning
           >
@@ -132,29 +146,43 @@ export default function Navbar() {
 
       {/* Mobile dropdown */}
       {menuOpen && (
-        <div className="md:hidden border-t border-white/[0.06] px-4 py-4 flex flex-col gap-1"
-          style={{ background: 'rgba(18,18,26,0.95)', backdropFilter: 'blur(20px)' }}>
-          {NAV_LINKS.map(l => (
-            <Link key={l.href} href={l.href} onClick={() => setMenuOpen(false)}
-              className={`px-4 py-3 rounded-xl text-sm transition-all ${
-                l.highlight ? 'font-700' : 'font-500'
-              } ${
-                pathname === l.href
-                  ? 'text-[#A78BFA] bg-[rgba(124,58,237,0.1)]'
-                  : l.highlight
-                    ? 'text-[#A78BFA] hover:bg-[rgba(124,58,237,0.08)]'
-                    : 'text-[#8B8BA8] hover:text-[#F1F0FF] hover:bg-white/[0.04]'
-              }`}>
-              {l.highlight ? `💎 ${l.label}` : l.label}
+        <div className="md:hidden border-t border-[#E5E7EB] px-4 py-4 flex flex-col gap-1 bg-white shadow-lg rounded-b-2xl">
+          {NAV_LINKS.map(l => {
+            const lx = l as { href: string; label: string; highlight?: boolean; shareEarn?: boolean }
+            return (
+              <Link key={l.href} href={l.href} onClick={() => setMenuOpen(false)}
+                className={`px-4 py-3 rounded-xl text-sm transition-all font-${lx.highlight || lx.shareEarn ? '700' : '500'}`}
+                style={
+                  pathname === l.href && lx.shareEarn
+                    ? { color: '#F59E0B', background: 'rgba(245,158,11,0.08)' }
+                  : lx.shareEarn
+                    ? { color: '#F59E0B' }
+                  : pathname === l.href && lx.highlight
+                    ? { color: '#FB923C', background: '#FFF7ED' }
+                  : lx.highlight
+                    ? { color: '#FB923C' }
+                  : pathname === l.href
+                    ? { color: '#FB923C', background: '#FFF7ED' }
+                  : { color: '#374151' }
+                }>
+                {l.label}
+              </Link>
+            )
+          })}
+          {user ? (
+            <button
+              onClick={handleSignOut}
+              suppressHydrationWarning
+              className="mt-2 px-4 py-3 rounded-xl text-sm text-[#374151] text-left hover:text-[#111827] hover:bg-[#FAFAF9] transition-all"
+            >
+              Sign out
+            </button>
+          ) : (
+            <Link href="/login" onClick={() => setMenuOpen(false)}
+              className="mt-2 px-4 py-3 rounded-xl text-sm text-center bg-[#FB923C] text-white font-semibold">
+              Get Started
             </Link>
-          ))}
-          <button
-            onClick={handleSignOut}
-            suppressHydrationWarning
-            className="mt-2 px-4 py-3 rounded-xl text-sm text-[#8B8BA8] text-left hover:text-[#F1F0FF] hover:bg-white/[0.04] transition-all"
-          >
-            Sign out
-          </button>
+          )}
         </div>
       )}
     </nav>

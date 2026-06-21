@@ -1,120 +1,117 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import type { Lead } from '@/lib/supabase/types'
 
-const STATUS_STYLE: Record<string, { bg: string; color: string; border: string }> = {
-  'New':            { bg: 'rgba(255,255,255,0.04)', color: '#8B8BA8', border: 'rgba(255,255,255,0.08)' },
-  'Called':         { bg: 'rgba(59,130,246,0.1)',   color: '#3B82F6', border: 'rgba(59,130,246,0.25)'  },
-  'Visit Fixed':    { bg: 'rgba(124,58,237,0.1)',   color: '#A78BFA', border: 'rgba(124,58,237,0.25)'  },
-  'Deal Done':      { bg: 'rgba(16,185,129,0.1)',   color: '#10B981', border: 'rgba(16,185,129,0.25)'  },
-  'Not Interested': { bg: 'rgba(239,68,68,0.08)',   color: '#EF4444', border: 'rgba(239,68,68,0.2)'    },
-}
-
-export default async function AdminLeadsPage() {
+export default async function AdminOverviewPage() {
   const supabase = await createClient()
 
-  const { data: leads } = await supabase
-    .from('leads')
-    .select('*, properties(title)')
-    .order('ai_score', { ascending: false })
-    .order('created_at', { ascending: false })
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
 
-  const hot   = leads?.filter(l => l.tier === 'HOT').length  || 0
-  const warm  = leads?.filter(l => l.tier === 'WARM').length || 0
-  const cold  = leads?.filter(l => l.tier === 'COLD').length || 0
-  const deals = leads?.filter(l => l.status === 'Deal Done').length || 0
+  const [
+    { data: leads },
+    { data: properties },
+    { data: dealerSubs },
+    { data: builderPkgs },
+    { data: donations },
+    { data: coinConvs },
+    { data: payments },
+  ] = await Promise.all([
+    supabase.from('leads').select('tier, status, created_at'),
+    supabase.from('properties').select('is_active, is_featured'),
+    supabase.from('dealer_subscriptions').select('amount, status').eq('status', 'Active'),
+    supabase.from('builder_packages').select('amount, status').eq('status', 'Active'),
+    supabase.from('donated_listings').select('status').eq('status', 'Pending'),
+    supabase.from('coin_conversions').select('cash_amount, status').eq('status', 'Pending'),
+    supabase.from('payment_orders').select('amount, status, created_at').order('created_at', { ascending: false }).limit(5),
+  ])
 
-  const statCards = [
-    { label: 'HOT',         value: hot,   icon: '🔥', color: '#EF4444', bg: 'rgba(239,68,68,0.1)',   border: 'rgba(239,68,68,0.2)'   },
-    { label: 'WARM',        value: warm,  icon: '☀️', color: '#F59E0B', bg: 'rgba(245,158,11,0.1)',  border: 'rgba(245,158,11,0.2)'  },
-    { label: 'COLD',        value: cold,  icon: '💎', color: '#3B82F6', bg: 'rgba(59,130,246,0.1)',  border: 'rgba(59,130,246,0.2)'  },
-    { label: 'Deals Done',  value: deals, icon: '✅', color: '#10B981', bg: 'rgba(16,185,129,0.1)',  border: 'rgba(16,185,129,0.2)'  },
+  const hotToday   = (leads || []).filter(l => l.tier === 'HOT' && new Date(l.created_at) >= today).length
+  const totalLeads = (leads || []).length
+  const dealerMRR  = (dealerSubs  || []).reduce((s, d) => s + (d.amount || 0), 0)
+  const builderMRR = (builderPkgs || []).reduce((s, b) => s + (b.amount || 0), 0)
+  const totalMRR   = dealerMRR + builderMRR
+  const pendingDonations = (donations || []).length
+  const pendingCoins     = (coinConvs || []).reduce((s, c) => s + (c.cash_amount || 0), 0)
+  const activeProperties = (properties || []).filter(p => p.is_active).length
+  const dealsDone        = (leads || []).filter(l => l.status === 'Deal Done').length
+
+  const STATS = [
+    { label: 'HOT Leads Today', value: hotToday,         icon: '⚡', color: '#EF4444', href: '/admin/leads'      },
+    { label: 'Total Leads',     value: totalLeads,        icon: '👥', color: '#F59E0B', href: '/admin/leads'      },
+    { label: 'Deals Done',      value: dealsDone,         icon: '✅', color: '#22C55E', href: '/admin/leads'      },
+    { label: 'Total MRR',       value: `₹${totalMRR.toLocaleString('en-IN')}`, icon: '💰', color: '#FB923C', href: '/admin/commissions' },
+    { label: 'Dealer MRR',      value: `₹${dealerMRR.toLocaleString('en-IN')}`, icon: '📈', color: '#FB923C', href: '/admin/dealers' },
+    { label: 'Builder MRR',     value: `₹${builderMRR.toLocaleString('en-IN')}`, icon: '🏗️', color: '#FB923C', href: '/admin/builders' },
+    { label: 'Active Listings', value: activeProperties, icon: '🏢', color: '#3B82F6', href: '/admin/properties'  },
+    { label: 'Pending Donations', value: pendingDonations, icon: '🎁', color: '#F59E0B', href: '/admin/donations' },
+    { label: 'Coins to Pay Out', value: `₹${pendingCoins.toLocaleString('en-IN')}`, icon: '🪙', color: '#F59E0B', href: '/admin/coins' },
+  ]
+
+  const QUICK_LINKS = [
+    { href: '/admin/leads',       label: 'View all Leads',   icon: '👥' },
+    { href: '/admin/properties',  label: 'Manage Properties', icon: '🏢' },
+    { href: '/admin/builders',    label: 'Builder Accounts', icon: '🏗️' },
+    { href: '/admin/dealers',     label: 'Dealer Accounts',  icon: '📈' },
+    { href: '/admin/commissions', label: 'Revenue Dashboard', icon: '💰' },
+    { href: '/admin/donations',   label: 'Approve Donations', icon: '🎁' },
+    { href: '/admin/coins',       label: 'Coin Payouts',     icon: '🪙'  },
+    { href: '/admin/payments',    label: 'Payment Orders',   icon: '💳' },
   ]
 
   return (
     <div>
       <div className="mb-7">
-        <h1 className="font-heading text-2xl font-800 text-[#F1F0FF]">Leads Dashboard</h1>
-        <p className="text-[#8B8BA8] text-sm mt-1">Sorted by AI score · {leads?.length || 0} total leads</p>
+        <h1 className="font-heading text-2xl font-800 text-[#111827]">Admin Overview</h1>
+        <p className="text-[#6B7280] text-sm mt-1">
+          {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+        </p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-7">
-        {statCards.map(s => (
-          <div key={s.label} className="glass p-4" style={{ border: `1px solid ${s.border}` }}>
-            <div className="text-sm mb-1">{s.icon} <span style={{ color: s.color }} className="font-600 text-xs">{s.label}</span></div>
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
+        {STATS.map(s => (
+          <Link key={s.label} href={s.href}
+            className="bg-white border border-[#E5E7EB] rounded-2xl p-4 transition-all hover:shadow-md hover:border-[#FB923C]/30">
+            <div className="text-sm mb-1">{s.icon} <span className="text-xs font-600 text-[#6B7280]">{s.label}</span></div>
             <div className="font-heading text-2xl font-800" style={{ color: s.color }}>{s.value}</div>
-          </div>
+          </Link>
         ))}
       </div>
 
-      {/* Leads list */}
-      <div className="space-y-2">
-        {!leads || leads.length === 0 ? (
-          <div className="text-center py-16 glass">
-            <div className="text-5xl mb-3">📭</div>
-            <h3 className="font-heading font-700 text-[#F1F0FF]">No leads yet</h3>
-            <p className="text-[#8B8BA8] text-sm mt-1">Leads appear here as buyers submit inquiries</p>
-          </div>
-        ) : (
-          leads.map((lead: Lead & { properties?: { title: string } | null }) => {
-            const ss = STATUS_STYLE[lead.status] || STATUS_STYLE['New']
-            return (
-              <Link key={lead.id} href={`/admin/leads/${lead.id}`}
-                className="block rounded-xl p-4 transition-all hover:translate-x-0.5"
-                style={{ background: 'rgba(18,18,26,0.8)', border: '1px solid rgba(255,255,255,0.06)' }}
-                onMouseEnter={undefined}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    {/* Score */}
-                    <div className="shrink-0 w-11 h-11 rounded-xl flex items-center justify-center"
-                      style={{
-                        background: lead.tier === 'HOT' ? 'rgba(239,68,68,0.1)' : lead.tier === 'WARM' ? 'rgba(245,158,11,0.1)' : 'rgba(59,130,246,0.1)',
-                        border: `1px solid ${lead.tier === 'HOT' ? 'rgba(239,68,68,0.2)' : lead.tier === 'WARM' ? 'rgba(245,158,11,0.2)' : 'rgba(59,130,246,0.2)'}`,
-                      }}>
-                      <span className="font-heading font-800 text-sm"
-                        style={{ color: lead.tier === 'HOT' ? '#EF4444' : lead.tier === 'WARM' ? '#F59E0B' : '#3B82F6' }}>
-                        {lead.ai_score}
-                      </span>
-                    </div>
+      {/* Quick links */}
+      <div className="mb-8">
+        <h2 className="font-heading text-lg font-700 mb-4 text-[#111827]">Quick Access</h2>
+        <div className="grid sm:grid-cols-2 gap-2">
+          {QUICK_LINKS.map(l => (
+            <Link key={l.href} href={l.href}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-white border border-[#E5E7EB] hover:border-[#FB923C]/40 hover:shadow-sm">
+              <span className="text-xl">{l.icon}</span>
+              <span className="text-sm font-600 text-[#111827]">{l.label}</span>
+              <span className="ml-auto text-[#9CA3AF]">→</span>
+            </Link>
+          ))}
+        </div>
+      </div>
 
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-600 text-sm text-[#F1F0FF]">{lead.name}</span>
-                        {lead.tier && (
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-700 tier-${lead.tier.toLowerCase()}`}>
-                            {lead.tier}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 mt-0.5 flex-wrap text-xs text-[#8B8BA8]">
-                        <span>{lead.phone}</span>
-                        {lead.city && <><span>·</span><span>{lead.city}</span></>}
-                        {lead.budget && <><span>·</span><span>{lead.budget}</span></>}
-                        {lead.timeline && <><span>·</span><span>{lead.timeline}</span></>}
-                      </div>
-                      {lead.properties?.title && (
-                        <div className="text-xs text-[#4A4A6A] mt-0.5 truncate">→ {lead.properties.title}</div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-end gap-1.5 shrink-0">
-                    <span className="text-[10px] px-2.5 py-1 rounded-full font-700"
-                      style={{ background: ss.bg, color: ss.color, border: `1px solid ${ss.border}` }}>
-                      {lead.status}
-                    </span>
-                    <span className="text-xs text-[#4A4A6A]">
-                      {new Date(lead.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-                    </span>
+      {/* Recent payments */}
+      {payments && payments.length > 0 && (
+        <div>
+          <h2 className="font-heading text-lg font-700 mb-4 text-[#111827]">Recent Payments</h2>
+          <div className="space-y-2">
+            {payments.map((p, i) => (
+              <div key={i} className="bg-white border border-[#E5E7EB] rounded-xl p-3 flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-600 text-[#111827]">{p.status === 'paid' ? '✅' : '🕐'} {p.status}</div>
+                  <div className="text-xs text-[#6B7280]">
+                    {new Date(p.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
-              </Link>
-            )
-          })
-        )}
-      </div>
+                <div className="font-heading font-800 text-[#FB923C]">₹{(p.amount || 0).toLocaleString('en-IN')}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

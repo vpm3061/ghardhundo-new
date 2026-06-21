@@ -93,17 +93,17 @@ export default function AIQuestionnaire({ userId }: { userId: string }) {
       <div className="glass p-6 md:p-8">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-            style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2.2">
+            style={{ background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.25)' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FB923C" strokeWidth="2.2">
               <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
           </div>
-          <span className="text-xs font-700 tracking-wider uppercase" style={{ color: '#A78BFA' }}>AI Property Match</span>
+          <span className="text-xs font-700 tracking-wider uppercase" style={{ color: '#FB923C' }}>AI Property Match</span>
         </div>
-        <h2 className="font-heading text-2xl font-800 mb-2 text-[#F1F0FF]">
+        <h2 className="font-heading text-2xl font-800 mb-2 text-[#111827]">
           Find your perfect property in 60 seconds
         </h2>
-        <p className="text-[#8B8BA8] text-sm mb-6 leading-relaxed">
+        <p className="text-[#6B7280] text-sm mb-6 leading-relaxed">
           Answer 5 quick questions — our AI calculates your buyer score and surfaces the best matches instantly.
         </p>
         <button onClick={() => setStep('questions')} className="btn-accent" suppressHydrationWarning>
@@ -121,18 +121,18 @@ export default function AIQuestionnaire({ userId }: { userId: string }) {
         {/* Progress */}
         <div className="mb-6">
           <div className="flex justify-between text-xs mb-2">
-            <span className="text-[#8B8BA8]">Question {currentQ + 1} of {AI_QUESTIONS.length}</span>
-            <span style={{ color: '#A78BFA' }}>{Math.round(progress + (100 / AI_QUESTIONS.length))}%</span>
+            <span className="text-[#6B7280]">Question {currentQ + 1} of {AI_QUESTIONS.length}</span>
+            <span style={{ color: '#FB923C' }}>{Math.round(progress + (100 / AI_QUESTIONS.length))}%</span>
           </div>
           <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
             <div
               className="h-full rounded-full transition-all duration-500"
-              style={{ width: `${progress + (100 / AI_QUESTIONS.length)}%`, background: 'linear-gradient(to right, #7C3AED, #A78BFA)' }}
+              style={{ width: `${progress + (100 / AI_QUESTIONS.length)}%`, background: 'linear-gradient(to right, #FB923C, #F59E0B)' }}
             />
           </div>
         </div>
 
-        <h3 className="font-heading text-lg font-700 mb-5 text-[#F1F0FF]">{q.question}</h3>
+        <h3 className="font-heading text-lg font-700 mb-5 text-[#111827]">{q.question}</h3>
 
         <div className="grid gap-2">
           {q.options.map(opt => (
@@ -141,17 +141,17 @@ export default function AIQuestionnaire({ userId }: { userId: string }) {
               onClick={() => handleAnswer(opt)}
               suppressHydrationWarning
               className="text-left px-4 py-3.5 rounded-xl text-sm font-500 transition-all group"
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(0,0,0,0.05)' }}
               onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.background = 'rgba(124,58,237,0.1)'
-                ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(124,58,237,0.4)'
+                (e.currentTarget as HTMLElement).style.background = 'rgba(251,146,60,0.08)'
+                ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(251,146,60,0.35)'
               }}
               onMouseLeave={e => {
                 (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'
-                ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.06)'
+                ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,0,0,0.05)'
               }}
             >
-              <span className="text-[#8B8BA8] group-hover:text-[#F1F0FF] transition-colors">{opt}</span>
+              <span className="text-[#6B7280] group-hover:text-[#111827] transition-colors">{opt}</span>
             </button>
           ))}
         </div>
@@ -183,16 +183,16 @@ export default function AIQuestionnaire({ userId }: { userId: string }) {
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="font-heading text-3xl font-800" style={{ color: tc.color }}>{result.score}</span>
-              <span className="text-[#8B8BA8] text-[10px]">/ 100</span>
+              <span className="text-[#6B7280] text-[10px]">/ 100</span>
             </div>
           </div>
 
-          <p className="text-[#8B8BA8] text-sm max-w-xs mx-auto">{tc.desc}</p>
+          <p className="text-[#6B7280] text-sm max-w-xs mx-auto">{tc.desc}</p>
         </div>
 
         {!submitted ? (
           <form onSubmit={handleSubmitLead} className="flex flex-col gap-3" suppressHydrationWarning>
-            <h4 className="font-heading font-700 text-sm text-[#F1F0FF]">Get personalized recommendations</h4>
+            <h4 className="font-heading font-700 text-sm text-[#111827]">Get personalized recommendations</h4>
             <input
               type="text" className="input-dark" placeholder="Your name" required
               value={formData.name} onChange={e => setFormData(d => ({ ...d, name: e.target.value }))} suppressHydrationWarning
@@ -213,7 +213,7 @@ export default function AIQuestionnaire({ userId }: { userId: string }) {
                 <polyline points="20,6 9,17 4,12"/>
               </svg>
             </div>
-            <p className="font-heading font-700 text-[#F1F0FF] mb-1">Saved! Our team will reach out soon.</p>
+            <p className="font-heading font-700 text-[#111827] mb-1">Saved! Our team will reach out soon.</p>
             <button onClick={() => router.push('/properties')} className="btn-outline mt-3 text-sm" suppressHydrationWarning>
               Browse Properties →
             </button>
@@ -223,7 +223,7 @@ export default function AIQuestionnaire({ userId }: { userId: string }) {
         {!submitted && (
           <button
             onClick={() => { setStep('intro'); setCurrentQ(0); setAnswers({}); setResult(null) }}
-            className="w-full text-center text-[#4A4A6A] text-xs mt-3 hover:text-[#8B8BA8] transition-colors"
+            className="w-full text-center text-[#9CA3AF] text-xs mt-3 hover:text-[#6B7280] transition-colors"
             suppressHydrationWarning
           >
             Start over

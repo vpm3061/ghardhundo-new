@@ -1,46 +1,48 @@
 import type { Metadata, Viewport } from 'next'
-import { Syne, DM_Sans } from 'next/font/google'
+import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister'
+import { Toaster } from 'react-hot-toast'
 
-const syne = Syne({
-  variable: '--font-syne',
+const inter = Inter({
+  variable: '--font-inter',
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['400', '500', '600', '700'],
 })
 
-const dmSans = DM_Sans({
-  variable: '--font-dm-sans',
+const jakarta = Plus_Jakarta_Sans({
+  variable: '--font-plus-jakarta-sans',
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['600', '700', '800'],
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orenzaa.com'),
   title: {
-    default: 'GharDhundo — AI Powered Property Search Lucknow Noida',
-    template: '%s | GharDhundo',
+    default: 'Orenzaa — Find Where Life Belongs',
+    template: '%s | Orenzaa',
   },
-  description: 'Find RERA verified flats in Lucknow and Noida with AI matching. 2BHK 3BHK apartments with free site visit and home loan help.',
-  keywords: ['flats in Lucknow', '2BHK Noida', 'RERA verified property', 'Shalimar Mannat', 'Eldeco Lucknow', 'property dealer Lucknow', 'flats in Noida', 'property in Greater Noida'],
+  description: 'Premium AI-powered property platform. RERA verified homes in Lucknow, Noida, Ayodhya. Zero pressure. AI matched.',
+  keywords: ['property in Lucknow', 'flats in Noida', 'RERA verified property', '2BHK Lucknow', 'buy flat Noida', 'Orenzaa'],
   openGraph: {
-    title: 'GharDhundo — Find Your Perfect Home',
-    description: 'AI matched RERA verified properties in Lucknow & Noida. Free site visit, home loan help.',
+    title: 'Orenzaa — Find Where Life Belongs',
+    description: 'AI-powered property platform for home buyers and investors.',
     images: ['/og-image.jpg'],
     type: 'website',
     locale: 'en_IN',
-    siteName: 'GharDhundo',
+    siteName: 'Orenzaa',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'GharDhundo — AI Powered Property Search',
-    description: 'Find RERA verified flats in Lucknow and Noida with AI matching.',
+    title: 'Orenzaa — Find Where Life Belongs',
+    description: 'Premium AI-Powered Property Platform',
     images: ['/og-image.jpg'],
   },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'GharDhundo',
+    statusBarStyle: 'default',
+    title: 'Orenzaa',
   },
   icons: {
     icon: '/icon-192.png',
@@ -49,7 +51,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#0A0A0F',
+  themeColor: '#FB923C',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -57,10 +59,25 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${syne.variable} ${dmSans.variable}`}>
-      <body className="min-h-dvh bg-[#0A0A0F] text-[#F1F0FF] antialiased">
+    <html lang="en" className={`${inter.variable} ${jakarta.variable}`}>
+      <body className="min-h-dvh bg-[#FAFAF9] text-[#111827] antialiased">
         <ServiceWorkerRegister />
         {children}
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: {
+              background: '#FFFFFF',
+              color: '#111827',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+              fontSize: '14px',
+            },
+            success: { iconTheme: { primary: '#22C55E', secondary: '#fff' } },
+            error: { iconTheme: { primary: '#EF4444', secondary: '#fff' } },
+          }}
+        />
       </body>
     </html>
   )

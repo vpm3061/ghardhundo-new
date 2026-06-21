@@ -34,7 +34,7 @@ const FIELD_LABELS: [keyof PullResult, string][] = [
 ]
 
 function ConfidenceBadge({ score }: { score: number }) {
-  const color = score >= 80 ? '#10B981' : score >= 55 ? '#F59E0B' : '#EF4444'
+  const color = score >= 80 ? '#22C55E' : score >= 55 ? '#F59E0B' : '#EF4444'
   const bg    = score >= 80 ? 'rgba(16,185,129,0.1)' : score >= 55 ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.1)'
   const border= score >= 80 ? 'rgba(16,185,129,0.3)' : score >= 55 ? 'rgba(245,158,11,0.3)' : 'rgba(239,68,68,0.3)'
   const label = score >= 80 ? 'High confidence' : score >= 55 ? 'Medium confidence — please verify' : 'Low confidence — review carefully'
@@ -45,7 +45,7 @@ function ConfidenceBadge({ score }: { score: number }) {
         <polyline points="20,6 9,17 4,12"/>
       </svg>
       <span className="font-700">{score}% confident</span>
-      <span style={{ color: '#8B8BA8' }}>— {label}</span>
+      <span style={{ color: '#6B7280' }}>— {label}</span>
     </div>
   )
 }
@@ -86,22 +86,22 @@ export default function PropertyPull({ onFill }: { onFill: (data: PullResult) =>
 
   return (
     <div className="mb-5 rounded-2xl overflow-hidden"
-      style={{ border: '1px solid rgba(124,58,237,0.25)', background: 'rgba(124,58,237,0.04)' }}>
+      style={{ border: '1px solid rgba(251,146,60,0.15)', background: 'rgba(124,58,237,0.04)' }}>
 
       {/* Header */}
       <div className="flex items-center gap-3 px-5 pt-5 pb-4"
-        style={{ borderBottom: '1px solid rgba(124,58,237,0.12)' }}>
+        style={{ borderBottom: '1px solid rgba(251,146,60,0.08)' }}>
         <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-          style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)' }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2.2">
+          style={{ background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.25)' }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FB923C" strokeWidth="2.2">
             <circle cx="12" cy="12" r="10"/>
             <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
             <line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
         </div>
         <div>
-          <p className="font-heading font-700 text-sm" style={{ color: '#F1F0FF' }}>AI Property Extractor</p>
-          <p className="text-xs" style={{ color: '#8B8BA8' }}>
+          <p className="font-heading font-700 text-sm" style={{ color: '#111827' }}>AI Property Extractor</p>
+          <p className="text-xs" style={{ color: '#6B7280' }}>
             Paste a URL, brochure text, WhatsApp message — Claude fills all fields
           </p>
         </div>
@@ -147,13 +147,13 @@ export default function PropertyPull({ onFill }: { onFill: (data: PullResult) =>
             <button
               onClick={() => { setInput(''); setResult(null) }}
               className="text-xs transition-colors"
-              style={{ color: '#4A4A6A' }}
+              style={{ color: '#9CA3AF' }}
               suppressHydrationWarning
             >
               Clear
             </button>
           )}
-          <span className="text-xs ml-auto" style={{ color: '#4A4A6A' }}>
+          <span className="text-xs ml-auto" style={{ color: '#9CA3AF' }}>
             Powered by Claude Sonnet
           </span>
         </div>
@@ -179,18 +179,18 @@ export default function PropertyPull({ onFill }: { onFill: (data: PullResult) =>
           {/* Extracted fields preview */}
           {filledFields.length > 0 && (
             <div className="rounded-xl p-3"
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <p className="text-[10px] font-700 uppercase tracking-wider mb-2" style={{ color: '#4A4A6A' }}>
+              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(0,0,0,0.05)' }}>
+              <p className="text-[10px] font-700 uppercase tracking-wider mb-2" style={{ color: '#9CA3AF' }}>
                 {filledFields.length} fields extracted — form auto-filled ↓
               </p>
               <div className="flex flex-wrap gap-x-4 gap-y-1">
                 {filledFields.map(([k, label]) => (
-                  <span key={k} className="text-xs flex items-center gap-1" style={{ color: '#8B8BA8' }}>
-                    <span style={{ color: '#10B981' }}>✓</span> {label}
+                  <span key={k} className="text-xs flex items-center gap-1" style={{ color: '#6B7280' }}>
+                    <span style={{ color: '#22C55E' }}>✓</span> {label}
                   </span>
                 ))}
                 {result.possession_date && (
-                  <span className="text-xs flex items-center gap-1" style={{ color: '#8B8BA8' }}>
+                  <span className="text-xs flex items-center gap-1" style={{ color: '#6B7280' }}>
                     <span style={{ color: '#F59E0B' }}>📅</span> {result.possession_date}
                   </span>
                 )}

@@ -9,7 +9,7 @@ const PURPOSE_OPTIONS = ['Self Use', 'Investment']
 
 function getReferrerId(): string | null {
   if (typeof document === 'undefined') return null
-  const match = document.cookie.match(/(?:^|;\s*)ghardhundo_ref=([^;]+)/)
+  const match = document.cookie.match(/(?:^|;\s*)orenzaa_ref=([^;]+)/)
   return match ? decodeURIComponent(match[1]) : null
 }
 
@@ -48,25 +48,25 @@ export default function LeadForm({ userId, propertyId, propertyTitle, onSuccess 
 
   if (submitted) {
     return (
-      <div className="glass p-6 text-center">
+      <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 text-center">
         <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
           style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.25)' }}>
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.5">
             <polyline points="20,6 9,17 4,12"/>
           </svg>
         </div>
-        <h3 className="font-heading font-700 mb-1 text-[#F1F0FF]">Request Submitted!</h3>
-        <p className="text-[#8B8BA8] text-sm">We'll contact you about <span className="text-[#F1F0FF]">{propertyTitle}</span> within 24 hours.</p>
+        <h3 className="font-heading font-700 mb-1 text-[#111827]">Request Submitted!</h3>
+        <p className="text-[#6B7280] text-sm">We'll contact you about <span className="text-[#111827]">{propertyTitle}</span> within 24 hours.</p>
       </div>
     )
   }
 
   return (
-    <div className="glass p-5">
-      <h3 className="font-heading font-700 mb-0.5 text-[#F1F0FF]">Schedule a Site Visit</h3>
-      <p className="text-[#8B8BA8] text-xs mb-4">Get expert guidance from our property advisors</p>
+    <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5">
+      <h3 className="font-heading font-700 mb-0.5 text-[#111827]">Schedule a Site Visit</h3>
+      <p className="text-[#6B7280] text-xs mb-4">Get expert guidance from our property advisors</p>
 
-      {error && <p className="text-red-400 text-xs mb-3 bg-red-500/5 border border-red-500/20 rounded-xl px-3 py-2">{error}</p>}
+      {error && <p className="text-red-600 text-xs mb-3 bg-red-50 border border-red-200 rounded-xl px-3 py-2">{error}</p>}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3" suppressHydrationWarning>
         <input type="text" placeholder="Full name" required className="input-dark" value={form.name} onChange={e => set('name', e.target.value)} suppressHydrationWarning />
