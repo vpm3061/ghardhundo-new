@@ -2,8 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 const NOTIFY_PHONE = (process.env.WHATSAPP_NOTIFY_NUMBER ?? '919643693090').replace(/\D/g, '')
-const WATI_URL    = process.env.WATI_API_URL   // e.g. https://live-server-XXXXX.wati.io
-const WATI_TOKEN  = process.env.WATI_API_TOKEN  // Bearer token from WATI dashboard
+const WATI_URL    = process.env.WATI_API_URL
+const WATI_TOKEN  = process.env.WATI_API_TOKEN
+const SITE_URL    = process.env.NEXT_PUBLIC_SITE_URL || 'https://orenzaacom.vercel.app'
 
 function buildMessage(lead: {
   name: string; phone: string; ai_score: number
@@ -23,7 +24,7 @@ function buildMessage(lead: {
     `Property Interest: ${propertyTitle}`,
     `Time: ${IST}`,
     '',
-    `Open Dashboard: https://orenzaa.com/admin/leads/${lead.id}`,
+    `Open Dashboard: ${SITE_URL}/admin/leads/${lead.id}`,
   ].join('\n')
 }
 

@@ -2,26 +2,21 @@
   "name": "Orenzaa",
   "short_name": "Orenzaa",
   "description": "Premium AI-Powered Property Platform",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#FFFFFF",
   "theme_color": "#FB923C",
-  "orientation": "portrait-primary",
-  "categories": ["real estate", "lifestyle"],
+  "background_color": "#FFFFFF",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/",
   "icons": [
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
-  ],
-  "screenshots": [],
-  "related_applications": []
+  ]
 }
