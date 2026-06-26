@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import MobileNav from '@/components/MobileNav'
@@ -11,9 +10,12 @@ import type { Property } from '@/lib/supabase/types'
 export default async function HomePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
 
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+  const userId = user?.id ?? null
+
+  const { data: profile } = user
+    ? await supabase.from('profiles').select('*').eq('id', user.id).single()
+    : { data: null }
 
   const { data: properties } = await supabase
     .from('properties')
@@ -25,7 +27,7 @@ export default async function HomePage() {
 
   return (
     <>
-      {profile && !profile.phone && <PhoneModal userId={user.id} />}
+      {userId && profile && !profile.phone && <PhoneModal userId={userId} />}
       <Navbar />
 
       {/* Hero */}
@@ -110,7 +112,14 @@ export default async function HomePage() {
             <h2 className="text-3xl font-heading font-800 text-[#111827]">Find Your Perfect Home</h2>
             <p className="text-[#6B7280] mt-2 text-sm">Answer 5 questions. Get matched instantly.</p>
           </div>
-          <AIQuestionnaire userId={user.id} />
+          {userId ? <AIQuestionnaire userId={userId} /> : (
+            <div className="text-center py-8">
+              <p className="text-[#6B7280] text-sm mb-4">Sign in to get AI-matched properties instantly</p>
+              <a href="/login" className="inline-flex items-center gap-2 px-6 py-3 bg-[#FB923C] hover:bg-[#F59E0B] text-white font-semibold rounded-xl transition-all">
+                Sign in Free →
+              </a>
+            </div>
+          )}
         </div>
       </section>
 
@@ -126,7 +135,7 @@ export default async function HomePage() {
           </div>
           {properties && properties.length > 0 ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {(properties as Property[]).map(p => <PropertyCard key={p.id} property={p} userId={user.id} />)}
+              {(properties as Property[]).map(p => <PropertyCard key={p.id} property={p} userId={userId ?? undefined} />)}
             </div>
           ) : (
             <div className="text-center py-20 bg-[#FAFAF9] rounded-2xl border border-[#E5E7EB]">

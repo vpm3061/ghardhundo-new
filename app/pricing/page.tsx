@@ -90,7 +90,7 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <RazorpayButton plan="Starter" role="dealer" amountRupees={2999} label="Get Started"
+              <RazorpayButton plan="Starter" role="dealer" amount={2999} label="Get Started"
                 className="block w-full text-center py-2.5 rounded-xl text-sm font-700 transition-all disabled:opacity-60 cursor-pointer border border-[#E5E7EB] text-[#374151] hover:border-[#FB923C] hover:text-[#FB923C]" />
             </div>
 
@@ -115,7 +115,7 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <RazorpayButton plan="Pro" role="dealer" amountRupees={5999} label="Start Pro"
+              <RazorpayButton plan="Pro" role="dealer" amount={5999} label="Start Pro"
                 className="block w-full text-center py-2.5 rounded-xl text-sm font-700 bg-white text-[#FB923C] transition-all disabled:opacity-60 cursor-pointer hover:bg-orange-50" />
             </div>
 
@@ -131,7 +131,7 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <RazorpayButton plan="Power" role="dealer" amountRupees={9999} label="Go Power"
+              <RazorpayButton plan="Power" role="dealer" amount={9999} label="Go Power"
                 className="block w-full text-center py-2.5 rounded-xl text-sm font-700 transition-all disabled:opacity-60 cursor-pointer bg-orange-50 border border-[#FED7AA] text-[#F59E0B] hover:bg-orange-100" />
             </div>
           </div>
@@ -174,7 +174,7 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <RazorpayButton plan="Basic" role="builder" amountRupees={0} label="Get Started Free" free
+              <RazorpayButton plan="Basic" role="builder" amount={0} label="Get Started Free" free
                 className="block w-full text-center py-2.5 rounded-xl text-sm font-700 transition-all disabled:opacity-60 cursor-pointer bg-green-50 border border-green-200 text-[#22C55E] hover:bg-green-100" />
             </div>
 
@@ -199,7 +199,7 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <RazorpayButton plan="Standard" role="builder" amountRupees={4999} label="Start Standard"
+              <RazorpayButton plan="Standard" role="builder" amount={4999} label="Start Standard"
                 className="block w-full text-center py-2.5 rounded-xl text-sm font-700 bg-white text-[#FB923C] transition-all disabled:opacity-60 cursor-pointer hover:bg-orange-50" />
             </div>
 
@@ -215,7 +215,7 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <RazorpayButton plan="Premium" role="builder" amountRupees={9999} label="Go Premium"
+              <RazorpayButton plan="Premium" role="builder" amount={9999} label="Go Premium"
                 className="block w-full text-center py-2.5 rounded-xl text-sm font-700 transition-all disabled:opacity-60 cursor-pointer bg-orange-50 border border-[#FED7AA] text-[#F59E0B] hover:bg-orange-100" />
             </div>
           </div>

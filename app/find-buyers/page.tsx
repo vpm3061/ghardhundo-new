@@ -120,8 +120,8 @@ export default function FindBuyersPage() {
                 <div className="text-xs font-700 uppercase tracking-wider mb-3" style={{ color: p.color }}>{p.plan}</div>
                 <div className="font-heading text-3xl font-800 mb-0.5" style={{ color: '#111827' }}>₹{p.price.toLocaleString('en-IN')}</div>
                 <div className="text-xs mb-6" style={{ color: '#9CA3AF' }}>/month · {p.leads}</div>
-                <RazorpayButton plan={p.plan} role="dealer" amountRupees={p.price} label={`Get ${p.plan}`}
-                  className={p.btnClass} style={p.btnStyle} />
+                <RazorpayButton plan={p.plan} role="dealer" amount={p.price} label={`Get ${p.plan}`}
+                  className={p.btnClass} />
               </div>
             ))}
           </div>

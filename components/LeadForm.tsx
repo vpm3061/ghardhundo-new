@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 const BHK_OPTIONS = ['1 BHK', '2 BHK', '3 BHK', '4 BHK', '5+ BHK']
@@ -14,7 +15,7 @@ function getReferrerId(): string | null {
 }
 
 interface LeadFormProps {
-  userId: string
+  userId: string | null
   propertyId: string
   propertyTitle: string
   onSuccess?: () => void
@@ -25,11 +26,16 @@ export default function LeadForm({ userId, propertyId, propertyTitle, onSuccess 
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
+  const router = useRouter()
 
   const set = (f: string, v: string) => setForm(prev => ({ ...prev, [f]: v }))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!userId) {
+      router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`)
+      return
+    }
     if (!form.phone.match(/^[+]?[0-9]{10,13}$/)) { setError('Please enter a valid phone number'); return }
     setSubmitting(true); setError('')
     const supabase = createClient()

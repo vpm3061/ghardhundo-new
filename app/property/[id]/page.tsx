@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { redirect, notFound } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import Navbar from '@/components/Navbar'
@@ -72,15 +72,15 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
   const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
 
-  const { data: profile } = await supabase.from('profiles').select('phone').eq('id', user.id).single()
-
-  const [{ data: property }, { data: offersData }, { data: savedRow }] = await Promise.all([
+  const [{ data: property }, { data: offersData }, profileResult, savedResult] = await Promise.all([
     supabase.from('properties').select('*').eq('id', id).eq('is_active', true).single(),
     supabase.from('offers').select('id, title, description, valid_till').eq('property_id', id).order('created_at'),
-    supabase.from('saved_properties').select('id').eq('user_id', user.id).eq('property_id', id).maybeSingle(),
+    user ? supabase.from('profiles').select('phone').eq('id', user.id).single() : Promise.resolve({ data: null }),
+    user ? supabase.from('saved_properties').select('id').eq('user_id', user.id).eq('property_id', id).maybeSingle() : Promise.resolve({ data: null }),
   ])
+  const profile = profileResult.data
+  const savedRow = savedResult.data
 
   if (!property) notFound()
   const p = property as Property
@@ -103,8 +103,8 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
 
   return (
     <>
-      {profile && !profile.phone && <PhoneModal userId={user.id} />}
-      <ViewTracker propertyId={p.id} userId={user.id} />
+      {user && profile && !profile.phone && <PhoneModal userId={user.id} />}
+      <ViewTracker propertyId={p.id} userId={user?.id ?? null} />
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-28 md:pb-12">
         {/* Breadcrumb */}
@@ -143,7 +143,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
               <div className="flex items-start justify-between gap-4 mb-2">
                 <h1 className="font-heading text-3xl font-800 text-[#111827]">{p.title}</h1>
                 <div className="flex items-center gap-2 shrink-0 mt-1">
-                  <HeartButton propertyId={p.id} userId={user.id} initialSaved={isSaved} />
+                  <HeartButton propertyId={p.id} userId={user?.id} initialSaved={isSaved} />
                   <WhatsAppButton
                   propertyTitle={p.title}
                   price={priceStr}
@@ -249,7 +249,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
           {/* Right — sticky form */}
           <div className="lg:col-span-1">
             <div className="sticky top-20">
-              <LeadForm userId={user.id} propertyId={p.id} propertyTitle={p.title} />
+              <LeadForm userId={user?.id ?? null} propertyId={p.id} propertyTitle={p.title} />
             </div>
           </div>
         </div>

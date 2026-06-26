@@ -1,46 +1,49 @@
-import { NextResponse } from 'next/server'
 import Razorpay from 'razorpay'
 import { createClient } from '@/lib/supabase/server'
-
-const PLAN_AMOUNTS: Record<string, number> = {
-  /* Dealer */
-  Starter: 299900,
-  Pro:     599900,
-  Power:   999900,
-  /* Builder */
-  Standard: 499900,
-  Premium:  999900,
-}
+import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const keyId     = process.env.RAZORPAY_KEY_ID
-  const keySecret = process.env.RAZORPAY_KEY_SECRET
-  if (!keyId || !keySecret) {
-    return NextResponse.json({ error: 'Payment gateway not configured' }, { status: 503 })
-  }
-
-  const { plan, role } = await req.json()
-  const amount = PLAN_AMOUNTS[plan]
-  if (!amount) return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
-
-  const rzp = new Razorpay({ key_id: keyId, key_secret: keySecret })
-  const order = await rzp.orders.create({
-    amount,
-    currency: 'INR',
-    notes: { plan, role, userId: user.id },
-  })
-
-  /* Record intent — non-blocking, ignore errors */
   try {
-    await supabase.from('payment_orders').insert({
-      user_id: user.id, razorpay_order_id: order.id,
-      plan, role, amount: amount / 100, status: 'created',
-    })
-  } catch { /* table may not exist yet */ }
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      return NextResponse.json({ error: 'Razorpay not configured' }, { status: 500 })
+    }
 
-  return NextResponse.json({ orderId: order.id, amount: order.amount, currency: 'INR', keyId })
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Login required' }, { status: 401 })
+
+    const { amount, plan, role } = await req.json()
+
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
+    })
+
+    const order = await razorpay.orders.create({
+      amount: amount * 100,
+      currency: 'INR',
+      notes: { plan, role, userId: user.id }
+    })
+
+    try {
+      await supabase.from('payment_orders').insert({
+        user_id: user.id,
+        razorpay_order_id: order.id,
+        plan_type: plan,
+        plan_role: role,
+        amount,
+        status: 'created'
+      })
+    } catch { /* table may not exist yet */ }
+
+    return NextResponse.json({
+      orderId: order.id,
+      amount,
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      name: user.email
+    })
+  } catch (error: any) {
+    console.error('Order creation error:', error)
+    return NextResponse.json({ error: error.message || 'Order failed' }, { status: 500 })
+  }
 }
