@@ -2,6 +2,9 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+const PROTECTED = ['/admin', '/dealer', '/builder', '/owner', '/profile']
+const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'tellitorg1@gmail.com'
+
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -23,23 +26,18 @@ export async function proxy(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
+  const path = request.nextUrl.pathname
 
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-    if (!user || user.email !== 'tellitorg1@gmail.com') {
-      return NextResponse.redirect(new URL('/login', request.url))
-    }
+  const isProtected = PROTECTED.some(route => path.startsWith(route))
+
+  if (isProtected && !user) {
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('redirect', path)
+    return NextResponse.redirect(loginUrl)
   }
 
-  if (request.nextUrl.pathname.startsWith('/dealer')) {
-    if (!user) return NextResponse.redirect(new URL('/login', request.url))
-  }
-
-  if (request.nextUrl.pathname.startsWith('/builder')) {
-    if (!user) return NextResponse.redirect(new URL('/login', request.url))
-  }
-
-  if (request.nextUrl.pathname.startsWith('/owner')) {
-    if (!user) return NextResponse.redirect(new URL('/login', request.url))
+  if (path.startsWith('/admin') && user?.email !== ADMIN_EMAIL) {
+    return NextResponse.redirect(new URL('/', request.url))
   }
 
   return supabaseResponse
@@ -51,5 +49,6 @@ export const config = {
     '/dealer/:path*',
     '/builder/:path*',
     '/owner/:path*',
+    '/profile/:path*',
   ],
 }
