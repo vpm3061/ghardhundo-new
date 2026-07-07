@@ -5,7 +5,7 @@ import toast from 'react-hot-toast'
 interface Props {
   amount: number
   plan: string
-  role: 'dealer' | 'builder'
+  role: 'dealer' | 'builder' | 'expert'
   label: string
   free?: boolean
   className?: string
@@ -95,7 +95,7 @@ export default function RazorpayButton({ amount, plan, role, label, free, classN
             if (result.success) {
               toast.success('Payment successful! Dashboard khul raha hai...')
               setTimeout(() => {
-                window.location.href = role === 'dealer' ? '/dealer' : '/builder'
+                window.location.href = role === 'dealer' ? '/dealer' : role === 'expert' ? '/expert' : '/builder'
               }, 1500)
             } else {
               toast.error('Payment verify nahi hua. Support se contact karo.')
