@@ -12,11 +12,11 @@ export type Application = {
   phone: string | null
   rera_number: string | null
   partner_type: string | null
-  profiles: {
+  profiles: Array<{
     full_name: string | null
     email: string | null
     phone: string | null
-  } | null
+  }>
 }
 
 type Props = {
@@ -66,9 +66,9 @@ export default function AdminPartnersClient({ applications: initial }: Props) {
       {applications.map(app => {
         const sc = statusColor[app.status] || statusColor.pending
         const isLoading = loading === app.id
-        const displayName = app.full_name || app.profiles?.full_name || 'Unknown'
-        const displayPhone = app.phone || app.profiles?.phone
-        const displayEmail = app.profiles?.email
+        const displayName = app.full_name || app.profiles?.[0]?.full_name || 'Unknown'
+        const displayPhone = app.phone || app.profiles?.[0]?.phone
+        const displayEmail = app.profiles?.[0]?.email
 
         return (
           <div key={app.id} className="bg-white border border-[#E5E7EB] rounded-2xl p-5">

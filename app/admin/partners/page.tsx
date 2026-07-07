@@ -29,7 +29,7 @@ export default async function AdminPartnersPage() {
     `)
     .order('created_at', { ascending: false })
 
-  const applications = (data || []) as Application[]
+  const applications = (data || []) as unknown as Application[]
 
   return (
     <>
