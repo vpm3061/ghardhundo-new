@@ -2,12 +2,21 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
-type Application = {
+export type Application = {
   id: string
   status: string
   created_at: string
   user_id: string
-  profiles: { full_name: string | null; email: string | null; phone: string | null } | null
+  full_name: string | null
+  city: string | null
+  phone: string | null
+  rera_number: string | null
+  partner_type: string | null
+  profiles: {
+    full_name: string | null
+    email: string | null
+    phone: string | null
+  } | null
 }
 
 type Props = {
@@ -57,15 +66,25 @@ export default function AdminPartnersClient({ applications: initial }: Props) {
       {applications.map(app => {
         const sc = statusColor[app.status] || statusColor.pending
         const isLoading = loading === app.id
+        const displayName = app.full_name || app.profiles?.full_name || 'Unknown'
+        const displayPhone = app.phone || app.profiles?.phone
+        const displayEmail = app.profiles?.email
 
         return (
           <div key={app.id} className="bg-white border border-[#E5E7EB] rounded-2xl p-5">
             <div className="flex items-start justify-between gap-4 mb-3">
-              <div>
-                <p className="font-700 text-[#111827]">{app.profiles?.full_name || 'Unknown'}</p>
-                <p className="text-sm text-[#6B7280]">{app.profiles?.email}</p>
-                {app.profiles?.phone && (
-                  <p className="text-sm text-[#6B7280]">{app.profiles.phone}</p>
+              <div className="flex-1 min-w-0">
+                <p className="font-700 text-[#111827]">{displayName}</p>
+                {displayEmail && <p className="text-sm text-[#6B7280]">{displayEmail}</p>}
+                {displayPhone && <p className="text-sm text-[#6B7280]">{displayPhone}</p>}
+                {app.city && <p className="text-xs text-[#9CA3AF] mt-0.5">{app.city}</p>}
+                {app.rera_number && (
+                  <p className="text-xs text-green-600 mt-0.5">RERA: {app.rera_number}</p>
+                )}
+                {app.partner_type && (
+                  <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded-full bg-orange-50 text-[#FB923C] border border-orange-200">
+                    {app.partner_type}
+                  </span>
                 )}
               </div>
               <div className="flex items-center gap-3 shrink-0">
