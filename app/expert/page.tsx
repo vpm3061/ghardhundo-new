@@ -19,9 +19,6 @@ export default async function ExpertPage() {
     supabase.from('partner_applications').select('status, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1),
   ])
 
-  const isAdmin = user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
-  if (!isAdmin && profile?.role !== 'expert') redirect('/list-property')
-
   const propIds = (properties || []).map(p => p.id)
   const { data: leads } = propIds.length > 0
     ? await supabase.from('leads').select('id, name, phone, message, created_at, property_id').in('property_id', propIds).order('created_at', { ascending: false })

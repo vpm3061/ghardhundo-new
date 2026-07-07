@@ -1,15 +1,14 @@
 const CACHE_NAME = 'orenzaa-v1'
-const urlsToCache = ['/']
 
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)).catch(() => {})
-  )
+self.addEventListener('install', () => self.skipWaiting())
+self.addEventListener('activate', event => {
+  event.waitUntil(self.clients.claim())
 })
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return
-  event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
-  )
+  if (!event.request.url.startsWith('http')) return
+  if (event.request.url.includes('chrome-extension')) return
+  if (event.request.url.includes('supabase')) return
+  if (event.request.url.includes('razorpay')) return
 })
