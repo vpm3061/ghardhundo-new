@@ -3,6 +3,7 @@ import { useState, useTransition } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import toast from 'react-hot-toast'
 import type { Property } from '@/lib/supabase/types'
 import PropertyPull, { type PullResult } from './PropertyPull'
 import PhotoUpload from '@/components/PhotoUpload'
@@ -26,7 +27,7 @@ type FormState = {
   title: string; builder: string; sector: string; city: string
   price_min: string; price_max: string; bhk: string[]; status: FormStatus
   rera_number: string; description: string; amenities: string[]
-  photos: string[]; floor_plan: string; youtube_url: string
+  photos: string[]; floor_plan_url: string; youtube_url: string
   is_active: boolean; is_featured: boolean
   offers: OfferForm[]
 }
@@ -35,7 +36,7 @@ const EMPTY_FORM: FormState = {
   title: '', builder: '', sector: '', city: '',
   price_min: '', price_max: '', bhk: [], status: '',
   rera_number: '', description: '', amenities: [],
-  photos: [], floor_plan: '', youtube_url: '',
+  photos: [], floor_plan_url: '', youtube_url: '',
   is_active: true, is_featured: false,
   offers: [],
 }
@@ -54,7 +55,7 @@ function toFormState(p: Property): FormState {
     description: p.description || '',
     amenities: p.amenities || [],
     photos: p.photos || [],
-    floor_plan: p.floor_plan || '',
+    floor_plan_url: p.floor_plan || '',
     youtube_url: p.youtube_url || '',
     is_active: p.is_active,
     is_featured: p.is_featured,
@@ -160,7 +161,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
     startTransition(async () => {
       const supabase = createClient()
       const payload = {
-        title: form.title,
+        title: form.title || 'Untitled',
         builder: form.builder || null,
         sector: form.sector || null,
         city: form.city || null,
@@ -172,18 +173,22 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
         description: form.description || null,
         amenities: form.amenities.length ? form.amenities : null,
         photos: form.photos.length ? form.photos : null,
-        floor_plan: form.floor_plan || null,
+        floor_plan_url: form.floor_plan_url || null,
         youtube_url: form.youtube_url || null,
         is_active: form.is_active,
         is_featured: form.is_featured,
       }
 
+      console.log('Saving payload:', payload)
+
       let propertyId = editId
       if (editId) {
-        await supabase.from('properties').update(payload).eq('id', editId)
+        const { error } = await supabase.from('properties').update(payload).eq('id', editId)
+        if (error) { console.error('Update error:', error); toast.error('Save failed: ' + error.message); return }
       } else {
-        const { data: inserted } = await supabase
+        const { data: inserted, error } = await supabase
           .from('properties').insert(payload).select('id').single()
+        if (error) { console.error('Insert error:', error); toast.error('Save failed: ' + error.message); return }
         propertyId = inserted?.id ?? null
       }
 
@@ -205,6 +210,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
         } catch { /* offers table may not exist yet */ }
       }
 
+      toast.success(editId ? 'Property updated!' : 'Property added!')
       setShowForm(false)
       setEditId(null)
       router.refresh()
@@ -343,8 +349,8 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
               <div>
                 <SectionLabel>Floor Plan</SectionLabel>
                 <PhotoUpload
-                  photos={form.floor_plan ? [form.floor_plan] : []}
-                  setPhotos={urls => set('floor_plan', urls[0] || '')}
+                  photos={form.floor_plan_url ? [form.floor_plan_url] : []}
+                  setPhotos={urls => set('floor_plan_url', urls[0] || '')}
                   maxFiles={1}
                 />
               </div>
