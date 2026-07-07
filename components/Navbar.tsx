@@ -4,9 +4,10 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useState, useEffect } from 'react'
 
-const NAV_LINKS = [
+const NAV_LINKS: { href: string; label: string; highlight?: boolean }[] = [
+  { href: '/', label: 'Home' },
   { href: '/properties', label: 'Properties' },
-  { href: '/list-property', label: 'List Property' },
+  { href: '/list-property', label: 'List Property', highlight: true },
 ]
 
 export default function Navbar() {
