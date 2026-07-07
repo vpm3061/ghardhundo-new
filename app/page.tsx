@@ -48,7 +48,7 @@ export default async function HomePage() {
             <Link href="/properties" className="px-8 py-4 bg-[#FB923C] hover:bg-[#F59E0B] text-white font-semibold rounded-xl transition-all shadow-lg shadow-orange-200">
               Explore Properties →
             </Link>
-            <Link href="/list" className="px-8 py-4 bg-white border border-[#E5E7EB] hover:border-[#FB923C] text-[#374151] font-semibold rounded-xl transition-all">
+            <Link href="/list-property" className="px-8 py-4 bg-white border border-[#E5E7EB] hover:border-[#FB923C] text-[#374151] font-semibold rounded-xl transition-all">
               List Your Property
             </Link>
           </div>
@@ -192,29 +192,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Pricing teaser */}
-      <section className="bg-[#FAFAF9] py-16 px-6 border-t border-[#E5E7EB]">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white border border-[#E5E7EB] rounded-2xl px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
-            <div>
-              <div className="text-xs font-700 uppercase tracking-wider mb-2 text-[#FB923C]">
-                For Dealers & Brokers
-              </div>
-              <h3 className="font-heading text-2xl font-800 mb-1 text-[#111827]">
-                Get AI-scored buyer leads from <span className="text-[#FB923C]">₹299</span>
-              </h3>
-              <p className="text-sm text-[#6B7280]">
-                COLD · WARM · HOT — pay only for leads you want. Monthly plans from ₹2,999.
-              </p>
-            </div>
-            <Link href="/pricing"
-              className="shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-xl font-700 text-sm transition-all bg-[#FB923C] hover:bg-[#F59E0B] text-white whitespace-nowrap">
-              💎 See Pricing →
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="bg-[#111827] text-white py-16 px-6">
         <div className="max-w-6xl mx-auto">
@@ -228,10 +205,7 @@ export default async function HomePage() {
               <div className="space-y-2">
                 {[
                   { label: 'Properties', href: '/properties' },
-                  { label: 'Pricing', href: '/pricing' },
-                  { label: 'Share & Earn', href: '/share-earn' },
-                  { label: 'List Property', href: '/list' },
-                  { label: 'Find Buyers', href: '/find-buyers' },
+                  { label: 'List Property', href: '/list-property' },
                 ].map(l => (
                   <Link key={l.href} href={l.href} className="block text-gray-400 text-sm hover:text-white transition-colors">{l.label}</Link>
                 ))}
@@ -242,9 +216,8 @@ export default async function HomePage() {
               <div className="space-y-2">
                 {[
                   { label: 'Builder Dashboard', href: '/builder' },
-                  { label: 'Dealer Dashboard', href: '/dealer' },
-                  { label: 'Owner Listing', href: '/owner' },
-                  { label: 'Channel Partner', href: '/list' },
+                  { label: 'Expert Dashboard', href: '/expert' },
+                  { label: 'List Property', href: '/list-property' },
                 ].map(l => (
                   <Link key={l.href} href={l.href} className="block text-gray-400 text-sm hover:text-white transition-colors">{l.label}</Link>
                 ))}

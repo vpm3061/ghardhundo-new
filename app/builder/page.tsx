@@ -20,7 +20,7 @@ export default async function BuilderPage() {
   ])
 
   const isAdmin = user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
-  if (!isAdmin && profile?.role !== 'builder') redirect('/pricing')
+  if (!isAdmin && profile?.role !== 'builder') redirect('/list-property')
 
   const pkg = pkgData?.[0]
   type Plan = 'Basic' | 'Standard' | 'Premium'

@@ -33,9 +33,8 @@ export async function GET(request: Request) {
           .eq('id', user.id)
           .single()
 
-        if (profile?.role === 'dealer') return NextResponse.redirect(`${origin}/dealer`)
         if (profile?.role === 'builder') return NextResponse.redirect(`${origin}/builder`)
-        if (profile?.role === 'owner') return NextResponse.redirect(`${origin}/owner`)
+        if (profile?.role === 'expert') return NextResponse.redirect(`${origin}/expert`)
 
         return NextResponse.redirect(`${origin}/`)
       }

@@ -5,19 +5,14 @@ import { createClient } from '@/lib/supabase/client'
 import { useState, useEffect } from 'react'
 
 const NAV_LINKS = [
-  { href: '/', label: 'Home' },
   { href: '/properties', label: 'Properties' },
-  { href: '/pricing', label: 'Pricing', highlight: true },
-  { href: '/share-earn', label: '✨ Share & Earn', shareEarn: true },
-  { href: '/list', label: 'List Property' },
-  { href: '/find-buyers', label: 'Find Buyers' },
+  { href: '/list-property', label: 'List Property' },
 ]
 
 export default function Navbar() {
   const pathname = usePathname()
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [coins, setCoins] = useState<number | null>(null)
   const [user, setUser] = useState<{ id: string } | null>(null)
 
   useEffect(() => {
@@ -25,10 +20,6 @@ export default function Navbar() {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return
       setUser(user)
-      supabase.from('coins').select('amount, type').eq('user_id', user.id).then(({ data }) => {
-        if (!data) return
-        setCoins(data.reduce((s, c) => s + (c.type === 'earned' ? c.amount : -c.amount), 0))
-      })
     })
   }, [])
 
@@ -86,13 +77,6 @@ export default function Navbar() {
 
         {/* Desktop right */}
         <div className="hidden md:flex items-center gap-3">
-          {coins !== null && (
-            <div className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-600"
-              style={{ background: '#FFF7ED', border: '1px solid #FED7AA', color: '#FB923C' }}>
-              <span>🪙</span>
-              <span>{coins}</span>
-            </div>
-          )}
           {user ? (
             <>
               <Link href="/profile"
@@ -123,12 +107,6 @@ export default function Navbar() {
 
         {/* Mobile right */}
         <div className="md:hidden flex items-center gap-2">
-          {coins !== null && (
-            <div className="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-600"
-              style={{ background: '#FFF7ED', border: '1px solid #FED7AA', color: '#FB923C' }}>
-              🪙 {coins}
-            </div>
-          )}
           <button
             className="text-[#374151] hover:text-[#111827] p-2 rounded-lg border border-[#E5E7EB] bg-white transition-all"
             onClick={() => setMenuOpen(v => !v)}

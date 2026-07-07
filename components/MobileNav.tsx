@@ -26,22 +26,12 @@ const TABS = [
     ),
   },
   {
-    href: '/share-earn',
-    label: '✨ Earn',
+    href: '/list-property',
+    label: 'List',
     exact: false,
     isPrimary: true,
     icon: (_active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
-      </svg>
-    ),
-  },
-  {
-    href: '/list',
-    label: 'List',
-    exact: false,
-    icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 5v14M5 12h14"/>
       </svg>
     ),

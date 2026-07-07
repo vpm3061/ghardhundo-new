@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const PROTECTED = ['/admin', '/dealer', '/builder', '/owner', '/profile']
+const PROTECTED = ['/admin', '/expert', '/builder', '/profile']
 const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'tellitorg1@gmail.com'
 
 export async function proxy(request: NextRequest) {
@@ -46,9 +46,8 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     '/admin/:path*',
-    '/dealer/:path*',
+    '/expert/:path*',
     '/builder/:path*',
-    '/owner/:path*',
     '/profile/:path*',
   ],
 }

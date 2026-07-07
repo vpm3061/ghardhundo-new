@@ -1,5 +1,5 @@
 const CACHE_NAME = 'orenzaa-v1'
-const urlsToCache = ['/', '/properties', '/pricing']
+const urlsToCache = ['/']
 
 self.addEventListener('install', event => {
   event.waitUntil(

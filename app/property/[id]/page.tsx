@@ -15,6 +15,7 @@ import { generatePropertyTags, getShareTags } from '@/lib/property-tags'
 import OffersDisplay from '@/components/OffersDisplay'
 import HeartButton from '@/components/HeartButton'
 import ViewTracker from './ViewTracker'
+import VisitBookingModal from './VisitBookingModal'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params
@@ -249,6 +250,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
           {/* Right — sticky form */}
           <div className="lg:col-span-1">
             <div className="sticky top-20">
+              <VisitBookingModal userId={user?.id ?? null} propertyId={p.id} propertyTitle={p.title} />
               <LeadForm userId={user?.id ?? null} propertyId={p.id} propertyTitle={p.title} />
             </div>
           </div>
