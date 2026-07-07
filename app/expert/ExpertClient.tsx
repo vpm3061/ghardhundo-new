@@ -1,5 +1,6 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import RazorpayButton from '@/components/RazorpayButton'
@@ -43,9 +44,31 @@ const fmt = (n: number) =>
 export default function ExpertClient({
   userId, properties, leads, isSubscribed, activePlan, planExpiry, isPartner, partnerAppStatus,
 }: Props) {
+  const router = useRouter()
+  const [authLoading, setAuthLoading] = useState(true)
   const [tab, setTab] = useState<Tab>('My Listings')
   const [applying, setApplying] = useState(false)
   const [applied, setApplied] = useState(false)
+
+  useEffect(() => {
+    const supabase = createClient()
+    async function loadProfile() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/login?redirect=/expert'); return }
+      const { data: profile } = await supabase
+        .from('profiles').select('role').eq('id', user.id).single()
+      setAuthLoading(false)
+      if (profile?.role && profile.role !== 'expert') router.push('/')
+    }
+    loadProfile()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  if (authLoading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin w-8 h-8 border-2 border-orange-400 border-t-transparent rounded-full" />
+    </div>
+  )
 
   const applyPartner = async () => {
     setApplying(true)

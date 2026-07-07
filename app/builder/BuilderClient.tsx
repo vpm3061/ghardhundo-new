@@ -1,5 +1,5 @@
 'use client'
-import { useState, useTransition } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -46,7 +46,28 @@ export default function BuilderClient({
   propStats: PropStat[]
   pkgExpiry: string | null
 }) {
+  const [authLoading, setAuthLoading] = useState(true)
   const [tab, setTab]     = useState<'listings' | 'add' | 'analytics' | 'offers'>('listings')
+
+  useEffect(() => {
+    const supabase = createClient()
+    async function loadProfile() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/login?redirect=/builder'); return }
+      const { data: profile } = await supabase
+        .from('profiles').select('role').eq('id', user.id).single()
+      setAuthLoading(false)
+      if (profile?.role && profile.role !== 'builder') router.push('/')
+    }
+    loadProfile()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  if (authLoading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin w-8 h-8 border-2 border-orange-400 border-t-transparent rounded-full" />
+    </div>
+  )
   const [form, setForm]   = useState(BLANK_FORM)
   const [saving, start]   = useTransition()
   const [msg, setMsg]     = useState('')
