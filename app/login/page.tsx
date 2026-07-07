@@ -10,7 +10,7 @@ function LoginContent() {
 
   const handleGoogleLogin = async () => {
     const supabase = createClient()
-    const next = redirect !== '/' ? `?next=${encodeURIComponent(redirect)}` : ''
+    const next = redirect !== '/' ? `?redirect=${encodeURIComponent(redirect)}` : ''
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {

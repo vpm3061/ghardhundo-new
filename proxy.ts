@@ -37,7 +37,9 @@ export async function proxy(request: NextRequest) {
   }
 
   if (path.startsWith('/admin') && user?.email !== ADMIN_EMAIL) {
-    return NextResponse.redirect(new URL('/', request.url))
+    if (path !== '/admin/properties/new') {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
   }
 
   return supabaseResponse
