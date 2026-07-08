@@ -11,26 +11,17 @@ export default function ListPropertyPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    checkUser()
+    async function check() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.push('/login')
+        return
+      }
+      setLoading(false)
+    }
+    check()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      router.push('/login?redirect=/list-property')
-      return
-    }
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (profile?.role === 'expert') { router.push('/expert'); return }
-    if (profile?.role === 'builder') { router.push('/builder'); return }
-    setLoading(false)
-  }
 
   const selectRole = async (role: 'expert' | 'builder') => {
     const { data: { user } } = await supabase.auth.getUser()

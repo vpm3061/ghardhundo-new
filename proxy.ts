@@ -2,9 +2,6 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const PROTECTED = ['/admin', '/expert', '/builder', '/profile']
-const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'tellitorg1@gmail.com'
-
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -13,9 +10,13 @@ export async function proxy(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() { return request.cookies.getAll() },
+        getAll() {
+          return request.cookies.getAll()
+        },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          )
           supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
@@ -28,19 +29,40 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const path = request.nextUrl.pathname
 
-  const isProtected = PROTECTED.some(route => path.startsWith(route))
-
-  if (isProtected && !user) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('redirect', path)
-    return NextResponse.redirect(loginUrl)
-  }
-
-  if (path.startsWith('/admin') && user?.email !== ADMIN_EMAIL) {
-    if (path !== '/admin/properties/new') {
-      return NextResponse.redirect(new URL('/', request.url))
+  // Admin only
+  if (path.startsWith('/admin')) {
+    if (!user) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+    if (user.email !== 'tellitorg1@gmail.com') {
+      if (path !== '/admin/properties/new') {
+        return NextResponse.redirect(new URL('/', request.url))
+      }
     }
   }
+
+  // Expert — login required
+  if (path.startsWith('/expert')) {
+    if (!user) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+  }
+
+  // Builder — login required
+  if (path.startsWith('/builder')) {
+    if (!user) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+  }
+
+  // Profile — login required
+  if (path.startsWith('/profile')) {
+    if (!user) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+  }
+
+  // /list-property is NOT protected here — handles its own auth client-side
 
   return supabaseResponse
 }
