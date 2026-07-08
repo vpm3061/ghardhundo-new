@@ -58,7 +58,6 @@ export default function ExpertClient({
       const { data: profile } = await supabase
         .from('profiles').select('role').eq('id', user.id).single()
       setAuthLoading(false)
-      if (profile?.role && profile.role !== 'expert') router.push('/')
     }
     loadProfile()
   // eslint-disable-next-line react-hooks/exhaustive-deps

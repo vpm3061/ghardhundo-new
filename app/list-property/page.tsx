@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Navbar from '@/components/Navbar'
@@ -8,29 +8,35 @@ import MobileNav from '@/components/MobileNav'
 export default function ListPropertyPage() {
   const router = useRouter()
   const supabase = createClient()
-  const [loading, setLoading] = useState(true)
+  const [checking, setChecking] = useState(true)
+  const [selecting, setSelecting] = useState(false)
 
   useEffect(() => {
-    async function check() {
+    async function checkExistingRole() {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push('/login')
-        return
-      }
-      setLoading(false)
+      if (!user) { setChecking(false); return }
+      const { data: profile } = await supabase
+        .from('profiles').select('role').eq('id', user.id).single()
+      if (profile?.role === 'expert') { router.replace('/expert'); return }
+      if (profile?.role === 'builder') { router.replace('/builder'); return }
+      setChecking(false)
     }
-    check()
+    checkExistingRole()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const selectRole = async (role: 'expert' | 'builder') => {
+  const handleSelect = async (role: 'expert' | 'builder') => {
+    setSelecting(true)
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    if (!user) {
+      router.push('/login?redirect=/list-property')
+      return
+    }
     await supabase.from('profiles').update({ role }).eq('id', user.id)
-    router.push(role === 'expert' ? '/expert' : '/builder')
+    router.replace(role === 'expert' ? '/expert' : '/builder')
   }
 
-  if (loading) return (
+  if (checking) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="animate-spin w-8 h-8 border-2 border-orange-400 border-t-transparent rounded-full" />
     </div>
@@ -46,8 +52,10 @@ export default function ListPropertyPage() {
           <div className="grid md:grid-cols-2 gap-6">
 
             {/* Builder Card */}
-            <div onClick={() => selectRole('builder')}
-              className="border-2 border-gray-200 hover:border-orange-400 rounded-2xl p-6 cursor-pointer transition-all hover:shadow-lg">
+            <div
+              onClick={() => !selecting && handleSelect('builder')}
+              className="border-2 border-gray-200 hover:border-orange-400 rounded-2xl p-6 cursor-pointer transition-all hover:shadow-lg"
+            >
               <div className="text-4xl mb-4">🏗️</div>
               <h2 className="text-xl font-bold text-gray-900 mb-2">Builder / Developer</h2>
               <p className="text-gray-500 text-sm mb-4">List your new projects directly</p>
@@ -57,14 +65,19 @@ export default function ListPropertyPage() {
                 <li>✅ Direct buyer leads</li>
                 <li>⚠️ 1.75% commission on deals</li>
               </ul>
-              <button className="w-full py-3 bg-gray-900 text-white rounded-xl font-semibold">
-                Continue as Builder →
+              <button
+                disabled={selecting}
+                className="w-full py-3 bg-gray-900 text-white rounded-xl font-semibold disabled:opacity-50"
+              >
+                {selecting ? 'Please wait...' : 'Continue as Builder →'}
               </button>
             </div>
 
             {/* Expert Card */}
-            <div onClick={() => selectRole('expert')}
-              className="border-2 border-orange-400 bg-orange-50 rounded-2xl p-6 cursor-pointer transition-all hover:shadow-lg">
+            <div
+              onClick={() => !selecting && handleSelect('expert')}
+              className="border-2 border-orange-400 bg-orange-50 rounded-2xl p-6 cursor-pointer transition-all hover:shadow-lg"
+            >
               <div className="text-4xl mb-4">🤝</div>
               <h2 className="text-xl font-bold text-gray-900 mb-2">Property Expert</h2>
               <p className="text-gray-500 text-sm mb-4">List properties, get leads, earn commission</p>
@@ -74,8 +87,11 @@ export default function ListPropertyPage() {
                 <li>✅ Sell with Orenzaa option</li>
                 <li>✅ 55% commission on deals</li>
               </ul>
-              <button className="w-full py-3 bg-[#FB923C] text-white rounded-xl font-semibold">
-                Continue as Expert →
+              <button
+                disabled={selecting}
+                className="w-full py-3 bg-[#FB923C] text-white rounded-xl font-semibold disabled:opacity-50"
+              >
+                {selecting ? 'Please wait...' : 'Continue as Expert →'}
               </button>
             </div>
 

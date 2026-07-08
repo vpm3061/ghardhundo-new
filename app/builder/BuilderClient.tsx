@@ -46,8 +46,16 @@ export default function BuilderClient({
   propStats: PropStat[]
   pkgExpiry: string | null
 }) {
+  const router = useRouter()
   const [authLoading, setAuthLoading] = useState(true)
   const [tab, setTab]     = useState<'listings' | 'add' | 'analytics' | 'offers'>('listings')
+  const [form, setForm]   = useState(BLANK_FORM)
+  const [saving, start]   = useTransition()
+  const [msg, setMsg]     = useState('')
+  const [selProp, setSelProp] = useState('')
+  const [offers, setOffers]   = useState<Offer[]>([{ title: '', description: '', valid_till: '' }])
+  const [offerMsg, setOfferMsg] = useState('')
+  const [offerSaving, startOffer] = useTransition()
 
   useEffect(() => {
     const supabase = createClient()
@@ -57,7 +65,6 @@ export default function BuilderClient({
       const { data: profile } = await supabase
         .from('profiles').select('role').eq('id', user.id).single()
       setAuthLoading(false)
-      if (profile?.role && profile.role !== 'builder') router.push('/')
     }
     loadProfile()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -68,17 +75,7 @@ export default function BuilderClient({
       <div className="animate-spin w-8 h-8 border-2 border-orange-400 border-t-transparent rounded-full" />
     </div>
   )
-  const [form, setForm]   = useState(BLANK_FORM)
-  const [saving, start]   = useTransition()
-  const [msg, setMsg]     = useState('')
 
-  /* Offers state */
-  const [selProp, setSelProp] = useState('')
-  const [offers, setOffers]   = useState<Offer[]>([{ title: '', description: '', valid_till: '' }])
-  const [offerMsg, setOfferMsg] = useState('')
-  const [offerSaving, startOffer] = useTransition()
-
-  const router = useRouter()
   const planInfo = PLAN_INFO[plan]
 
   const setF = (k: keyof typeof BLANK_FORM, v: unknown) => setForm(p => ({ ...p, [k]: v }))
