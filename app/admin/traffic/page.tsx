@@ -33,8 +33,6 @@ export default async function TrafficPage() {
   })
   const mostViewed = Object.values(counts).sort((a, b) => b.views - a.views).slice(0, 10)
 
-  const gaEmbedUrl = process.env.NEXT_PUBLIC_GA_EMBED_URL
-
   return (
     <div>
       <div className="mb-7">
@@ -42,26 +40,41 @@ export default async function TrafficPage() {
         <p className="text-[#6B7280] text-sm mt-1">Live data from Supabase · Google Analytics for full traffic history</p>
       </div>
 
-      {/* Google Analytics embed */}
-      <div className="bg-white border border-[#E5E7EB] rounded-2xl p-4 mb-6">
-        {gaEmbedUrl ? (
-          <>
-            <p className="text-xs text-[#9CA3AF] mb-3">Live data from Google Analytics — updates every 24 hours</p>
-            <iframe
-              src={gaEmbedUrl}
-              width="100%"
-              height={600}
-              style={{ border: 0, borderRadius: 12 }}
-              allowFullScreen
-            />
-          </>
-        ) : (
-          <div className="text-center py-12">
-            <div className="text-4xl mb-3">📈</div>
-            <p className="font-heading font-700 text-[#111827]">Google Analytics not connected yet</p>
-            <p className="text-xs text-[#6B7280] mt-1">Add NEXT_PUBLIC_GA_EMBED_URL once the Looker Studio report is ready</p>
-          </div>
-        )}
+      {/* GA quick links */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <a href="https://analytics.google.com/analytics/web/#/p15226193210/reports/intelligenthome"
+          target="_blank" rel="noopener noreferrer"
+          className="bg-white border border-[#E5E7EB] rounded-2xl p-5 transition-all hover:border-[#FB923C]/40 hover:shadow-sm">
+          <p className="text-2xl mb-2">👥</p>
+          <p className="font-heading font-700 text-[#111827]">Real Time Users</p>
+          <p className="text-sm text-[#6B7280] mt-1">See who is on site right now</p>
+          <p className="text-sm font-600 mt-2" style={{ color: '#FB923C' }}>Open Analytics →</p>
+        </a>
+
+        <a href="https://analytics.google.com/analytics/web/#/p15226193210/reports/explorer?params=_u..nav%3Dmaui&r=all-pages-and-screens"
+          target="_blank" rel="noopener noreferrer"
+          className="bg-white border border-[#E5E7EB] rounded-2xl p-5 transition-all hover:border-[#FB923C]/40 hover:shadow-sm">
+          <p className="text-2xl mb-2">📄</p>
+          <p className="font-heading font-700 text-[#111827]">Page Views</p>
+          <p className="text-sm text-[#6B7280] mt-1">Which pages getting traffic</p>
+          <p className="text-sm font-600 mt-2" style={{ color: '#FB923C' }}>Open Analytics →</p>
+        </a>
+
+        <a href="https://analytics.google.com/analytics/web/#/p15226193210/reports/explorer?params=_u..nav%3Dmaui&r=user-acquisition-v2"
+          target="_blank" rel="noopener noreferrer"
+          className="bg-white border border-[#E5E7EB] rounded-2xl p-5 transition-all hover:border-[#FB923C]/40 hover:shadow-sm">
+          <p className="text-2xl mb-2">🌍</p>
+          <p className="font-heading font-700 text-[#111827]">Traffic Sources</p>
+          <p className="text-sm text-[#6B7280] mt-1">Google, Direct, Social</p>
+          <p className="text-sm font-600 mt-2" style={{ color: '#FB923C' }}>Open Analytics →</p>
+        </a>
+      </div>
+
+      {/* Info box */}
+      <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 mb-6">
+        <p className="text-sm font-600" style={{ color: '#9A5B1F' }}>
+          📊 Google Analytics ID: G-3NEK3PQYX9 — Data starts collecting after 24-48 hours of installation.
+        </p>
       </div>
 
       {/* Quick stats from Supabase */}
@@ -89,18 +102,6 @@ export default async function TrafficPage() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Direct GA link */}
-      <div className="mt-6 text-center">
-        <a
-          href="https://analytics.google.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-600 text-sm transition-all bg-orange-50 border border-orange-200 text-[#FB923C] hover:bg-orange-100"
-        >
-          📊 Open Full Google Analytics →
-        </a>
       </div>
     </div>
   )
