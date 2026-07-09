@@ -14,6 +14,7 @@ const MENU = [
   { href: '/admin/donations',   icon: '🎁', label: 'Donations'   },
   { href: '/admin/coins',       icon: '🪙', label: 'Coins'       },
   { href: '/admin/payments',    icon: '💳', label: 'Payments'    },
+  { href: '/admin/traffic',     icon: '🌐', label: 'Traffic'     },
 ]
 
 export default function AdminLayoutClient({

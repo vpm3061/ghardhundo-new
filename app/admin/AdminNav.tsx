@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { href: '/admin/donations',    label: 'Donations',    icon: '🎁', exact: false },
   { href: '/admin/coins',        label: 'Coins',        icon: '🪙', exact: false },
   { href: '/admin/payments',     label: 'Payments',     icon: '💳', exact: false },
+  { href: '/admin/traffic',      label: 'Traffic',      icon: '🌐', exact: false },
 ]
 
 const MOBILE_NAV = NAV_ITEMS.slice(0, 5)
