@@ -5,6 +5,7 @@ import MobileNav from '@/components/MobileNav'
 import PropertyCard from '@/components/PropertyCard'
 import AIQuestionnaire from '@/components/AIQuestionnaire'
 import PhoneModal from '@/components/PhoneModal'
+import BannerAd from '@/components/BannerAd'
 import type { Property } from '@/lib/supabase/types'
 
 export default async function HomePage() {
@@ -29,6 +30,10 @@ export default async function HomePage() {
     <>
       {userId && profile && !profile.phone && <PhoneModal userId={userId} />}
       <Navbar />
+
+      <div className="max-w-5xl mx-auto px-6 pt-6">
+        <BannerAd position="home_top" />
+      </div>
 
       {/* Hero */}
       <section className="bg-white pt-20 pb-16 px-6">

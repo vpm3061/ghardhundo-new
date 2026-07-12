@@ -14,6 +14,7 @@ import type { Property } from '@/lib/supabase/types'
 import { generatePropertyTags, getShareTags } from '@/lib/property-tags'
 import OffersDisplay from '@/components/OffersDisplay'
 import HeartButton from '@/components/HeartButton'
+import BannerAd from '@/components/BannerAd'
 import ViewTracker from './ViewTracker'
 import VisitBookingModal from './VisitBookingModal'
 
@@ -252,6 +253,9 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
             <div className="sticky top-20">
               <VisitBookingModal userId={user?.id ?? null} propertyId={p.id} propertyTitle={p.title} />
               <LeadForm userId={user?.id ?? null} propertyId={p.id} propertyTitle={p.title} />
+              <div className="mt-4">
+                <BannerAd position="property_detail_side" />
+              </div>
             </div>
           </div>
         </div>
