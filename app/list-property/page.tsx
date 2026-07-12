@@ -16,12 +16,17 @@ export default async function ListPropertyPage({
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role, expert_registered')
+    .select('role, expert_registered, is_partner')
     .eq('id', user.id)
     .single()
 
-  const role = profile?.role
-  const initialRole = role === 'builder' || role === 'expert' ? role : null
+  // role alone isn't proof of a paid/granted expert account -- it can be set to
+  // 'expert' without payment (e.g. admin partner-approval, or legacy data from
+  // before the payment gate existed). Only expert_registered/is_partner mean
+  // "actually allowed to skip the wizard."
+  const isBuilder = profile?.role === 'builder'
+  const isAuthorizedExpert = profile?.role === 'expert' && (profile?.expert_registered || profile?.is_partner)
+  const initialRole = isBuilder ? 'builder' : isAuthorizedExpert ? 'expert' : null
 
   if (initialRole && isNew !== '1') {
     redirect(initialRole === 'builder' ? '/builder' : '/expert')

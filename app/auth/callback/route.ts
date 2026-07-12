@@ -25,11 +25,13 @@ export async function GET(request: Request) {
 
         const { data: profile } = await supabase
           .from('profiles')
-          .select('role, expert_registered')
+          .select('role, expert_registered, is_partner')
           .eq('id', user.id)
           .single()
 
-        if (profile?.role === 'expert' || profile?.expert_registered) {
+        // role alone doesn't prove payment/authorization -- it can be 'expert'
+        // via admin partner-approval or legacy data with no ₹49 registration.
+        if (profile?.expert_registered || profile?.is_partner) {
           return NextResponse.redirect(`${origin}/expert`)
         }
 
