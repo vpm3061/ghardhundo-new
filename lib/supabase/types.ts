@@ -8,6 +8,10 @@ export type Profile = {
   is_partner: boolean
   expert_registered: boolean
   registration_paid_at: string | null
+  profile_complete: boolean
+  whatsapp_number: string | null
+  verification_status: 'none' | 'pending' | 'verified' | 'rejected'
+  verification_requested_at: string | null
   created_at: string
 }
 
@@ -119,6 +123,18 @@ export type DealerSubscription = {
   started_at: string
   expires_at: string | null
   status: 'Active' | 'Expired' | 'Cancelled'
+  created_at: string
+}
+
+export type AdvertiseEnquiry = {
+  id: string
+  name: string
+  company: string | null
+  phone: string
+  city: string | null
+  package: string | null
+  message: string | null
+  status: 'new' | 'contacted' | 'deal_done'
   created_at: string
 }
 
