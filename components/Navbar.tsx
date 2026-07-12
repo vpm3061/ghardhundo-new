@@ -4,9 +4,10 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useState, useEffect } from 'react'
 
-const NAV_LINKS: { href: string; label: string; highlight?: boolean }[] = [
+const NAV_LINKS: { href: string; label: string; highlight?: boolean; accent?: boolean }[] = [
   { href: '/', label: 'Home' },
   { href: '/properties', label: 'Properties' },
+  { href: '/advertise', label: '📢 Advertise', accent: true },
   { href: '/list-property', label: 'List Property', highlight: true },
 ]
 
@@ -54,7 +55,7 @@ export default function Navbar() {
                 </Link>
               )
             }
-            if ((l as { shareEarn?: boolean }).shareEarn) {
+            if ((l as { accent?: boolean }).accent) {
               return (
                 <Link key={l.href} href={l.href}
                   className="relative px-3.5 py-1.5 rounded-full text-sm font-700 transition-all"
@@ -127,14 +128,14 @@ export default function Navbar() {
       {menuOpen && (
         <div className="md:hidden border-t border-[#E5E7EB] px-4 py-4 flex flex-col gap-1 bg-white shadow-lg rounded-b-2xl">
           {NAV_LINKS.map(l => {
-            const lx = l as { href: string; label: string; highlight?: boolean; shareEarn?: boolean }
+            const lx = l as { href: string; label: string; highlight?: boolean; accent?: boolean }
             return (
               <Link key={l.href} href={l.href} onClick={() => setMenuOpen(false)}
-                className={`px-4 py-3 rounded-xl text-sm transition-all font-${lx.highlight || lx.shareEarn ? '700' : '500'}`}
+                className={`px-4 py-3 rounded-xl text-sm transition-all font-${lx.highlight || lx.accent ? '700' : '500'}`}
                 style={
-                  pathname === l.href && lx.shareEarn
+                  pathname === l.href && lx.accent
                     ? { color: '#F59E0B', background: 'rgba(245,158,11,0.08)' }
-                  : lx.shareEarn
+                  : lx.accent
                     ? { color: '#F59E0B' }
                   : pathname === l.href && lx.highlight
                     ? { color: '#FB923C', background: '#FFF7ED' }
