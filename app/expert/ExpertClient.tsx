@@ -18,6 +18,11 @@ type Lead = {
 
 type Props = {
   userId: string
+  fullName: string | null
+  email: string
+  phone: string | null
+  avatarUrl: string | null
+  verificationStatus: string
   properties: Property[]
   leads: Lead[]
   isSubscribed: boolean
@@ -34,13 +39,16 @@ const fmt = (n: number) =>
   n >= 1e7 ? `₹${(n / 1e7).toFixed(1)}Cr` : n >= 1e5 ? `₹${(n / 1e5).toFixed(0)}L` : `₹${n.toLocaleString()}`
 
 export default function ExpertClient({
-  userId, properties, leads, isSubscribed, activePlan, planExpiry, isPartner, partnerAppStatus,
+  userId, fullName, email, phone, avatarUrl, verificationStatus,
+  properties, leads, isSubscribed, activePlan, planExpiry, isPartner, partnerAppStatus,
 }: Props) {
   const router = useRouter()
   const [authLoading, setAuthLoading] = useState(true)
   const [tab, setTab] = useState<Tab>('My Listings')
   const [applying, setApplying] = useState(false)
   const [applied, setApplied] = useState(false)
+  const [verifStatus, setVerifStatus] = useState(verificationStatus)
+  const [verifApplying, setVerifApplying] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -69,11 +77,53 @@ export default function ExpertClient({
     setApplying(false)
   }
 
+  const applyVerification = async () => {
+    setVerifApplying(true)
+    const supabase = createClient()
+    await supabase.from('profiles').update({
+      verification_requested_at: new Date().toISOString(),
+      verification_status: 'pending',
+    }).eq('id', userId)
+    setVerifStatus('pending')
+    setVerifApplying(false)
+  }
+
   const FREE_LIMIT = 5
   const overLimit = properties.length >= FREE_LIMIT && !isSubscribed
+  const initials = (fullName || email).slice(0, 1).toUpperCase()
 
   return (
     <div>
+      {/* Profile card */}
+      <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-2xl p-5 mb-6">
+        <div className="flex items-center gap-4">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="" className="w-14 h-14 rounded-full object-cover" />
+          ) : (
+            <div className="w-14 h-14 rounded-full bg-orange-200 flex items-center justify-center text-xl font-bold text-orange-700">
+              {initials}
+            </div>
+          )}
+          <div>
+            <h2 className="font-bold text-[#111827]">{fullName || 'Property Expert'}</h2>
+            <p className="text-sm text-[#6B7280]">{email}</p>
+            {phone && <p className="text-sm text-[#6B7280]">📱 {phone}</p>}
+          </div>
+          <div className="ml-auto text-right">
+            {verifStatus === 'verified' ? (
+              <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">✅ Verified</span>
+            ) : verifStatus === 'pending' ? (
+              <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">⏳ Pending</span>
+            ) : (
+              <button onClick={applyVerification} disabled={verifApplying} suppressHydrationWarning
+                className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold hover:bg-orange-200 disabled:opacity-50">
+                {verifApplying ? '…' : 'Apply for Badge →'}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Tab bar */}
       <div className="flex gap-1 bg-[#F5F5F4] rounded-xl p-1 mb-6 overflow-x-auto">
         {TABS.map(t => (
@@ -261,6 +311,16 @@ export default function ExpertClient({
               <RazorpayButton plan="SixMonth" role="expert" amount={999} label="Subscribe ₹999/6mo"
                 className="block w-full text-center py-2.5 rounded-xl text-sm font-700 transition-all cursor-pointer bg-white text-[#FB923C] hover:bg-orange-50" />
             </div>
+          </div>
+
+          <div className="border border-[#E5E7EB] rounded-2xl p-5 mt-6">
+            <h3 className="font-bold mb-2" style={{ color: '#111827' }}>📢 Advertise on Orenzaa</h3>
+            <p className="text-sm text-[#6B7280] mb-4">
+              Featured listing ya banner ad ke liye apply karo — 10,000+ buyers tak pahuncho
+            </p>
+            <a href="/advertise" className="block w-full py-3 bg-[#111827] text-white text-center rounded-xl font-semibold">
+              Apply for Banner Ad →
+            </a>
           </div>
         </div>
       )}
