@@ -65,12 +65,19 @@ export default function RazorpayButton({ amount, plan, role, label, free, classN
       })
 
       if (!res.ok) {
-        const err = await res.json()
-        toast.error(err.error || 'Order create nahi hua')
+        const err = await res.json().catch(() => ({ error: `Server error (${res.status})` }))
+        toast.error(err.error || `Order create nahi hua (status ${res.status})`)
+        console.error('RazorpayButton: create-order failed', res.status, err)
         return
       }
 
       const { orderId, key, name } = await res.json()
+
+      if (!key || !orderId) {
+        toast.error('Payment setup incomplete — Razorpay key missing on server. Contact support.')
+        console.error('RazorpayButton: missing key/orderId from create-order response', { key, orderId })
+        return
+      }
 
       const options = {
         key,
@@ -120,7 +127,8 @@ export default function RazorpayButton({ amount, plan, role, label, free, classN
       rzp.open()
 
     } catch (e) {
-      toast.error('Kuch problem hua. Dobara try karo.')
+      const detail = e instanceof Error ? e.message : String(e)
+      toast.error(`Kuch problem hua: ${detail}`)
       console.error(e)
     } finally {
       setLoading(false)
