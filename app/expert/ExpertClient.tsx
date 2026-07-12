@@ -4,16 +4,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import RazorpayButton from '@/components/RazorpayButton'
-
-type Property = {
-  id: string
-  title: string
-  city: string | null
-  price_min: number | null
-  price_max: number | null
-  is_active: boolean | null
-  created_at: string
-}
+import StatusCard from '@/components/StatusCard'
+import type { Property } from '@/lib/supabase/types'
 
 type Lead = {
   id: string
@@ -147,11 +139,14 @@ export default function ExpertClient({
                       {p.city} · {p.price_min ? fmt(p.price_min) : '—'}
                     </p>
                   </div>
-                  <span className={`text-xs px-2.5 py-1 rounded-full font-600 ${
-                    p.is_active ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'
-                  }`}>
-                    {p.is_active ? 'Active' : 'Inactive'}
-                  </span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={`text-xs px-2.5 py-1 rounded-full font-600 ${
+                      p.is_active ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      {p.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                    <StatusCard property={p} />
+                  </div>
                 </div>
               ))}
             </div>

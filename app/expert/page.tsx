@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar'
 import MobileNav from '@/components/MobileNav'
 import ExpertClient from './ExpertClient'
 import type { Metadata } from 'next'
+import type { Property } from '@/lib/supabase/types'
 
 export const metadata: Metadata = { title: 'Expert Dashboard | Orenzaa' }
 
@@ -14,7 +15,7 @@ export default async function ExpertPage() {
 
   const [{ data: profile }, { data: properties }, { data: subData }, { data: partnerData }] = await Promise.all([
     supabase.from('profiles').select('full_name, email, role, is_partner').eq('id', user.id).single(),
-    supabase.from('properties').select('id, title, city, price_min, price_max, is_active, created_at').eq('listed_by', user.id).order('created_at', { ascending: false }),
+    supabase.from('properties').select('*').eq('listed_by', user.id).order('created_at', { ascending: false }),
     supabase.from('expert_subscriptions').select('plan, status, expires_at').eq('expert_id', user.id).eq('status', 'Active').limit(1),
     supabase.from('partner_applications').select('status, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1),
   ])
@@ -40,7 +41,7 @@ export default async function ExpertPage() {
 
         <ExpertClient
           userId={user.id}
-          properties={properties || []}
+          properties={(properties || []) as Property[]}
           leads={leads || []}
           isSubscribed={!!(subData && subData.length > 0)}
           activePlan={subData?.[0]?.plan ?? null}

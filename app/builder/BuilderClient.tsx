@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts'
+import StatusCard from '@/components/StatusCard'
 import type { Property } from '@/lib/supabase/types'
 
 const CHART_STYLE = {
@@ -197,6 +198,7 @@ export default function BuilderClient({
                         : { background: 'rgba(0,0,0,0.03)', color: '#9CA3AF', border: '1px solid rgba(0,0,0,0.05)' }}>
                       {p.is_active ? 'Live' : 'Hidden'}
                     </span>
+                    <StatusCard property={p} />
                     <Link href={`/property/${p.id}`}
                       className="text-xs px-3 py-1 rounded-lg transition-colors"
                       style={{ border: '1px solid rgba(0,0,0,0.06)', color: '#6B7280' }}>
