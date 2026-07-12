@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
+import { redirect, notFound } from 'next/navigation'
+import { isUUID } from '@/lib/is-uuid'
 
 export default async function ShareLinkPage({
   params,
@@ -9,6 +10,8 @@ export default async function ShareLinkPage({
   searchParams: Promise<{ ref?: string }>
 }) {
   const { id } = await params
+  if (!isUUID(id)) notFound()
+
   const { ref } = await searchParams
 
   if (ref) {

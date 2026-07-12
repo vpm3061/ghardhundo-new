@@ -17,9 +17,12 @@ import HeartButton from '@/components/HeartButton'
 import BannerAd from '@/components/BannerAd'
 import ViewTracker from './ViewTracker'
 import VisitBookingModal from './VisitBookingModal'
+import { isUUID } from '@/lib/is-uuid'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params
+  if (!isUUID(id)) return { title: 'Property | Orenzaa' }
+
   const supabase = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -72,10 +75,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  if (!isUUID(id)) notFound()
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const [{ data: property }, { data: offersData }, profileResult, savedResult] = await Promise.all([
+  const [{ data: property, error: propertyError }, { data: offersData }, profileResult, savedResult] = await Promise.all([
     supabase.from('properties').select('*').eq('id', id).eq('is_active', true).single(),
     supabase.from('offers').select('id, title, description, valid_till').eq('property_id', id).order('created_at'),
     user ? supabase.from('profiles').select('phone').eq('id', user.id).single() : Promise.resolve({ data: null }),
@@ -84,7 +89,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
   const profile = profileResult.data
   const savedRow = savedResult.data
 
-  if (!property) notFound()
+  if (propertyError || !property) notFound()
   const p = property as Property
   const offers = offersData || []
   const isSaved = !!savedRow
