@@ -12,6 +12,8 @@ const MENU = [
   { href: '/admin/experts',     icon: '🤝', label: 'Experts'     },
   { href: '/admin/cpl',         icon: '🎯', label: 'CPL Deals'   },
   { href: '/admin/banners',     icon: '🖼️', label: 'Banners'     },
+  { href: '/admin/advertise-enquiries', icon: '📢', label: 'Ad Enquiries' },
+  { href: '/admin/verifications', icon: '✅', label: 'Verifications' },
   { href: '/admin/payments',    icon: '💳', label: 'Payments'    },
   { href: '/admin/traffic',     icon: '🌐', label: 'Traffic'     },
 ]
