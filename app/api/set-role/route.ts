@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { role } = await req.json()
-  if (!['dealer', 'builder'].includes(role)) {
+  if (!['dealer', 'builder', 'expert'].includes(role)) {
     return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
   }
 

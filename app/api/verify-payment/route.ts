@@ -13,6 +13,11 @@ const BUILDER_PLANS: Record<string, { amount: number; listingLimit: number }> = 
   Premium:  { amount: 9999, listingLimit: 999 },
 }
 
+const EXPERT_PLANS: Record<string, { amount: number; months: number }> = {
+  'Pro-Monthly':  { amount: 599, months: 1 },
+  'Pro-6Month':   { amount: 999, months: 6 },
+}
+
 export async function POST(req: Request) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -38,7 +43,30 @@ export async function POST(req: Request) {
   const expiry = new Date(now)
   expiry.setMonth(expiry.getMonth() + 1)
 
-  if (role === 'dealer') {
+  if (role === 'expert' && plan === 'expert-registration') {
+    await supabase.from('profiles').update({
+      expert_registered: true,
+      registration_paid_at: now.toISOString(),
+    }).eq('id', user.id)
+  } else if (role === 'expert') {
+    const config = EXPERT_PLANS[plan]
+    if (!config) return NextResponse.json({ error: 'Unknown plan' }, { status: 400 })
+
+    const expertExpiry = new Date(now)
+    expertExpiry.setMonth(expertExpiry.getMonth() + config.months)
+
+    await supabase.from('expert_subscriptions').update({ status: 'Cancelled' })
+      .eq('expert_id', user.id).eq('status', 'Active')
+
+    await supabase.from('expert_subscriptions').insert({
+      expert_id:  user.id,
+      plan,
+      amount:     config.amount,
+      started_at: now.toISOString(),
+      expires_at: expertExpiry.toISOString(),
+      status:     'Active',
+    })
+  } else if (role === 'dealer') {
     const config = DEALER_PLANS[plan]
     if (!config) return NextResponse.json({ error: 'Unknown plan' }, { status: 400 })
 

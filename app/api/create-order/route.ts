@@ -29,8 +29,8 @@ export async function POST(req: Request) {
       await supabase.from('payment_orders').insert({
         user_id: user.id,
         razorpay_order_id: order.id,
-        plan_type: plan,
-        plan_role: role,
+        plan,
+        role,
         amount,
         status: 'created'
       })
