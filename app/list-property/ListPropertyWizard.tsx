@@ -159,24 +159,20 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
           <h1 className="font-heading text-2xl sm:text-3xl font-800 text-center mb-2" style={{ color: '#111827' }}>
             List Your Property
           </h1>
-          <p className="text-center text-sm mb-8" style={{ color: '#6B7280' }}>Choose how you want to list</p>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="glass p-6 cursor-pointer" style={{ border: '2px solid rgba(0,0,0,0.06)' }}
-              onClick={() => { setPersona('builder'); setStep(2) }}>
-              <div className="text-4xl mb-3">🏗️</div>
-              <h2 className="font-heading text-xl font-800 mb-2" style={{ color: '#111827' }}>Builder</h2>
-              <ul className="text-sm space-y-1 mb-2" style={{ color: '#6B7280' }}>
-                <li>✅ Free listings</li>
-                <li>✅ RERA badge — mandatory</li>
-              </ul>
-            </div>
+          <p className="text-center text-sm mb-8" style={{ color: '#6B7280' }}>Become a Property Expert on Orenzaa</p>
+          <div className="max-w-sm mx-auto">
             <div className="glass p-6 cursor-pointer" style={{ border: '2px solid rgba(251,146,60,0.4)', background: 'rgba(251,146,60,0.04)' }}
               onClick={() => { setPersona('expert'); setStep(2) }}>
               <div className="text-4xl mb-3">🤝</div>
               <h2 className="font-heading text-xl font-800 mb-2" style={{ color: '#111827' }}>Property Expert</h2>
-              <ul className="text-sm space-y-1 mb-2" style={{ color: '#6B7280' }}>
-                <li>✅ ₹49 one-time registration</li>
-                <li>✅ AI-scored leads</li>
+              <ul className="text-sm space-y-1.5 mb-2" style={{ color: '#6B7280' }}>
+                <li>✅ ₹49 one-time — lifetime access</li>
+                <li>✅ 5 free property listings</li>
+                <li>✅ AI-scored buyer leads HOT🔥 WARM🌡️ COLD❄️</li>
+                <li>✅ WhatsApp Status Card for each property</li>
+                <li>✅ Orenzaa Verified Expert badge</li>
+                <li>✅ WhatsApp alerts on new leads</li>
+                <li>✅ Expert dashboard with analytics</li>
               </ul>
             </div>
           </div>
