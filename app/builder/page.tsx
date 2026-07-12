@@ -69,7 +69,6 @@ export default async function BuilderPage() {
         </div>
 
         <BuilderClient
-          userId={user.id}
           properties={(properties || []) as Property[]}
           plan={plan}
           listingCount={listingCount}

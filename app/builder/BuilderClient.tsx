@@ -3,7 +3,6 @@ import { useState, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import PhotoUpload from '@/components/PhotoUpload'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts'
 import type { Property } from '@/lib/supabase/types'
 
@@ -15,10 +14,6 @@ type PropStat = { id: string; title: string; views: number; leads: number }
 type Offer = { id?: string; title: string; description: string; valid_till: string }
 
 const fmt = (n: number) => n >= 1e7 ? `₹${(n/1e7).toFixed(1)}Cr` : n >= 1e5 ? `₹${(n/1e5).toFixed(0)}L` : `₹${n}`
-const CITIES    = ['Lucknow', 'Noida', 'Greater Noida', 'Ayodhya']
-const STATUSES  = ['Ready to Move', 'Under Construction', 'New Launch']
-const AMENITIES = ['Swimming Pool', 'Gym', '24hr Security', 'Parking', 'Club House', 'Power Backup', 'Garden', 'Kids Zone']
-const BHK_OPTS  = ['1', '2', '3', '4', '5']
 
 type Plan = 'Basic' | 'Standard' | 'Premium'
 const PLAN_INFO: Record<Plan, { color: string; border: string; limit: number; price: string }> = {
@@ -27,18 +22,9 @@ const PLAN_INFO: Record<Plan, { color: string; border: string; limit: number; pr
   Premium:  { color: '#F59E0B', border: 'rgba(245,158,11,0.3)',  limit: 999, price: '₹9,999/mo' },
 }
 
-const BLANK_FORM = {
-  title: '', builder: '', sector: '', city: '', status: '',
-  price_min: '', price_max: '', rera_number: '', description: '',
-  possession_date: '', tags: '',
-  bhk: [] as string[], amenities: [] as string[],
-  photos: [] as string[], floor_plan: '', youtube_url: '',
-}
-
 export default function BuilderClient({
-  userId, properties, plan, listingCount, listingLimit, propStats, pkgExpiry,
+  properties, plan, listingCount, listingLimit, propStats, pkgExpiry,
 }: {
-  userId: string
   properties: Property[]
   plan: Plan
   listingCount: number
@@ -48,10 +34,7 @@ export default function BuilderClient({
 }) {
   const router = useRouter()
   const [authLoading, setAuthLoading] = useState(true)
-  const [tab, setTab]     = useState<'listings' | 'add' | 'analytics' | 'offers'>('listings')
-  const [form, setForm]   = useState(BLANK_FORM)
-  const [saving, start]   = useTransition()
-  const [msg, setMsg]     = useState('')
+  const [tab, setTab]     = useState<'listings' | 'analytics' | 'offers'>('listings')
   const [selProp, setSelProp] = useState('')
   const [offers, setOffers]   = useState<Offer[]>([{ title: '', description: '', valid_till: '' }])
   const [offerMsg, setOfferMsg] = useState('')
@@ -78,49 +61,6 @@ export default function BuilderClient({
 
   const planInfo = PLAN_INFO[plan]
 
-  const setF = (k: keyof typeof BLANK_FORM, v: unknown) => setForm(p => ({ ...p, [k]: v }))
-  const toggleArr = (k: 'bhk' | 'amenities', val: string) =>
-    setF(k, (form[k] as string[]).includes(val)
-      ? (form[k] as string[]).filter(x => x !== val)
-      : [...(form[k] as string[]), val])
-
-  const handleAdd = () => {
-    start(async () => {
-      setMsg('')
-      if (!form.title) { setMsg('Title is required'); return }
-      if (listingCount >= listingLimit) { setMsg('Listing limit reached. Upgrade plan.'); return }
-
-      const supabase = createClient()
-      const { error } = await supabase.from('properties').insert({
-        title:            form.title,
-        builder:          form.builder || null,
-        sector:           form.sector  || null,
-        city:             form.city    || null,
-        status:           form.status  || null,
-        price_min:        form.price_min ? parseFloat(form.price_min) : null,
-        price_max:        form.price_max ? parseFloat(form.price_max) : null,
-        rera_number:      form.rera_number || null,
-        description:      form.description || null,
-        possession_date:  form.possession_date || null,
-        tags:             form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : null,
-        bhk:              form.bhk.length > 0 ? form.bhk : null,
-        amenities:        form.amenities.length > 0 ? form.amenities : null,
-        photos:           form.photos.length > 0 ? form.photos : null,
-        floor_plan:       form.floor_plan || null,
-        youtube_url:      form.youtube_url || null,
-        listed_by:        userId,
-        created_by:       userId,
-        listing_type:     'builder',
-        is_active:        true,
-        is_featured:      false,
-      })
-      if (error) { setMsg(error.message); return }
-      setMsg('✅ Property listed successfully!')
-      setForm(BLANK_FORM)
-      router.refresh()
-    })
-  }
-
   const handleSaveOffers = () => {
     if (!selProp) { setOfferMsg('Select a property'); return }
     startOffer(async () => {
@@ -142,7 +82,6 @@ export default function BuilderClient({
 
   const TABS = [
     { id: 'listings',  label: 'My Listings' },
-    { id: 'add',       label: '+ Add Property' },
     { id: 'analytics', label: 'Analytics' },
     { id: 'offers',    label: 'Offers' },
   ] as const
@@ -213,13 +152,25 @@ export default function BuilderClient({
           <div className="glass p-10 text-center">
             <div className="text-4xl mb-3">🏗️</div>
             <p className="font-heading font-700 mb-1" style={{ color: '#111827' }}>No listings yet</p>
-            <button onClick={() => setTab('add')} suppressHydrationWarning
+            <Link href="/list-property?new=1"
               className="btn-accent text-sm px-5 py-2.5 mt-3 inline-block">
               + Add First Property
-            </button>
+            </Link>
           </div>
         ) : (
           <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <p className="text-sm" style={{ color: '#6B7280' }}>
+                {listingCount}/{listingLimit === 999 ? '∞' : listingLimit} listings used
+              </p>
+              {listingCount < listingLimit && (
+                <Link href="/list-property?new=1"
+                  className="px-4 py-2 rounded-xl text-sm font-700 text-white transition-all"
+                  style={{ background: '#FB923C' }}>
+                  + Add Property
+                </Link>
+              )}
+            </div>
             {properties.map(p => {
               const stat = propStats.find(s => s.id === p.id)
               return (
@@ -257,126 +208,6 @@ export default function BuilderClient({
             })}
           </div>
         )
-      )}
-
-      {/* ── ADD PROPERTY ── */}
-      {tab === 'add' && (
-        <div className="glass p-5">
-          {listingCount >= listingLimit ? (
-            <div className="text-center py-8">
-              <p className="font-heading font-700 mb-2" style={{ color: '#111827' }}>Listing limit reached</p>
-              <p className="text-sm mb-4" style={{ color: '#6B7280' }}>Upgrade your plan to add more properties.</p>
-              <a href="/pricing" className="btn-accent text-sm px-5 py-2.5 inline-block">Upgrade Plan</a>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              <div className="text-sm font-700 mb-1" style={{ color: '#9CA3AF' }}>
-                {listingCount}/{listingLimit === 999 ? '∞' : listingLimit} listings used
-              </div>
-
-              <div>
-                <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Property Photos</label>
-                <PhotoUpload photos={form.photos} setPhotos={v => setF('photos', v)} maxFiles={15} />
-              </div>
-
-              <input className="input-dark text-sm" placeholder="Property title *"
-                value={form.title} onChange={e => setF('title', e.target.value)} suppressHydrationWarning />
-
-              <div className="grid grid-cols-2 gap-3">
-                <input className="input-dark text-sm" placeholder="Builder name"
-                  value={form.builder} onChange={e => setF('builder', e.target.value)} suppressHydrationWarning />
-                <input className="input-dark text-sm" placeholder="Sector / Area"
-                  value={form.sector} onChange={e => setF('sector', e.target.value)} suppressHydrationWarning />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <select className="input-dark text-sm" value={form.city}
-                  onChange={e => setF('city', e.target.value)} suppressHydrationWarning>
-                  <option value="">Select City</option>
-                  {CITIES.map(c => <option key={c}>{c}</option>)}
-                </select>
-                <select className="input-dark text-sm" value={form.status}
-                  onChange={e => setF('status', e.target.value)} suppressHydrationWarning>
-                  <option value="">Status</option>
-                  {STATUSES.map(s => <option key={s}>{s}</option>)}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <input className="input-dark text-sm" placeholder="Min Price (₹)" type="number"
-                  value={form.price_min} onChange={e => setF('price_min', e.target.value)} suppressHydrationWarning />
-                <input className="input-dark text-sm" placeholder="Max Price (₹)" type="number"
-                  value={form.price_max} onChange={e => setF('price_max', e.target.value)} suppressHydrationWarning />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <input className="input-dark text-sm" placeholder="RERA Number (optional)"
-                  value={form.rera_number} onChange={e => setF('rera_number', e.target.value)} suppressHydrationWarning />
-                <input className="input-dark text-sm" placeholder="Possession Date" type="date"
-                  value={form.possession_date} onChange={e => setF('possession_date', e.target.value)} suppressHydrationWarning />
-              </div>
-
-              <div>
-                <label className="text-xs font-700 uppercase tracking-wider mb-2 block" style={{ color: '#9CA3AF' }}>BHK Options</label>
-                <div className="flex flex-wrap gap-2">
-                  {BHK_OPTS.map(b => (
-                    <button key={b} type="button" onClick={() => toggleArr('bhk', b)} suppressHydrationWarning
-                      className="text-sm px-3 py-1.5 rounded-xl transition-all"
-                      style={{
-                        background: form.bhk.includes(b) ? 'rgba(251,146,60,0.08)' : 'rgba(0,0,0,0.03)',
-                        border: `1px solid ${form.bhk.includes(b) ? 'rgba(251,146,60,0.35)' : 'rgba(0,0,0,0.06)'}`,
-                        color: form.bhk.includes(b) ? '#FB923C' : '#6B7280',
-                      }}>
-                      {b} BHK
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs font-700 uppercase tracking-wider mb-2 block" style={{ color: '#9CA3AF' }}>Amenities</label>
-                <div className="flex flex-wrap gap-2">
-                  {AMENITIES.map(a => (
-                    <button key={a} type="button" onClick={() => toggleArr('amenities', a)} suppressHydrationWarning
-                      className="text-xs px-3 py-1.5 rounded-xl transition-all"
-                      style={{
-                        background: form.amenities.includes(a) ? 'rgba(251,146,60,0.08)' : 'rgba(0,0,0,0.03)',
-                        border: `1px solid ${form.amenities.includes(a) ? 'rgba(251,146,60,0.35)' : 'rgba(0,0,0,0.06)'}`,
-                        color: form.amenities.includes(a) ? '#FB923C' : '#6B7280',
-                      }}>
-                      {a}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <textarea className="input-dark text-sm resize-none" rows={3}
-                placeholder="Description"
-                value={form.description} onChange={e => setF('description', e.target.value)} suppressHydrationWarning />
-
-              <div>
-                <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Floor Plan (optional)</label>
-                <PhotoUpload photos={form.floor_plan ? [form.floor_plan] : []}
-                  setPhotos={v => setF('floor_plan', v[0] || '')} maxFiles={1} />
-              </div>
-
-              <input className="input-dark text-sm" placeholder="YouTube URL (optional)"
-                value={form.youtube_url} onChange={e => setF('youtube_url', e.target.value)} suppressHydrationWarning />
-
-              <input className="input-dark text-sm" placeholder="Tags (comma separated: 2BHK, Metro nearby, Garden)"
-                value={form.tags} onChange={e => setF('tags', e.target.value)} suppressHydrationWarning />
-
-              {msg && (
-                <p className="text-sm" style={{ color: msg.startsWith('✅') ? '#22C55E' : '#F87171' }}>{msg}</p>
-              )}
-
-              <button onClick={handleAdd} disabled={saving} suppressHydrationWarning
-                className="btn-accent disabled:opacity-50">
-                {saving ? 'Saving…' : '+ List Property'}
-              </button>
-            </div>
-          )}
-        </div>
       )}
 
       {/* ── ANALYTICS ── */}

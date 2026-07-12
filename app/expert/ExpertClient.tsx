@@ -107,7 +107,7 @@ export default function ExpertClient({
             </p>
             {!overLimit && (
               <Link
-                href="/admin/properties/new"
+                href="/list-property?new=1"
                 className="px-4 py-2 rounded-xl text-sm font-700 text-white transition-all"
                 style={{ background: '#FB923C' }}
               >
@@ -131,7 +131,7 @@ export default function ExpertClient({
             <div className="text-center py-16 text-[#9CA3AF]">
               <div className="text-4xl mb-3">🏠</div>
               <p className="font-600">No listings yet</p>
-              <Link href="/admin/properties/new"
+              <Link href="/list-property?new=1"
                 className="inline-block mt-4 px-5 py-2.5 rounded-xl text-sm font-700 text-white"
                 style={{ background: '#FB923C' }}>
                 Add your first listing →
