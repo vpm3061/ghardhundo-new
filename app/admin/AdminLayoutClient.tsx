@@ -9,10 +9,9 @@ const MENU = [
   { href: '/admin/leads',       icon: '👥', label: 'Leads'       },
   { href: '/admin/properties',  icon: '🏢', label: 'Properties'  },
   { href: '/admin/builders',    icon: '🏗️', label: 'Builders'    },
-  { href: '/admin/dealers',     icon: '📈', label: 'Dealers'     },
-  { href: '/admin/commissions', icon: '💰', label: 'Commissions' },
-  { href: '/admin/donations',   icon: '🎁', label: 'Donations'   },
-  { href: '/admin/coins',       icon: '🪙', label: 'Coins'       },
+  { href: '/admin/experts',     icon: '🤝', label: 'Experts'     },
+  { href: '/admin/cpl',         icon: '🎯', label: 'CPL Deals'   },
+  { href: '/admin/banners',     icon: '🖼️', label: 'Banners'     },
   { href: '/admin/payments',    icon: '💳', label: 'Payments'    },
   { href: '/admin/traffic',     icon: '🌐', label: 'Traffic'     },
 ]

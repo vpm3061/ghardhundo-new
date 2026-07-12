@@ -10,52 +10,44 @@ export default async function AdminOverviewPage() {
   const [
     { data: leads },
     { data: properties },
-    { data: dealerSubs },
-    { data: builderPkgs },
-    { data: donations },
-    { data: coinConvs },
+    { count: expertCount },
+    { count: builderCount },
+    { data: cplDeals },
     { data: payments },
   ] = await Promise.all([
     supabase.from('leads').select('tier, status, created_at'),
     supabase.from('properties').select('is_active, is_featured'),
-    supabase.from('dealer_subscriptions').select('amount, status').eq('status', 'Active'),
-    supabase.from('builder_packages').select('amount, status').eq('status', 'Active'),
-    supabase.from('donated_listings').select('status').eq('status', 'Pending'),
-    supabase.from('coin_conversions').select('cash_amount, status').eq('status', 'Pending'),
+    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'expert'),
+    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'builder'),
+    supabase.from('cpl_deals').select('cost_per_lead, leads_delivered'),
     supabase.from('payment_orders').select('amount, status, created_at').order('created_at', { ascending: false }).limit(5),
   ])
 
-  const hotToday   = (leads || []).filter(l => l.tier === 'HOT' && new Date(l.created_at) >= today).length
-  const totalLeads = (leads || []).length
-  const dealerMRR  = (dealerSubs  || []).reduce((s, d) => s + (d.amount || 0), 0)
-  const builderMRR = (builderPkgs || []).reduce((s, b) => s + (b.amount || 0), 0)
-  const totalMRR   = dealerMRR + builderMRR
-  const pendingDonations = (donations || []).length
-  const pendingCoins     = (coinConvs || []).reduce((s, c) => s + (c.cash_amount || 0), 0)
+  const hotToday    = (leads || []).filter(l => l.tier === 'HOT' && new Date(l.created_at) >= today).length
+  const totalLeads  = (leads || []).length
+  const dealsDone   = (leads || []).filter(l => l.status === 'Deal Done').length
   const activeProperties = (properties || []).filter(p => p.is_active).length
-  const dealsDone        = (leads || []).filter(l => l.status === 'Deal Done').length
+  const cplRevenue  = (cplDeals || []).reduce((s, d) => s + (d.cost_per_lead || 0) * (d.leads_delivered || 0), 0)
 
   const STATS = [
-    { label: 'HOT Leads Today', value: hotToday,         icon: '⚡', color: '#EF4444', href: '/admin/leads'      },
-    { label: 'Total Leads',     value: totalLeads,        icon: '👥', color: '#F59E0B', href: '/admin/leads'      },
-    { label: 'Deals Done',      value: dealsDone,         icon: '✅', color: '#22C55E', href: '/admin/leads'      },
-    { label: 'Total MRR',       value: `₹${totalMRR.toLocaleString('en-IN')}`, icon: '💰', color: '#FB923C', href: '/admin/commissions' },
-    { label: 'Dealer MRR',      value: `₹${dealerMRR.toLocaleString('en-IN')}`, icon: '📈', color: '#FB923C', href: '/admin/dealers' },
-    { label: 'Builder MRR',     value: `₹${builderMRR.toLocaleString('en-IN')}`, icon: '🏗️', color: '#FB923C', href: '/admin/builders' },
-    { label: 'Active Listings', value: activeProperties, icon: '🏢', color: '#3B82F6', href: '/admin/properties'  },
-    { label: 'Pending Donations', value: pendingDonations, icon: '🎁', color: '#F59E0B', href: '/admin/donations' },
-    { label: 'Coins to Pay Out', value: `₹${pendingCoins.toLocaleString('en-IN')}`, icon: '🪙', color: '#F59E0B', href: '/admin/coins' },
+    { label: 'HOT Leads Today', value: hotToday,         icon: '⚡', color: '#EF4444', href: '/admin/leads' },
+    { label: 'Total Leads',     value: totalLeads,        icon: '👥', color: '#F59E0B', href: '/admin/leads' },
+    { label: 'Deals Done',      value: dealsDone,         icon: '✅', color: '#22C55E', href: '/admin/leads' },
+    { label: 'Active Listings', value: activeProperties,  icon: '🏢', color: '#3B82F6', href: '/admin/properties' },
+    { label: 'Experts',         value: expertCount || 0,  icon: '🤝', color: '#FB923C', href: '/admin/experts' },
+    { label: 'Builders',        value: builderCount || 0, icon: '🏗️', color: '#FB923C', href: '/admin/builders' },
+    { label: 'CPL Revenue',     value: `₹${cplRevenue.toLocaleString('en-IN')}`, icon: '🎯', color: '#FB923C', href: '/admin/cpl' },
   ]
 
   const QUICK_LINKS = [
-    { href: '/admin/leads',       label: 'View all Leads',   icon: '👥' },
+    { href: '/admin/leads',       label: 'View all Leads',    icon: '👥' },
     { href: '/admin/properties',  label: 'Manage Properties', icon: '🏢' },
-    { href: '/admin/builders',    label: 'Builder Accounts', icon: '🏗️' },
-    { href: '/admin/dealers',     label: 'Dealer Accounts',  icon: '📈' },
+    { href: '/admin/builders',    label: 'Builder Accounts',  icon: '🏗️' },
+    { href: '/admin/experts',     label: 'Expert Accounts',   icon: '🤝' },
+    { href: '/admin/cpl',         label: 'CPL Deals',         icon: '🎯' },
+    { href: '/admin/banners',     label: 'Banner Ads',        icon: '🖼️' },
     { href: '/admin/commissions', label: 'Revenue Dashboard', icon: '💰' },
-    { href: '/admin/donations',   label: 'Approve Donations', icon: '🎁' },
-    { href: '/admin/coins',       label: 'Coin Payouts',     icon: '🪙'  },
-    { href: '/admin/payments',    label: 'Payment Orders',   icon: '💳' },
+    { href: '/admin/payments',    label: 'Payment Orders',    icon: '💳' },
   ]
 
   return (
