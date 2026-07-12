@@ -1,5 +1,6 @@
 'use client'
 import { useState, useTransition } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 interface Props {
@@ -10,12 +11,16 @@ interface Props {
 }
 
 export default function HeartButton({ propertyId, userId, initialSaved = false, size = 18 }: Props) {
+  const router = useRouter()
+  const pathname = usePathname()
   const [saved, setSaved]   = useState(initialSaved)
   const [isPending, start]  = useTransition()
 
-  if (!userId) return null
-
   const toggle = () => {
+    if (!userId) {
+      router.push(`/login?redirect=${encodeURIComponent(pathname)}`)
+      return
+    }
     start(async () => {
       const supabase = createClient()
       if (saved) {

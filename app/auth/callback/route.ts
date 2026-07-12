@@ -25,16 +25,13 @@ export async function GET(request: Request) {
 
         const { data: profile } = await supabase
           .from('profiles')
-          .select('role, profile_complete')
+          .select('role, expert_registered')
           .eq('id', user.id)
           .single()
 
-        if (!profile?.profile_complete) {
-          return NextResponse.redirect(`${origin}/onboarding?redirect=${encodeURIComponent(safeRedirect)}`)
+        if (profile?.role === 'expert' || profile?.expert_registered) {
+          return NextResponse.redirect(`${origin}/expert`)
         }
-
-        if (profile?.role === 'builder') return NextResponse.redirect(`${origin}/builder`)
-        if (profile?.role === 'expert') return NextResponse.redirect(`${origin}/expert`)
 
         return NextResponse.redirect(`${origin}${safeRedirect}`)
       }

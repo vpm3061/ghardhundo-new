@@ -15,13 +15,17 @@ export default function Navbar() {
   const pathname = usePathname()
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [user, setUser] = useState<{ id: string } | null>(null)
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null)
+  const [profile, setProfile] = useState<{ role: string; expert_registered: boolean } | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return
       setUser(user)
+      supabase.from('profiles').select('role, expert_registered')
+        .eq('id', user.id).single()
+        .then(({ data }) => setProfile(data))
     })
   }, [])
 
@@ -31,6 +35,10 @@ export default function Navbar() {
     router.push('/login')
     router.refresh()
   }
+
+  const isAdmin = user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL || user?.email === 'tellitorg1@gmail.com'
+  const isExpert = profile?.role === 'expert' || !!profile?.expert_registered
+  const dashboardLink = isAdmin ? { href: '/admin', label: 'Admin' } : isExpert ? { href: '/expert', label: 'My Dashboard' } : { href: '/profile', label: 'Profile' }
 
   return (
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#E5E7EB] shadow-sm">
@@ -81,9 +89,9 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3">
           {user ? (
             <>
-              <Link href="/profile"
+              <Link href={dashboardLink.href}
                 className="text-sm text-[#374151] hover:text-[#111827] transition-colors px-3 py-2 rounded-lg hover:bg-[#FAFAF9]">
-                Profile
+                {dashboardLink.label}
               </Link>
               <button
                 onClick={handleSignOut}
@@ -150,13 +158,19 @@ export default function Navbar() {
             )
           })}
           {user ? (
-            <button
-              onClick={handleSignOut}
-              suppressHydrationWarning
-              className="mt-2 px-4 py-3 rounded-xl text-sm text-[#374151] text-left hover:text-[#111827] hover:bg-[#FAFAF9] transition-all"
-            >
-              Sign out
-            </button>
+            <>
+              <Link href={dashboardLink.href} onClick={() => setMenuOpen(false)}
+                className="px-4 py-3 rounded-xl text-sm text-[#374151] hover:text-[#111827] hover:bg-[#FAFAF9] transition-all">
+                {dashboardLink.label}
+              </Link>
+              <button
+                onClick={handleSignOut}
+                suppressHydrationWarning
+                className="mt-2 px-4 py-3 rounded-xl text-sm text-[#374151] text-left hover:text-[#111827] hover:bg-[#FAFAF9] transition-all"
+              >
+                Sign out
+              </button>
+            </>
           ) : (
             <Link href="/login" onClick={() => setMenuOpen(false)}
               className="mt-2 px-4 py-3 rounded-xl text-sm text-center bg-[#FB923C] text-white font-semibold">
