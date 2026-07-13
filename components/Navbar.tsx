@@ -37,7 +37,7 @@ export default function Navbar() {
   }
 
   const isAdmin = user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL || user?.email === 'tellitorg1@gmail.com'
-  const isExpert = profile?.role === 'expert' || !!profile?.expert_registered
+  const isExpert = !!profile?.expert_registered || profile?.role === 'expert'
   const dashboardLink = isAdmin ? { href: '/admin', label: 'Admin' } : isExpert ? { href: '/expert', label: 'My Dashboard' } : { href: '/profile', label: 'Profile' }
 
   return (
@@ -89,10 +89,9 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3">
           {user ? (
             <>
-              <Link href={dashboardLink.href}
-                className="text-sm text-[#374151] hover:text-[#111827] transition-colors px-3 py-2 rounded-lg hover:bg-[#FAFAF9]">
-                {dashboardLink.label}
-              </Link>
+              <Link href={user?.email === 'tellitorg1@gmail.com' ? '/admin' : profile?.expert_registered ? '/expert' : '/profile'}>
+  {profile?.expert_registered ? 'My Dashboard' : 'Profile'}
+</Link>
               <button
                 onClick={handleSignOut}
                 suppressHydrationWarning
