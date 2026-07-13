@@ -13,10 +13,16 @@ export default async function ExpertPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login?redirect=/expert')
 
-  const { data: gateProfile } = await supabase.from('profiles')
+  const { data: gateProfile, error: gateError } = await supabase.from('profiles')
     .select('expert_registered, is_partner').eq('id', user.id).single()
 
-  if (!gateProfile?.expert_registered && !gateProfile?.is_partner) {
+  if (gateError) {
+    console.error('[expert] gate profile fetch failed', gateError)
+  }
+
+  const isRegisteredExpert = gateProfile?.expert_registered === true || gateProfile?.is_partner === true
+
+  if (!gateError && !isRegisteredExpert) {
     redirect('/list-property')
   }
 
