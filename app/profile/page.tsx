@@ -18,10 +18,14 @@ export default async function ProfilePage() {
     { data: enquiries },
     { data: savedRaw },
   ] = await Promise.all([
-    supabase.from('profiles').select('full_name, email, phone, whatsapp_number, avatar_url, role, verification_status').eq('id', user.id).single(),
+    supabase.from('profiles').select('full_name, email, phone, whatsapp_number, avatar_url, role, verification_status, expert_registered').eq('id', user.id).single(),
     supabase.from('leads').select('id, name, tier, ai_score, status, created_at, properties(title)').eq('user_id', user.id).order('created_at', { ascending: false }).limit(10),
     supabase.from('saved_properties').select('property_id, properties(*)').eq('user_id', user.id).order('created_at', { ascending: false }),
   ])
+
+  if (profile?.expert_registered === true) {
+    redirect('/expert')
+  }
 
   const enquiriesTyped = (enquiries || []).map(e => ({
     id: e.id as string,
