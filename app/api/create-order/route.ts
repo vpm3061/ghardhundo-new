@@ -3,6 +3,12 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
+  console.log('ENV CHECK:', {
+    hasKeyId: !!process.env.RAZORPAY_KEY_ID,
+    keyIdPrefix: process.env.RAZORPAY_KEY_ID?.substring(0, 10),
+    hasSecret: !!process.env.RAZORPAY_KEY_SECRET,
+    secretPrefix: process.env.RAZORPAY_KEY_SECRET?.substring(0, 5),
+  })
   try {
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
       return NextResponse.json({ error: 'Razorpay not configured' }, { status: 500 })
