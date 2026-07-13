@@ -20,16 +20,15 @@ export default async function ListPropertyPage({
     .eq('id', user.id)
     .single()
 
-  // role alone isn't proof of a paid/granted expert account -- it can be set to
-  // 'expert' without payment (e.g. admin partner-approval, or legacy data from
-  // before the payment gate existed). Only expert_registered/is_partner mean
-  // "actually allowed to skip the wizard."
   const isBuilder = profile?.role === 'builder'
-  const isAuthorizedExpert = profile?.role === 'expert' && (profile?.expert_registered || profile?.is_partner)
+  const isAuthorizedExpert = profile?.expert_registered === true || profile?.is_partner === true
   const initialRole = isBuilder ? 'builder' : isAuthorizedExpert ? 'expert' : null
 
-  if (initialRole && isNew !== '1') {
-    redirect(initialRole === 'builder' ? '/builder' : '/expert')
+  if (isBuilder && isNew !== '1') {
+    redirect('/builder')
+  }
+  if (isAuthorizedExpert && isNew !== '1') {
+    redirect('/expert')
   }
 
   return (
@@ -39,7 +38,8 @@ export default async function ListPropertyPage({
         <ListPropertyWizard
           userId={user.id}
           initialRole={initialRole}
-          expertRegistered={profile?.expert_registered ?? false}
+          expertRegistered={isAuthorizedExpert}
+          initialStep={isAuthorizedExpert ? 1 : 0}
         />
       </main>
       <MobileNav />

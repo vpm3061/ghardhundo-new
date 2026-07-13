@@ -47,14 +47,15 @@ type Props = {
   userId: string
   initialRole: Persona | null
   expertRegistered: boolean
+  initialStep?: number
 }
 
 type Step = 0 | 'register' | 1 | 2
 
-export default function ListPropertyWizard({ userId, initialRole, expertRegistered }: Props) {
+export default function ListPropertyWizard({ userId, initialRole, expertRegistered, initialStep }: Props) {
   const router = useRouter()
   const alreadyAuthorized = !!initialRole || expertRegistered
-  const [step, setStep] = useState<Step>(alreadyAuthorized ? 1 : 0)
+  const [step, setStep] = useState<Step>((initialStep as Step | undefined) ?? (alreadyAuthorized ? 1 : 0))
   const [persona] = useState<Persona>(initialRole ?? 'expert')
   const [category, setCategory] = useState<Category | null>(null)
   const [form, setForm] = useState<WizardForm>(BLANK_WIZARD_FORM)
