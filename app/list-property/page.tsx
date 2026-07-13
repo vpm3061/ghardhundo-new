@@ -14,11 +14,30 @@ export default async function ListPropertyPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login?redirect=/list-property')
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('role, expert_registered, is_partner')
     .eq('id', user.id)
     .single()
+
+  if (profileError) {
+    console.error('[list-property] profile fetch failed', profileError)
+    return (
+      <>
+        <Navbar />
+        <main className="max-w-lg mx-auto px-4 sm:px-6 py-16 text-center">
+          <div className="text-4xl mb-4">⚠️</div>
+          <h1 className="font-heading text-2xl font-800 mb-2" style={{ color: '#111827' }}>
+            Couldn&apos;t verify your account
+          </h1>
+          <p className="text-sm mb-6" style={{ color: '#6B7280' }}>
+            Please refresh and try again. If you&apos;ve already paid, you won&apos;t be charged again.
+          </p>
+        </main>
+        <MobileNav />
+      </>
+    )
+  }
 
   const isBuilder = profile?.role === 'builder'
   const isAuthorizedExpert = profile?.expert_registered === true || profile?.is_partner === true
