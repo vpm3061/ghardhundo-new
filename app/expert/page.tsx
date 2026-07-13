@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import MobileNav from '@/components/MobileNav'
 import ExpertClient from './ExpertClient'
@@ -16,11 +17,25 @@ export default async function ExpertPage() {
   const { data: gateProfile } = await supabase.from('profiles')
     .select('expert_registered, is_partner').eq('id', user.id).single()
 
-  // Dashboard is for experts who've actually paid + registered (or admin-approved
-  // partners) -- otherwise send them into the payment/registration flow instead of
-  // showing an empty shell they can't use.
   if (!gateProfile?.expert_registered && !gateProfile?.is_partner) {
-    redirect('/list-property')
+    return (
+      <>
+        <Navbar />
+        <main className="max-w-lg mx-auto px-4 sm:px-6 py-16 text-center">
+          <div className="text-4xl mb-4">🔒</div>
+          <h1 className="font-heading text-2xl font-800 mb-2" style={{ color: '#111827' }}>
+            Please complete registration
+          </h1>
+          <p className="text-sm mb-6" style={{ color: '#6B7280' }}>
+            Complete your expert registration to unlock your dashboard, listings, and leads.
+          </p>
+          <Link href="/list-property" className="btn-accent inline-block px-6 py-3 text-sm">
+            Complete Registration →
+          </Link>
+        </main>
+        <MobileNav />
+      </>
+    )
   }
 
   const [{ data: profile }, { data: properties }, { data: subData }, { data: partnerData }] = await Promise.all([
