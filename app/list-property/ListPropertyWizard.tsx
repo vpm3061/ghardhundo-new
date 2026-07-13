@@ -27,8 +27,9 @@ type Props = {
 
 export default function ListPropertyWizard({ userId, initialRole, expertRegistered }: Props) {
   const router = useRouter()
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(initialRole ? 2 : 1)
-  const [persona, setPersona] = useState<Persona | null>(initialRole)
+  const alreadyAuthorized = !!initialRole || expertRegistered
+  const [step, setStep] = useState<0 | 1 | 2>(alreadyAuthorized ? 1 : 0)
+  const [persona] = useState<Persona>(initialRole ?? 'expert')
   const [category, setCategory] = useState<Category | null>(null)
   const [form, setForm] = useState<WizardForm>(BLANK_WIZARD_FORM)
   const [saving, setSaving] = useState(false)
@@ -42,7 +43,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
 
   const usesMonthlyRent = category === 'rental' || (category === 'commercial' && form.commercial_deal === 'Rent')
 
-  const validateStep3 = (): string | null => {
+  const validateForm = (): string | null => {
     if (!form.title.trim()) return 'Title required hai'
     if (!form.city) return 'City select karo'
     if (!form.locality.trim()) return 'Locality / area required hai'
@@ -102,39 +103,27 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
     frontage_width: form.frontage_width ? parseFloat(form.frontage_width) : null,
   })
 
-  const goToStep4 = () => {
-    const err = validateStep3()
-    if (err) { setMsg(err); return }
-    setMsg('')
-    setStep(4)
-  }
-
   const insertProperty = async () => {
     const supabase = createClient()
     return supabase.from('properties').insert(buildPayload())
   }
 
-  const handleBuilderSubmit = async () => {
-    setSaving(true)
+  const handleSubmit = async () => {
+    const err = validateForm()
+    if (err) { setMsg(err); return }
     setMsg('')
-    await fetch('/api/set-role', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role: 'builder' }),
-    })
+    setSaving(true)
+    if (persona === 'builder') {
+      await fetch('/api/set-role', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: 'builder' }),
+      })
+    }
     const { error } = await insertProperty()
     setSaving(false)
     if (error) { setMsg(error.message); return }
-    router.push('/builder?welcome=1')
-  }
-
-  const handleExpertFreeSubmit = async () => {
-    setSaving(true)
-    setMsg('')
-    const { error } = await insertProperty()
-    setSaving(false)
-    if (error) { setMsg(error.message); return }
-    router.push('/expert?welcome=1')
+    router.push(persona === 'builder' ? '/builder?welcome=1' : '/expert?welcome=1')
   }
 
   const TypeFields = category === 'flat' ? FlatFields
@@ -147,40 +136,46 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
     <div>
       {/* Step indicator */}
       <div className="flex items-center gap-2 mb-8">
-        {[1, 2, 3, 4].map(n => (
+        {[0, 1, 2].map(n => (
           <div key={n} className="flex-1 h-1 rounded-full"
             style={{ background: step >= n ? '#FB923C' : 'rgba(0,0,0,0.06)' }} />
         ))}
       </div>
 
-      {/* STEP 1 — persona */}
-      {step === 1 && (
+      {/* STEP 0 — payment gate (only reached when not already an authorized expert/builder) */}
+      {step === 0 && (
         <div>
           <h1 className="font-heading text-2xl sm:text-3xl font-800 text-center mb-2" style={{ color: '#111827' }}>
             List Your Property
           </h1>
           <p className="text-center text-sm mb-8" style={{ color: '#6B7280' }}>Become a Property Expert on Orenzaa</p>
-          <div className="max-w-sm mx-auto">
-            <div className="glass p-6 cursor-pointer" style={{ border: '2px solid rgba(251,146,60,0.4)', background: 'rgba(251,146,60,0.04)' }}
-              onClick={() => { setPersona('expert'); setStep(2) }}>
-              <div className="text-4xl mb-3">🤝</div>
-              <h2 className="font-heading text-xl font-800 mb-2" style={{ color: '#111827' }}>Property Expert</h2>
-              <ul className="text-sm space-y-1.5 mb-2" style={{ color: '#6B7280' }}>
-                <li>✅ ₹49 one-time — lifetime access</li>
-                <li>✅ 5 free property listings</li>
-                <li>✅ AI-scored buyer leads HOT🔥 WARM🌡️ COLD❄️</li>
-                <li>✅ WhatsApp Status Card for each property</li>
-                <li>✅ Orenzaa Verified Expert badge</li>
-                <li>✅ WhatsApp alerts on new leads</li>
-                <li>✅ Expert dashboard with analytics</li>
-              </ul>
-            </div>
+          <div className="max-w-sm mx-auto glass p-6" style={{ border: '2px solid rgba(251,146,60,0.4)', background: 'rgba(251,146,60,0.04)' }}>
+            <div className="text-4xl mb-3">🤝</div>
+            <h2 className="font-heading text-xl font-800 mb-2" style={{ color: '#111827' }}>Property Expert</h2>
+            <ul className="text-sm space-y-1.5 mb-5" style={{ color: '#6B7280' }}>
+              <li>✅ ₹49 one-time — lifetime access</li>
+              <li>✅ 5 free property listings</li>
+              <li>✅ AI-scored buyer leads HOT🔥 WARM🌡️ COLD❄️</li>
+              <li>✅ WhatsApp Status Card for each property</li>
+              <li>✅ Orenzaa Verified Expert badge</li>
+              <li>✅ WhatsApp alerts on new leads</li>
+              <li>✅ Expert dashboard with analytics</li>
+            </ul>
+            <RazorpayButton
+              amount={49}
+              plan="expert-registration"
+              role="expert"
+              label="Pay ₹49 & Start Listing →"
+              onVerified={() => setStep(1)}
+              redirectTo={false}
+              className="btn-accent w-full"
+            />
           </div>
         </div>
       )}
 
-      {/* STEP 2 — property type */}
-      {step === 2 && (
+      {/* STEP 1 — property type */}
+      {step === 1 && (
         <div>
           <h1 className="font-heading text-2xl font-800 text-center mb-2" style={{ color: '#111827' }}>What are you listing?</h1>
           <p className="text-center text-sm mb-8" style={{ color: '#6B7280' }}>Pick a property type</p>
@@ -188,21 +183,21 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
             {PROPERTY_TYPES.map(t => (
               <div key={t.id} className="glass p-5 text-center cursor-pointer"
                 style={{ border: '2px solid rgba(0,0,0,0.06)' }}
-                onClick={() => { setCategory(t.id); setStep(3) }}>
+                onClick={() => { setCategory(t.id); setStep(2) }}>
                 <div className="text-3xl mb-2">{t.icon}</div>
                 <div className="text-sm font-700" style={{ color: '#111827' }}>{t.label}</div>
               </div>
             ))}
           </div>
-          {!initialRole && (
-            <button onClick={() => setStep(1)} suppressHydrationWarning
+          {!alreadyAuthorized && (
+            <button onClick={() => setStep(0)} suppressHydrationWarning
               className="mt-6 text-sm" style={{ color: '#6B7280' }}>← Back</button>
           )}
         </div>
       )}
 
-      {/* STEP 3 — form */}
-      {step === 3 && TypeFields && (
+      {/* STEP 2 — form + submit (payment already done, if it was needed) */}
+      {step === 2 && TypeFields && (
         <div className="glass p-5 flex flex-col gap-4">
           <div>
             <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Photos (3–10)</label>
@@ -227,7 +222,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
               value={form.price_min} onChange={e => setF('price_min', e.target.value)} suppressHydrationWarning />
           )}
 
-          <TypeFields form={form} persona={persona!} setF={setF} toggleArr={toggleArr} />
+          <TypeFields form={form} persona={persona} setF={setF} toggleArr={toggleArr} />
 
           <textarea className="input-dark text-sm resize-none" rows={3} placeholder="Description"
             value={form.description} onChange={e => setF('description', e.target.value)} suppressHydrationWarning />
@@ -254,62 +249,14 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
           {msg && <p className="text-sm" style={{ color: '#F87171' }}>{msg}</p>}
 
           <div className="flex gap-3">
-            <button onClick={() => setStep(2)} suppressHydrationWarning
+            <button onClick={() => setStep(1)} suppressHydrationWarning
               className="px-5 py-2.5 rounded-xl text-sm font-700" style={{ border: '1px solid rgba(0,0,0,0.06)', color: '#6B7280' }}>
               ← Back
             </button>
-            <button onClick={goToStep4} suppressHydrationWarning className="btn-accent flex-1">
-              Continue →
+            <button onClick={handleSubmit} disabled={saving} suppressHydrationWarning className="btn-accent flex-1 disabled:opacity-50">
+              {saving ? 'Listing…' : '+ List My Property'}
             </button>
           </div>
-        </div>
-      )}
-
-      {/* STEP 4 — submit / payment */}
-      {step === 4 && (
-        <div className="glass p-6 text-center">
-          {persona === 'builder' ? (
-            <>
-              <div className="text-4xl mb-3">🏗️</div>
-              <h2 className="font-heading text-xl font-800 mb-2" style={{ color: '#111827' }}>List for free</h2>
-              <p className="text-sm mb-6" style={{ color: '#6B7280' }}>Builder listings are free — no payment required.</p>
-              {msg && <p className="text-sm mb-3" style={{ color: '#F87171' }}>{msg}</p>}
-              <button onClick={handleBuilderSubmit} disabled={saving} suppressHydrationWarning
-                className="btn-accent w-full disabled:opacity-50">
-                {saving ? 'Listing…' : '+ List My Property'}
-              </button>
-            </>
-          ) : expertRegistered ? (
-            <>
-              <div className="text-4xl mb-3">🤝</div>
-              <h2 className="font-heading text-xl font-800 mb-2" style={{ color: '#111827' }}>You&apos;re registered</h2>
-              <p className="text-sm mb-6" style={{ color: '#6B7280' }}>Add this listing to your Expert account.</p>
-              {msg && <p className="text-sm mb-3" style={{ color: '#F87171' }}>{msg}</p>}
-              <button onClick={handleExpertFreeSubmit} disabled={saving} suppressHydrationWarning
-                className="btn-accent w-full disabled:opacity-50">
-                {saving ? 'Listing…' : '+ List My Property'}
-              </button>
-            </>
-          ) : (
-            <>
-              <div className="text-4xl mb-3">🤝</div>
-              <h2 className="font-heading text-xl font-800 mb-2" style={{ color: '#111827' }}>Pay ₹49 to register</h2>
-              <p className="text-sm mb-6" style={{ color: '#6B7280' }}>
-                One-time Property Expert registration. Your listing goes live right after payment.
-              </p>
-              <RazorpayButton
-                amount={49}
-                plan="expert-registration"
-                role="expert"
-                label="Pay ₹49 & List Property"
-                onVerified={async () => { await insertProperty() }}
-                redirectTo="/expert?welcome=1"
-                className="btn-accent w-full"
-              />
-            </>
-          )}
-          <button onClick={() => setStep(3)} suppressHydrationWarning
-            className="mt-4 text-sm" style={{ color: '#6B7280' }}>← Back to edit</button>
         </div>
       )}
     </div>

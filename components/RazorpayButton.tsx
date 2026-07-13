@@ -11,8 +11,10 @@ interface Props {
   className?: string
   /** Called after payment verification succeeds, before the default redirect. */
   onVerified?: () => void | Promise<void>
-  /** Overrides the default role-based redirect after a successful payment. */
-  redirectTo?: string
+  /** Overrides the default role-based redirect after a successful payment.
+   *  Pass `false` to stay on the current page (e.g. when onVerified already
+   *  handles moving the user forward, like advancing a wizard step). */
+  redirectTo?: string | false
 }
 
 
@@ -104,11 +106,13 @@ export default function RazorpayButton({ amount, plan, role, label, free, classN
             })
             const result = await verify.json()
             if (result.success) {
-              toast.success('Payment successful! Dashboard khul raha hai...')
+              toast.success('Payment successful!')
               if (onVerified) await onVerified()
-              setTimeout(() => {
-                window.location.href = redirectTo || (role === 'dealer' ? '/dealer' : role === 'expert' ? '/expert' : '/builder')
-              }, 1500)
+              if (redirectTo !== false) {
+                setTimeout(() => {
+                  window.location.href = redirectTo || (role === 'dealer' ? '/dealer' : role === 'expert' ? '/expert' : '/builder')
+                }, 1500)
+              }
             } else {
               toast.error('Payment verify nahi hua. Support se contact karo.')
             }
