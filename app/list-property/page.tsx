@@ -18,10 +18,10 @@ export default async function ListPropertyPage({
     .from('profiles')
     .select('role, expert_registered, is_partner')
     .eq('id', user.id)
-    .single()
+    .maybeSingle()
 
   if (profileError) {
-    console.error('[list-property] profile fetch failed', profileError)
+    console.error('[list-property] profile fetch failed', { userId: user.id, profileError })
     return (
       <>
         <Navbar />
