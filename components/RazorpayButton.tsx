@@ -114,7 +114,8 @@ export default function RazorpayButton({ amount, plan, role, label, free, classN
                 }, 1500)
               }
             } else {
-              toast.error('Payment verify nahi hua. Support se contact karo.')
+              toast.error(result.error || 'Payment verify nahi hua. Support se contact karo.')
+              console.error('RazorpayButton: verify-payment failed', result)
             }
           } catch {
             toast.error('Verification failed')

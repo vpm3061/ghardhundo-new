@@ -38,17 +38,25 @@ export async function POST(req: Request) {
   }
 
   /* Activate role */
-  await supabase.from('profiles').update({ role }).eq('id', user.id)
+  const { error: roleError } = await supabase.from('profiles').update({ role }).eq('id', user.id)
+  if (roleError) {
+    console.error('[verify-payment] role update failed', roleError)
+    return NextResponse.json({ error: 'Could not activate account: ' + roleError.message }, { status: 500 })
+  }
 
   const now    = new Date()
   const expiry = new Date(now)
   expiry.setMonth(expiry.getMonth() + 1)
 
   if (role === 'expert' && plan === 'expert-registration') {
-    await supabase.from('profiles').update({
+    const { error: regError } = await supabase.from('profiles').update({
       expert_registered: true,
       registration_paid_at: now.toISOString(),
     }).eq('id', user.id)
+    if (regError) {
+      console.error('[verify-payment] expert_registered update failed', regError)
+      return NextResponse.json({ error: 'Could not complete registration: ' + regError.message }, { status: 500 })
+    }
   } else if (role === 'expert') {
     const config = EXPERT_PLANS[plan]
     if (!config) return NextResponse.json({ error: 'Unknown plan' }, { status: 400 })

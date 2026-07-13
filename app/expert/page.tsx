@@ -13,6 +13,16 @@ export default async function ExpertPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login?redirect=/expert')
 
+  const { data: gateProfile } = await supabase.from('profiles')
+    .select('expert_registered, is_partner').eq('id', user.id).single()
+
+  // Dashboard is for experts who've actually paid + registered (or admin-approved
+  // partners) -- otherwise send them into the payment/registration flow instead of
+  // showing an empty shell they can't use.
+  if (!gateProfile?.expert_registered && !gateProfile?.is_partner) {
+    redirect('/list-property')
+  }
+
   const [{ data: profile }, { data: properties }, { data: subData }, { data: partnerData }] = await Promise.all([
     supabase.from('profiles')
       .select('full_name, email, phone, whatsapp_number, avatar_url, role, is_partner, verification_status, city, experience_years, rera_number')
