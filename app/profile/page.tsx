@@ -23,9 +23,8 @@ export default async function ProfilePage() {
     supabase.from('saved_properties').select('property_id, properties(*)').eq('user_id', user.id).order('created_at', { ascending: false }),
   ])
 
-  if (profile?.expert_registered === true) {
-    redirect('/expert')
-  }
+  if (user?.email === 'tellitorg1@gmail.com') redirect('/admin')
+  if (profile?.expert_registered === true) redirect('/expert')
 
   const enquiriesTyped = (enquiries || []).map(e => ({
     id: e.id as string,

@@ -36,9 +36,10 @@ export default function Navbar() {
     router.refresh()
   }
 
-  const isAdmin = user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL || user?.email === 'tellitorg1@gmail.com'
-  const isExpert = !!profile?.expert_registered || profile?.role === 'expert'
-  const dashboardLink = isAdmin ? { href: '/admin', label: 'Admin' } : isExpert ? { href: '/expert', label: 'My Dashboard' } : { href: '/profile', label: 'Profile' }
+  const isAdmin = user?.email === 'tellitorg1@gmail.com'
+  const isExpert = profile?.expert_registered === true
+  const dashboardHref = isAdmin ? '/admin' : isExpert ? '/expert' : '/profile'
+  const dashboardLabel = isAdmin ? 'Admin' : isExpert ? 'My Dashboard' : 'Profile'
 
   return (
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#E5E7EB] shadow-sm">
@@ -158,9 +159,9 @@ export default function Navbar() {
           })}
           {user ? (
             <>
-              <Link href={dashboardLink.href} onClick={() => setMenuOpen(false)}
+              <Link href={dashboardHref} onClick={() => setMenuOpen(false)}
                 className="px-4 py-3 rounded-xl text-sm text-[#374151] hover:text-[#111827] hover:bg-[#FAFAF9] transition-all">
-                {dashboardLink.label}
+                {dashboardLabel}
               </Link>
               <button
                 onClick={handleSignOut}

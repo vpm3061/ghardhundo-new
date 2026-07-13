@@ -4,12 +4,7 @@ import { NextResponse } from 'next/server'
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
-  const redirectParam = requestUrl.searchParams.get('redirect') || '/'
   const origin = requestUrl.origin
-
-  const safeRedirect = redirectParam.startsWith('/') && !redirectParam.startsWith('//')
-    ? redirectParam
-    : '/'
 
   if (code) {
     const supabase = await createClient()
@@ -19,23 +14,19 @@ export async function GET(request: Request) {
       const { data: { user } } = await supabase.auth.getUser()
 
       if (user) {
-        if (user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL || user.email === 'tellitorg1@gmail.com') {
-          return NextResponse.redirect(`${origin}/admin`)
-        }
-
         const { data: profile } = await supabase
           .from('profiles')
           .select('role, expert_registered, is_partner')
           .eq('id', user.id)
           .single()
 
-        // role alone doesn't prove payment/authorization -- it can be 'expert'
-        // via admin partner-approval or legacy data with no ₹49 registration.
-        if (profile?.expert_registered || profile?.is_partner) {
+        if (user.email === 'tellitorg1@gmail.com') {
+          return NextResponse.redirect(`${origin}/admin`)
+        }
+        if (profile?.expert_registered === true) {
           return NextResponse.redirect(`${origin}/expert`)
         }
-
-        return NextResponse.redirect(`${origin}${safeRedirect}`)
+        return NextResponse.redirect(`${origin}/`)
       }
     }
   }
