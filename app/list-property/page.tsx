@@ -11,14 +11,17 @@ export default async function ListPropertyPage({
 }) {
   const { new: isNew } = await searchParams
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  console.log('[list-property] user:', user?.id, 'error:', userError?.message)
   if (!user) redirect('/login?redirect=/list-property')
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('role, expert_registered, is_partner')
-    .eq('id', user.id)
+    .eq('id', user?.id ?? '')
     .maybeSingle()
+
+  console.log('[list-property] profile:', profile, 'error:', profileError?.message)
 
   if (profileError) {
     console.error('[list-property] profile fetch failed', { userId: user.id, profileError })
