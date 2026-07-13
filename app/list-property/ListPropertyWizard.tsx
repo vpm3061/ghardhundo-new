@@ -1,6 +1,7 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import PhotoUpload from '@/components/PhotoUpload'
 import RazorpayButton from '@/components/RazorpayButton'
@@ -11,6 +12,29 @@ import CommercialFields from '@/components/wizard/CommercialFields'
 import { BLANK_WIZARD_FORM, type WizardForm, type Persona, type Category } from '@/components/wizard/types'
 
 const CITIES = ['Lucknow', 'Noida', 'Greater Noida', 'Ayodhya', 'Ghaziabad']
+const EXPERT_CITIES = [...CITIES, 'Other']
+const EXPERIENCE_OPTIONS = ['0-1 year', '1-3 years', '3-5 years', '5-10 years', '10+ years']
+const SPECIALIZATIONS = ['Residential Flats', 'Plots', 'Rental', 'Commercial', 'All types']
+
+type RegForm = {
+  full_name: string
+  phone: string
+  whatsapp_number: string
+  city: string
+  experience_years: string
+  property_specialization: string[]
+  rera_number: string
+}
+
+const BLANK_REG_FORM: RegForm = {
+  full_name: '',
+  phone: '',
+  whatsapp_number: '',
+  city: '',
+  experience_years: '',
+  property_specialization: [],
+  rera_number: '',
+}
 
 const PROPERTY_TYPES: { id: Category; icon: string; label: string }[] = [
   { id: 'flat', icon: '🏢', label: 'Flat / Apartment' },
@@ -25,15 +49,31 @@ type Props = {
   expertRegistered: boolean
 }
 
+type Step = 0 | 'register' | 1 | 2
+
 export default function ListPropertyWizard({ userId, initialRole, expertRegistered }: Props) {
   const router = useRouter()
   const alreadyAuthorized = !!initialRole || expertRegistered
-  const [step, setStep] = useState<0 | 1 | 2>(alreadyAuthorized ? 1 : 0)
+  const [step, setStep] = useState<Step>(alreadyAuthorized ? 1 : 0)
   const [persona] = useState<Persona>(initialRole ?? 'expert')
   const [category, setCategory] = useState<Category | null>(null)
   const [form, setForm] = useState<WizardForm>(BLANK_WIZARD_FORM)
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
+
+  const [userEmail, setUserEmail] = useState('')
+  const [regForm, setRegForm] = useState<RegForm>(BLANK_REG_FORM)
+  const [regSaving, setRegSaving] = useState(false)
+  const [regSuccess, setRegSuccess] = useState(false)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      setUserEmail(user.email || '')
+      setRegForm(f => ({ ...f, full_name: user.user_metadata?.full_name || f.full_name }))
+    })
+  }, [])
 
   const setF = (k: keyof WizardForm, v: unknown) => setForm(p => ({ ...p, [k]: v }))
   const toggleArr = (k: 'bhk' | 'amenities', val: string) =>
@@ -108,6 +148,58 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
     return supabase.from('properties').insert(buildPayload())
   }
 
+  const toggleSpecialization = (val: string) =>
+    setRegForm(f => ({
+      ...f,
+      property_specialization: f.property_specialization.includes(val)
+        ? f.property_specialization.filter(x => x !== val)
+        : [...f.property_specialization, val],
+    }))
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!regForm.full_name.trim() || !regForm.phone.trim() || !regForm.city) {
+      toast.error('Naam, phone aur city zaroori hain!')
+      return
+    }
+    setRegSaving(true)
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setRegSaving(false); return }
+
+    const { error } = await supabase.from('profiles').update({
+      full_name: regForm.full_name,
+      phone: regForm.phone,
+      whatsapp_number: regForm.whatsapp_number || regForm.phone,
+      city: regForm.city,
+      experience_years: regForm.experience_years || null,
+      property_specialization: regForm.property_specialization.length > 0 ? regForm.property_specialization : null,
+      rera_number: regForm.rera_number || null,
+      role: 'expert',
+      expert_registered: true,
+      profile_complete: true,
+      registration_paid_at: new Date().toISOString(),
+    }).eq('id', user.id)
+
+    if (error) { toast.error('Error: ' + error.message); setRegSaving(false); return }
+
+    await fetch('/api/notify-expert-registration', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: regForm.full_name,
+        phone: regForm.phone,
+        email: user.email,
+        city: regForm.city,
+      }),
+    }).catch(() => {})
+
+    toast.success('Welcome to Orenzaa! 🎉')
+    setRegSaving(false)
+    setRegSuccess(true)
+    setTimeout(() => router.push('/expert'), 2000)
+  }
+
   const handleSubmit = async () => {
     const err = validateForm()
     if (err) { setMsg(err); return }
@@ -132,13 +224,16 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
     : category === 'commercial' ? CommercialFields
     : null
 
+  const STEP_ORDER: Step[] = [0, 'register', 1, 2]
+  const stepPos = STEP_ORDER.indexOf(step)
+
   return (
     <div>
       {/* Step indicator */}
       <div className="flex items-center gap-2 mb-8">
-        {[0, 1, 2].map(n => (
-          <div key={n} className="flex-1 h-1 rounded-full"
-            style={{ background: step >= n ? '#FB923C' : 'rgba(0,0,0,0.06)' }} />
+        {STEP_ORDER.map(n => (
+          <div key={String(n)} className="flex-1 h-1 rounded-full"
+            style={{ background: stepPos >= STEP_ORDER.indexOf(n) ? '#FB923C' : 'rgba(0,0,0,0.06)' }} />
         ))}
       </div>
 
@@ -166,11 +261,116 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
               plan="expert-registration"
               role="expert"
               label="Pay ₹49 & Start Listing →"
-              onVerified={() => setStep(1)}
+              onVerified={() => setStep('register')}
               redirectTo={false}
               className="btn-accent w-full"
             />
           </div>
+        </div>
+      )}
+
+      {/* STEP 'register' — post-payment expert registration form */}
+      {step === 'register' && (
+        <div className="max-w-md mx-auto">
+          {regSuccess ? (
+            <div className="text-center py-12">
+              <div className="text-5xl mb-3">🎉</div>
+              <h1 className="text-2xl font-bold text-[#111827]">Welcome to Orenzaa!</h1>
+              <p className="text-[#6B7280] mt-1">Taking you to your dashboard…</p>
+            </div>
+          ) : (
+            <>
+              <div className="text-center mb-6">
+                <div className="text-5xl mb-3">✅</div>
+                <h1 className="text-2xl font-bold text-[#111827]">Payment Successful!</h1>
+                <p className="text-[#6B7280] mt-1">Ab apni details bharo — almost done!</p>
+              </div>
+
+              <form onSubmit={handleRegister} className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-[#374151] block mb-1">Email</label>
+                  <input type="email" value={userEmail} disabled
+                    className="w-full border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm bg-gray-50 text-gray-400" />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-[#374151] block mb-1">Full Name *</label>
+                  <input type="text" value={regForm.full_name}
+                    onChange={e => setRegForm(f => ({ ...f, full_name: e.target.value }))}
+                    placeholder="Aapka poora naam" suppressHydrationWarning
+                    className="w-full border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FB923C]" />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-[#374151] block mb-1">Phone Number *</label>
+                  <input type="tel" value={regForm.phone}
+                    onChange={e => setRegForm(f => ({ ...f, phone: e.target.value }))}
+                    placeholder="9876543210" suppressHydrationWarning
+                    className="w-full border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FB923C]" />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-[#374151] block mb-1">WhatsApp Number</label>
+                  <input type="tel" value={regForm.whatsapp_number}
+                    onChange={e => setRegForm(f => ({ ...f, whatsapp_number: e.target.value }))}
+                    placeholder="Same as phone? Khali rakho" suppressHydrationWarning
+                    className="w-full border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FB923C]" />
+                  <p className="text-xs text-[#9CA3AF] mt-1">Leads ke alerts yahan aayenge</p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-[#374151] block mb-1">City *</label>
+                  <select value={regForm.city}
+                    onChange={e => setRegForm(f => ({ ...f, city: e.target.value }))} suppressHydrationWarning
+                    className="w-full border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FB923C]">
+                    <option value="">Select city</option>
+                    {EXPERT_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-[#374151] block mb-1">Experience in Real Estate</label>
+                  <select value={regForm.experience_years}
+                    onChange={e => setRegForm(f => ({ ...f, experience_years: e.target.value }))} suppressHydrationWarning
+                    className="w-full border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FB923C]">
+                    <option value="">Select experience</option>
+                    {EXPERIENCE_OPTIONS.map(e => <option key={e} value={e}>{e}</option>)}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-[#374151] block mb-2">I deal in (select all that apply)</label>
+                  <div className="flex flex-wrap gap-2">
+                    {SPECIALIZATIONS.map(s => (
+                      <button key={s} type="button" onClick={() => toggleSpecialization(s)} suppressHydrationWarning
+                        className={`px-3 py-1.5 rounded-full text-xs border transition-all ${
+                          regForm.property_specialization.includes(s)
+                            ? 'bg-orange-100 text-orange-600 border-orange-400'
+                            : 'bg-gray-50 text-gray-500 border-gray-200'
+                        }`}>
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-[#374151] block mb-1">
+                    RERA Number <span className="text-[#9CA3AF] font-normal">(optional)</span>
+                  </label>
+                  <input type="text" value={regForm.rera_number}
+                    onChange={e => setRegForm(f => ({ ...f, rera_number: e.target.value }))}
+                    placeholder="Adds verified badge to your profile" suppressHydrationWarning
+                    className="w-full border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FB923C]" />
+                </div>
+
+                <button type="submit" disabled={regSaving} suppressHydrationWarning
+                  className="w-full py-4 bg-[#FB923C] hover:bg-[#F59E0B] text-white font-bold rounded-xl disabled:opacity-50 text-base">
+                  {regSaving ? 'Setting up your account...' : 'Complete Registration & Go to Dashboard →'}
+                </button>
+              </form>
+            </>
+          )}
         </div>
       )}
 

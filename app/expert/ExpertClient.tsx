@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import RazorpayButton from '@/components/RazorpayButton'
 import StatusCard from '@/components/StatusCard'
@@ -14,6 +15,17 @@ type Lead = {
   message: string | null
   created_at: string
   property_id: string | null
+  ai_score: number
+  tier: 'HOT' | 'WARM' | 'COLD' | null
+  propertyTitle: string | null
+}
+
+type Analytics = {
+  viewsThisMonth: number
+  enquiriesThisMonth: number
+  mostViewedTitle: string | null
+  mostViewedCount: number
+  conversionRate: number
 }
 
 type Props = {
@@ -21,8 +33,12 @@ type Props = {
   fullName: string | null
   email: string
   phone: string | null
+  whatsappNumber: string | null
   avatarUrl: string | null
   verificationStatus: string
+  city: string | null
+  experienceYears: string | null
+  reraNumber: string | null
   properties: Property[]
   leads: Lead[]
   isSubscribed: boolean
@@ -30,17 +46,25 @@ type Props = {
   planExpiry: string | null
   isPartner: boolean
   partnerAppStatus: string | null
+  analytics: Analytics
 }
 
-const TABS = ['My Listings', 'My Leads', 'Subscription', 'Sell with Orenzaa'] as const
+const TABS = ['My Listings', 'My Leads', 'Analytics', 'Upgrade', 'Sell with Orenzaa'] as const
 type Tab = typeof TABS[number]
+
+const TIER_BADGE: Record<string, { label: string; className: string }> = {
+  HOT:  { label: 'HOT 🔥',  className: 'bg-red-50 text-red-600' },
+  WARM: { label: 'WARM 🌡️', className: 'bg-orange-50 text-orange-600' },
+  COLD: { label: 'COLD ❄️',  className: 'bg-blue-50 text-blue-600' },
+}
 
 const fmt = (n: number) =>
   n >= 1e7 ? `₹${(n / 1e7).toFixed(1)}Cr` : n >= 1e5 ? `₹${(n / 1e5).toFixed(0)}L` : `₹${n.toLocaleString()}`
 
 export default function ExpertClient({
-  userId, fullName, email, phone, avatarUrl, verificationStatus,
-  properties, leads, isSubscribed, activePlan, planExpiry, isPartner, partnerAppStatus,
+  userId, fullName, email, phone, whatsappNumber, avatarUrl, verificationStatus,
+  city, experienceYears, reraNumber,
+  properties, leads, isSubscribed, activePlan, planExpiry, isPartner, partnerAppStatus, analytics,
 }: Props) {
   const router = useRouter()
   const [authLoading, setAuthLoading] = useState(true)
@@ -49,14 +73,13 @@ export default function ExpertClient({
   const [applied, setApplied] = useState(false)
   const [verifStatus, setVerifStatus] = useState(verificationStatus)
   const [verifApplying, setVerifApplying] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
     async function loadProfile() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login?redirect=/expert'); return }
-      const { data: profile } = await supabase
-        .from('profiles').select('role').eq('id', user.id).single()
       setAuthLoading(false)
     }
     loadProfile()
@@ -88,8 +111,21 @@ export default function ExpertClient({
     setVerifApplying(false)
   }
 
+  const deleteProperty = async (id: string, title: string) => {
+    if (!window.confirm(`Delete "${title}"? This can't be undone.`)) return
+    setDeletingId(id)
+    const supabase = createClient()
+    const { error } = await supabase.from('properties').delete().eq('id', id)
+    setDeletingId(null)
+    if (error) { toast.error('Delete failed: ' + error.message); return }
+    toast.success('Listing deleted')
+    router.refresh()
+  }
+
   const FREE_LIMIT = 5
-  const overLimit = properties.length >= FREE_LIMIT && !isSubscribed
+  const PRO_LIMIT = 20
+  const listingLimit = isSubscribed ? PRO_LIMIT : FREE_LIMIT
+  const overLimit = properties.length >= listingLimit
   const initials = (fullName || email).slice(0, 1).toUpperCase()
 
   return (
@@ -104,21 +140,41 @@ export default function ExpertClient({
               {initials}
             </div>
           )}
-          <div>
-            <h2 className="font-bold text-[#111827]">{fullName || 'Property Expert'}</h2>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <h2 className="font-bold text-[#111827]">{fullName || 'Property Expert'}</h2>
+              {verifStatus === 'verified' && (
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">✅ Verified</span>
+              )}
+            </div>
             <p className="text-sm text-[#6B7280]">{email}</p>
-            {phone && <p className="text-sm text-[#6B7280]">📱 {phone}</p>}
+            {(phone || whatsappNumber) && (
+              <p className="text-sm text-[#6B7280]">
+                {phone && `📱 ${phone}`}{phone && whatsappNumber && ' | '}{whatsappNumber && `💬 ${whatsappNumber}`}
+              </p>
+            )}
+            {(city || experienceYears) && (
+              <p className="text-sm text-[#6B7280]">
+                {city && `📍 ${city}`}{city && experienceYears && ' | '}{experienceYears}
+              </p>
+            )}
+            {reraNumber && <p className="text-sm text-[#6B7280]">🪪 RERA: {reraNumber}</p>}
           </div>
-          <div className="ml-auto text-right">
-            {verifStatus === 'verified' ? (
-              <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">✅ Verified</span>
-            ) : verifStatus === 'pending' ? (
-              <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">⏳ Pending</span>
-            ) : (
-              <button onClick={applyVerification} disabled={verifApplying} suppressHydrationWarning
-                className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold hover:bg-orange-200 disabled:opacity-50">
-                {verifApplying ? '…' : 'Apply for Badge →'}
-              </button>
+          <div className="text-right shrink-0">
+            <span className="text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-bold">
+              🤝 Expert
+            </span>
+            {verifStatus !== 'verified' && (
+              <div className="mt-2">
+                {verifStatus === 'pending' ? (
+                  <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">⏳ Pending</span>
+                ) : (
+                  <button onClick={applyVerification} disabled={verifApplying} suppressHydrationWarning
+                    className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold hover:bg-orange-200 disabled:opacity-50">
+                    {verifApplying ? '…' : 'Apply for Badge →'}
+                  </button>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -145,7 +201,7 @@ export default function ExpertClient({
         <div>
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm text-[#6B7280]">
-              {properties.length} / {isSubscribed ? '∞' : FREE_LIMIT} listings used
+              {properties.length} / {listingLimit} listings used
             </p>
             {!overLimit && (
               <Link
@@ -160,12 +216,18 @@ export default function ExpertClient({
 
           {overLimit && (
             <div className="mb-4 p-4 rounded-xl bg-orange-50 border border-orange-200 text-sm">
-              <p className="font-700 text-[#FB923C] mb-1">Free plan limit reached (5 listings)</p>
-              <p className="text-[#6B7280]">Subscribe to add unlimited listings.</p>
-              <button onClick={() => setTab('Subscription')}
-                className="mt-2 text-[#FB923C] font-700 underline text-xs">
-                View Subscription →
-              </button>
+              <p className="font-700 text-[#FB923C] mb-1">
+                {isSubscribed ? 'Pro plan limit reached (20 listings)' : 'Free plan limit reached (5 listings)'}
+              </p>
+              <p className="text-[#6B7280]">
+                {isSubscribed ? 'Contact support to raise your limit.' : 'Upgrade to Pro to add up to 20 listings.'}
+              </p>
+              {!isSubscribed && (
+                <button onClick={() => setTab('Upgrade')}
+                  className="mt-2 text-[#FB923C] font-700 underline text-xs">
+                  View Upgrade →
+                </button>
+              )}
             </div>
           )}
 
@@ -182,20 +244,30 @@ export default function ExpertClient({
           ) : (
             <div className="flex flex-col gap-3">
               {properties.map(p => (
-                <div key={p.id} className="bg-white border border-[#E5E7EB] rounded-xl px-5 py-4 flex items-center justify-between gap-4">
-                  <div>
-                    <p className="font-700 text-[#111827] text-sm">{p.title}</p>
-                    <p className="text-xs text-[#6B7280] mt-0.5">
-                      {p.city} · {p.price_min ? fmt(p.price_min) : '—'}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className={`text-xs px-2.5 py-1 rounded-full font-600 ${
+                <div key={p.id} className="bg-white border border-[#E5E7EB] rounded-xl px-5 py-4">
+                  <div className="flex items-center justify-between gap-4 mb-3">
+                    <div>
+                      <p className="font-700 text-[#111827] text-sm">{p.title}</p>
+                      <p className="text-xs text-[#6B7280] mt-0.5">
+                        {p.city} · {p.price_min ? fmt(p.price_min) : '—'}
+                      </p>
+                    </div>
+                    <span className={`text-xs px-2.5 py-1 rounded-full font-600 shrink-0 ${
                       p.is_active ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'
                     }`}>
                       {p.is_active ? 'Active' : 'Inactive'}
                     </span>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
                     <StatusCard property={p} />
+                    <Link href={`/list-property/${p.id}/edit`}
+                      className="px-3 py-1.5 rounded-lg text-xs font-700 border border-[#E5E7EB] text-[#374151] hover:border-[#FB923C]">
+                      Edit
+                    </Link>
+                    <button onClick={() => deleteProperty(p.id, p.title)} disabled={deletingId === p.id} suppressHydrationWarning
+                      className="px-3 py-1.5 rounded-lg text-xs font-700 border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50">
+                      {deletingId === p.id ? 'Deleting…' : 'Delete'}
+                    </button>
                   </div>
                 </div>
               ))}
@@ -212,9 +284,9 @@ export default function ExpertClient({
               <span className="text-xl">🔒</span>
               <div>
                 <p className="font-700 text-[#FB923C]">Phone numbers are blurred</p>
-                <p className="text-[#6B7280]">Subscribe to unlock full lead details.</p>
-                <button onClick={() => setTab('Subscription')} className="mt-1.5 text-[#FB923C] font-700 underline text-xs">
-                  Subscribe now →
+                <p className="text-[#6B7280]">Upgrade to Pro to unlock full lead details.</p>
+                <button onClick={() => setTab('Upgrade')} className="mt-1.5 text-[#FB923C] font-700 underline text-xs">
+                  Upgrade now →
                 </button>
               </div>
             </div>
@@ -228,29 +300,75 @@ export default function ExpertClient({
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              {leads.map(lead => (
-                <div key={lead.id} className="bg-white border border-[#E5E7EB] rounded-xl px-5 py-4">
-                  <div className="flex items-center justify-between gap-4 mb-1">
-                    <p className="font-700 text-[#111827] text-sm">{lead.name}</p>
-                    <p className="text-xs text-[#9CA3AF]">
-                      {new Date(lead.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
-                    </p>
+              {leads.map(lead => {
+                const badge = lead.tier ? TIER_BADGE[lead.tier] : null
+                return (
+                  <div key={lead.id} className="bg-white border border-[#E5E7EB] rounded-xl px-5 py-4">
+                    <div className="flex items-center justify-between gap-4 mb-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-700 text-[#111827] text-sm">{lead.name}</p>
+                        {badge && (
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-700 ${badge.className}`}>{badge.label}</span>
+                        )}
+                      </div>
+                      <p className="text-xs text-[#9CA3AF]">
+                        {new Date(lead.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                      </p>
+                    </div>
+                    {lead.propertyTitle && (
+                      <p className="text-xs text-[#6B7280] mb-1">Enquired: {lead.propertyTitle}</p>
+                    )}
+                    {isSubscribed ? (
+                      <p className="text-sm" style={{ color: '#374151' }}>{lead.phone}</p>
+                    ) : (
+                      <p className="text-sm" style={{ color: '#374151' }}>
+                        **** ****{lead.phone.slice(-2)}{' '}
+                        <button onClick={() => setTab('Upgrade')} className="text-[#FB923C] font-700 underline text-xs">
+                          Upgrade to reveal
+                        </button>
+                      </p>
+                    )}
+                    {lead.message && (
+                      <p className="text-xs text-[#9CA3AF] mt-1 truncate">{lead.message}</p>
+                    )}
                   </div>
-                  <p className="text-sm" style={isSubscribed ? { color: '#374151' } : { filter: 'blur(5px)', userSelect: 'none', color: '#374151' }}>
-                    {lead.phone}
-                  </p>
-                  {lead.message && (
-                    <p className="text-xs text-[#9CA3AF] mt-1 truncate">{lead.message}</p>
-                  )}
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
       )}
 
-      {/* Subscription */}
-      {tab === 'Subscription' && (
+      {/* Analytics */}
+      {tab === 'Analytics' && (
+        <div>
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-4">
+              <p className="text-xs font-600 text-[#6B7280] mb-1">👁️ Views this month</p>
+              <p className="font-heading text-2xl font-800 text-[#111827]">{analytics.viewsThisMonth}</p>
+            </div>
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-4">
+              <p className="text-xs font-600 text-[#6B7280] mb-1">📋 Enquiries this month</p>
+              <p className="font-heading text-2xl font-800 text-[#111827]">{analytics.enquiriesThisMonth}</p>
+            </div>
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-4">
+              <p className="text-xs font-600 text-[#6B7280] mb-1">📈 Conversion rate</p>
+              <p className="font-heading text-2xl font-800 text-[#111827]">{analytics.conversionRate}%</p>
+            </div>
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-4">
+              <p className="text-xs font-600 text-[#6B7280] mb-1">🏆 Most viewed</p>
+              <p className="font-700 text-sm text-[#111827] truncate">{analytics.mostViewedTitle || '—'}</p>
+              {analytics.mostViewedTitle && <p className="text-xs text-[#9CA3AF]">{analytics.mostViewedCount} views</p>}
+            </div>
+          </div>
+          {properties.length === 0 && (
+            <p className="text-sm text-[#9CA3AF] text-center py-8">Add a listing to start seeing analytics.</p>
+          )}
+        </div>
+      )}
+
+      {/* Upgrade */}
+      {tab === 'Upgrade' && (
         <div>
           {isSubscribed ? (
             <div className="bg-green-50 border border-green-200 rounded-2xl p-6 mb-6">
@@ -265,55 +383,33 @@ export default function ExpertClient({
                   )}
                 </div>
               </div>
-              <p className="text-sm text-[#6B7280]">Full lead access enabled. Unlimited listings.</p>
+              <p className="text-sm text-[#6B7280]">Full lead access enabled. Up to 20 listings.</p>
             </div>
           ) : (
             <div className="mb-6 p-5 rounded-2xl bg-orange-50 border border-orange-200">
-              <p className="font-700 text-[#111827] mb-1">No active subscription</p>
-              <p className="text-sm text-[#6B7280]">Subscribe to unlock phone numbers and add unlimited listings.</p>
+              <p className="font-700 text-[#111827] mb-1">Current plan: Basic (₹49 paid)</p>
+              <p className="text-sm text-[#6B7280]">Upgrade to Pro to unlock phone numbers and add up to 20 listings.</p>
             </div>
           )}
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            {/* Monthly */}
-            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 flex flex-col">
-              <div className="text-xs font-700 uppercase tracking-wider mb-3 text-[#9CA3AF]">Monthly</div>
-              <div className="font-heading text-3xl font-800 mb-0.5 text-[#111827]">₹599</div>
-              <div className="text-xs mb-5 text-[#9CA3AF]">/month</div>
-              <ul className="flex flex-col gap-2 text-sm text-[#6B7280] mb-6 flex-1">
-                {['Unlimited listings', 'Full lead details', '55/45 deal split', 'Priority support'].map(f => (
-                  <li key={f} className="flex items-center gap-2">
-                    <span className="text-[#FB923C]">✓</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <RazorpayButton plan="Monthly" role="expert" amount={599} label="Subscribe ₹599/mo"
-                className="block w-full text-center py-2.5 rounded-xl text-sm font-700 transition-all cursor-pointer bg-[#FB923C] text-white hover:bg-[#F59E0B]" />
-            </div>
-
-            {/* 6-Month */}
-            <div className="bg-[#FB923C] rounded-2xl p-6 flex flex-col relative overflow-hidden">
-              <div className="absolute -top-3 right-4">
-                <span className="text-[10px] font-800 uppercase tracking-wider px-3 py-1 rounded-full bg-[#111827] text-white">
-                  Best Value
-                </span>
-              </div>
-              <div className="text-xs font-700 uppercase tracking-wider mb-3 text-orange-100">6 Months</div>
-              <div className="font-heading text-3xl font-800 mb-0.5 text-white">₹999</div>
-              <div className="text-xs mb-5 text-orange-200">/6 months · Save ₹1,595</div>
-              <ul className="flex flex-col gap-2 text-sm text-orange-100 mb-6 flex-1">
-                {['Everything in Monthly', '6 months access', 'Priority placement', 'Dedicated support'].map(f => (
+          {!isSubscribed && (
+            <div className="bg-[#FB923C] rounded-2xl p-6 flex flex-col relative overflow-hidden mb-6">
+              <div className="text-xs font-700 uppercase tracking-wider mb-3 text-orange-100">Pro Plan</div>
+              <div className="font-heading text-3xl font-800 mb-0.5 text-white">₹499</div>
+              <div className="text-xs mb-5 text-orange-200">/month</div>
+              <ul className="flex flex-col gap-2 text-sm text-orange-100 mb-6">
+                {['20 listings', 'Lead phone reveal', 'Priority in search'].map(f => (
                   <li key={f} className="flex items-center gap-2">
                     <span className="text-white">✓</span> {f}
                   </li>
                 ))}
               </ul>
-              <RazorpayButton plan="SixMonth" role="expert" amount={999} label="Subscribe ₹999/6mo"
+              <RazorpayButton plan="expert-pro" role="expert" amount={499} label="Upgrade to Pro ₹499/mo"
                 className="block w-full text-center py-2.5 rounded-xl text-sm font-700 transition-all cursor-pointer bg-white text-[#FB923C] hover:bg-orange-50" />
             </div>
-          </div>
+          )}
 
-          <div className="border border-[#E5E7EB] rounded-2xl p-5 mt-6">
+          <div className="border border-[#E5E7EB] rounded-2xl p-5">
             <h3 className="font-bold mb-2" style={{ color: '#111827' }}>📢 Advertise on Orenzaa</h3>
             <p className="text-sm text-[#6B7280] mb-4">
               Featured listing ya banner ad ke liye apply karo — 10,000+ buyers tak pahuncho

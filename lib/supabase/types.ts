@@ -12,6 +12,10 @@ export type Profile = {
   whatsapp_number: string | null
   verification_status: 'none' | 'pending' | 'verified' | 'rejected'
   verification_requested_at: string | null
+  city: string | null
+  experience_years: string | null
+  property_specialization: string[] | null
+  rera_number: string | null
   created_at: string
 }
 

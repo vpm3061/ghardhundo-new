@@ -16,6 +16,7 @@ const BUILDER_PLANS: Record<string, { amount: number; listingLimit: number }> = 
 const EXPERT_PLANS: Record<string, { amount: number; months: number }> = {
   'Pro-Monthly':  { amount: 599, months: 1 },
   'Pro-6Month':   { amount: 999, months: 6 },
+  'expert-pro':   { amount: 499, months: 1 },
 }
 
 export async function POST(req: Request) {
