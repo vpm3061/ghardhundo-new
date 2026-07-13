@@ -70,38 +70,38 @@ export default function ProfileClient({
   return (
     <div className="flex flex-col gap-5">
       {/* Profile header */}
-      <div className="glass p-5 flex items-center gap-4">
-        {avatarUrl ? (
-          <img src={avatarUrl} alt="" className="w-16 h-16 rounded-2xl object-cover" />
-        ) : (
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center font-heading font-800 text-lg shrink-0"
-            style={{ background: 'linear-gradient(135deg, #FB923C, #F59E0B)', color: '#111827' }}>
-            {initials}
+      <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
+        <div className="flex items-center gap-4">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="" className="w-16 h-16 rounded-full object-cover shrink-0" />
+          ) : (
+            <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center text-2xl font-bold text-orange-600 shrink-0">
+              {initials}
+            </div>
+          )}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="font-bold text-[#111827] text-lg truncate">{fullName || 'Your Name'}</h2>
+              {role === 'expert' && (
+                <span className="text-[10px] font-700 px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 shrink-0">
+                  {verificationStatus === 'verified' ? '✅ Verified Expert' : 'Orenzaa Expert'}
+                </span>
+              )}
+            </div>
+            <p className="text-sm text-[#6B7280] truncate">{email}</p>
+            {phone && <p className="text-sm text-[#6B7280] mt-0.5">📱 {phone}</p>}
+            {whatsappNumber && <p className="text-xs text-[#9CA3AF] mt-0.5">💬 WhatsApp: {whatsappNumber}</p>}
           </div>
-        )}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="font-heading font-800 text-base truncate" style={{ color: '#111827' }}>{fullName || 'User'}</div>
-            {role === 'expert' && (
-              <span className="text-[10px] font-700 px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 shrink-0">
-                {verificationStatus === 'verified' ? '✅ Verified Expert' : 'Orenzaa Expert'}
-              </span>
-            )}
+          <div className="shrink-0 flex flex-col items-end gap-1.5">
+            <button onClick={() => setEditMode(true)} suppressHydrationWarning
+              className="px-4 py-2 border border-[#E5E7EB] rounded-xl text-sm text-[#374151] hover:border-[#FB923C] hover:text-[#FB923C] transition-all">
+              ✏️ Edit
+            </button>
+            <button onClick={signOut} suppressHydrationWarning
+              className="text-xs transition-colors" style={{ color: '#9CA3AF' }}>
+              Sign out
+            </button>
           </div>
-          <div className="text-sm truncate" style={{ color: '#6B7280' }}>{email}</div>
-          {phone && <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>📱 {phone}</div>}
-          {whatsappNumber && <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>💬 WhatsApp: {whatsappNumber}</div>}
-        </div>
-        <div className="shrink-0 flex flex-col items-end gap-1.5">
-          <button onClick={() => setEditMode(true)} suppressHydrationWarning
-            className="text-xs font-700 px-3 py-1.5 rounded-xl transition-all"
-            style={{ background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.25)', color: '#FB923C' }}>
-            Edit Profile
-          </button>
-          <button onClick={signOut} suppressHydrationWarning
-            className="text-xs transition-colors" style={{ color: '#9CA3AF' }}>
-            Sign out
-          </button>
         </div>
       </div>
 
@@ -204,33 +204,37 @@ export default function ProfileClient({
 
       {/* Edit profile modal */}
       {editMode && (
-        <div className="modal-overlay">
-          <div className="w-full max-w-sm" style={{ background: 'white', border: '1px solid rgba(0,0,0,0.06)', borderRadius: '20px', padding: '24px' }}>
-            <h2 className="font-heading text-xl font-800 mb-4" style={{ color: '#111827' }}>Edit Profile</h2>
-            <form onSubmit={saveEdit} className="flex flex-col gap-3">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-6">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md">
+            <h3 className="font-bold text-lg mb-4" style={{ color: '#111827' }}>Edit Profile</h3>
+            <form onSubmit={saveEdit} className="space-y-4">
               <div>
-                <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Full Name</label>
-                <input className="input-dark text-sm" value={editForm.full_name}
-                  onChange={e => setEditForm(f => ({ ...f, full_name: e.target.value }))} suppressHydrationWarning />
+                <label className="text-sm font-medium text-[#374151] block mb-1">Full Name</label>
+                <input type="text" value={editForm.full_name}
+                  onChange={e => setEditForm(f => ({ ...f, full_name: e.target.value }))} suppressHydrationWarning
+                  className="w-full border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FB923C]" />
               </div>
               <div>
-                <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Phone</label>
-                <input className="input-dark text-sm" type="tel" value={editForm.phone}
-                  onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))} suppressHydrationWarning />
+                <label className="text-sm font-medium text-[#374151] block mb-1">Phone</label>
+                <input type="tel" value={editForm.phone}
+                  onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))} suppressHydrationWarning
+                  className="w-full border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FB923C]" />
               </div>
               <div>
-                <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>WhatsApp Number</label>
-                <input className="input-dark text-sm" type="tel" value={editForm.whatsapp_number}
+                <label className="text-sm font-medium text-[#374151] block mb-1">WhatsApp</label>
+                <input type="tel" value={editForm.whatsapp_number}
                   onChange={e => setEditForm(f => ({ ...f, whatsapp_number: e.target.value }))} suppressHydrationWarning
-                  placeholder="Same as phone? leave blank" />
+                  placeholder="Same as phone? leave blank"
+                  className="w-full border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FB923C]" />
               </div>
               {editMsg && <p className="text-xs" style={{ color: '#F87171' }}>{editMsg}</p>}
-              <div className="flex gap-3 mt-1">
+              <div className="flex gap-3 mt-6">
                 <button type="button" onClick={() => setEditMode(false)} suppressHydrationWarning
-                  className="flex-1 py-2.5 rounded-xl text-sm font-700" style={{ border: '1px solid rgba(0,0,0,0.06)', color: '#6B7280' }}>
+                  className="flex-1 py-3 border border-[#E5E7EB] rounded-xl text-sm text-[#374151]">
                   Cancel
                 </button>
-                <button type="submit" disabled={isPending} suppressHydrationWarning className="flex-1 btn-accent text-sm disabled:opacity-50">
+                <button type="submit" disabled={isPending} suppressHydrationWarning
+                  className="flex-1 py-3 bg-[#FB923C] text-white rounded-xl text-sm font-semibold disabled:opacity-50">
                   {isPending ? 'Saving…' : 'Save'}
                 </button>
               </div>

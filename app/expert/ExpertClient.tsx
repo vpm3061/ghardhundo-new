@@ -133,13 +133,30 @@ export default function ExpertClient({
       {/* Profile card */}
       <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-2xl p-5 mb-6">
         <div className="flex items-center gap-4">
-          {avatarUrl ? (
-            <img src={avatarUrl} alt="" className="w-14 h-14 rounded-full object-cover" />
-          ) : (
-            <div className="w-14 h-14 rounded-full bg-orange-200 flex items-center justify-center text-xl font-bold text-orange-700">
-              {initials}
+          <label className="cursor-pointer relative group shrink-0">
+            <div className="w-14 h-14 rounded-full bg-orange-200 flex items-center justify-center text-xl font-bold text-orange-700 overflow-hidden">
+              {avatarUrl
+                ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+                : <span>{initials}</span>
+              }
             </div>
-          )}
+            <div className="absolute bottom-0 right-0 bg-white rounded-full p-0.5 shadow text-xs">📷</div>
+            <input type="file" accept="image/*" className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0]
+                if (!file) return
+                const supabase = createClient()
+                const ext = file.name.split('.').pop()
+                const path = `avatars/${userId}.${ext}`
+                const { error } = await supabase.storage.from('property-photos').upload(path, file, { upsert: true })
+                if (error) { toast.error('Upload failed: ' + error.message); return }
+                const { data } = supabase.storage.from('property-photos').getPublicUrl(path)
+                await supabase.from('profiles').update({ avatar_url: data.publicUrl }).eq('id', userId)
+                toast.success('Profile photo updated!')
+                router.refresh()
+              }}
+            />
+          </label>
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <h2 className="font-bold text-[#111827]">{fullName || 'Property Expert'}</h2>

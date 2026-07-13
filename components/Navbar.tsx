@@ -16,14 +16,14 @@ export default function Navbar() {
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null)
-  const [profile, setProfile] = useState<{ role: string; expert_registered: boolean } | null>(null)
+  const [profile, setProfile] = useState<{ role: string; expert_registered: boolean; avatar_url: string | null; full_name: string | null } | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return
       setUser(user)
-      supabase.from('profiles').select('role, expert_registered')
+      supabase.from('profiles').select('role, expert_registered, avatar_url, full_name')
         .eq('id', user.id).single()
         .then(({ data }) => setProfile(data))
     })
@@ -90,9 +90,17 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3">
           {user ? (
             <>
-              <Link href={user?.email === 'tellitorg1@gmail.com' ? '/admin' : profile?.expert_registered ? '/expert' : '/profile'}>
-  {profile?.expert_registered ? 'My Dashboard' : 'Profile'}
-</Link>
+              <Link href={dashboardHref} className="flex items-center gap-2 hover:opacity-80">
+                <div className="w-8 h-8 rounded-full bg-[#FB923C] flex items-center justify-center text-white text-sm font-bold overflow-hidden">
+                  {profile?.avatar_url
+                    ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                    : <span>{profile?.full_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase()}</span>
+                  }
+                </div>
+                <span className="text-sm font-medium text-[#374151]">
+                  {profile?.full_name?.split(' ')[0] || 'Account'}
+                </span>
+              </Link>
               <button
                 onClick={handleSignOut}
                 suppressHydrationWarning
