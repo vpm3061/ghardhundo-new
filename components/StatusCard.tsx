@@ -43,68 +43,123 @@ export default function StatusCard({ property }: { property: Property }) {
       const ctx = canvas.getContext('2d')
       if (!ctx) return
 
-      ctx.fillStyle = '#111827'
+      // Background — dark gradient
+      const bg = ctx.createLinearGradient(0, 0, 0, 1920)
+      bg.addColorStop(0, '#0F172A')
+      bg.addColorStop(1, '#1E293B')
+      ctx.fillStyle = bg
       ctx.fillRect(0, 0, 1080, 1920)
 
+      // Property photo — full-bleed top portion, cropped to cover (no stretching)
       if (property.photos?.[0]) {
         try {
           const img = await loadImage(property.photos[0])
-          const scale = Math.max(1080 / img.width, 1000 / img.height)
+          const photoH = 1060
+          ctx.save()
+          ctx.beginPath()
+          ctx.rect(0, 0, 1080, photoH)
+          ctx.clip()
+          const scale = Math.max(1080 / img.width, photoH / img.height)
           const w = img.width * scale, h = img.height * scale
-          ctx.drawImage(img, (1080 - w) / 2, 0, w, h)
-          const gradient = ctx.createLinearGradient(0, 600, 0, 1000)
-          gradient.addColorStop(0, 'rgba(17,24,39,0)')
-          gradient.addColorStop(1, 'rgba(17,24,39,1)')
-          ctx.fillStyle = gradient
-          ctx.fillRect(0, 600, 1080, 400)
+          ctx.drawImage(img, (1080 - w) / 2, (photoH - h) / 2, w, h)
+          ctx.restore()
+
+          const photoOverlay = ctx.createLinearGradient(0, 700, 0, photoH)
+          photoOverlay.addColorStop(0, 'rgba(15,23,42,0)')
+          photoOverlay.addColorStop(1, 'rgba(15,23,42,0.9)')
+          ctx.fillStyle = photoOverlay
+          ctx.fillRect(0, 700, 1080, photoH - 700)
         } catch { /* fall back to solid background if the photo can't be loaded/drawn */ }
       }
 
+      // Orange top bar with ORENZAA logo
       ctx.fillStyle = '#FB923C'
-      ctx.fillRect(0, 0, 1080, 120)
+      ctx.fillRect(0, 0, 1080, 100)
       ctx.fillStyle = '#FFFFFF'
-      ctx.font = '800 60px Arial'
-      ctx.fillText('ORENZAA', 60, 80)
+      ctx.font = '800 56px Arial'
+      ctx.fillText('ORENZAA', 50, 68)
 
+      // Property type badge, sized to fit its label
+      const badgeLabel = property.property_category === 'rental' ? '🏠 RENTAL'
+        : property.property_category === 'plot' ? '🌍 PLOT'
+        : property.property_category === 'commercial' ? '🏪 COMMERCIAL'
+        : '🏢 FLAT'
+      ctx.font = '800 32px Arial'
+      const badgeW = ctx.measureText(badgeLabel).width + 60
+      ctx.fillStyle = '#FB923C'
+      roundRect(ctx, 50, 950, badgeW, 64, 32)
+      ctx.fill()
       ctx.fillStyle = '#FFFFFF'
-      ctx.font = '800 64px Arial'
-      const title = property.title.length > 26 ? property.title.slice(0, 24) + '…' : property.title
-      ctx.fillText(title, 60, 1080)
+      ctx.fillText(badgeLabel, 80, 992)
 
-      ctx.fillStyle = '#D1D5DB'
-      ctx.font = '42px Arial'
+      // Property title — big and bold
+      ctx.fillStyle = '#FFFFFF'
+      ctx.font = '800 72px Arial'
+      const title = property.title.toUpperCase()
+      ctx.fillText(title.length > 20 ? title.slice(0, 19) + '…' : title, 50, 1130)
+
+      // Location
+      ctx.fillStyle = '#94A3B8'
+      ctx.font = '40px Arial'
       const loc = [property.locality || property.sector, property.city].filter(Boolean).join(', ')
-      ctx.fillText(`📍 ${loc}`, 60, 1150)
+      ctx.fillText(`📍 ${loc}`, 50, 1200)
 
+      // Price — big green (smaller font if the fallback text runs long)
       ctx.fillStyle = '#22C55E'
-      ctx.font = '800 90px Arial'
-      ctx.fillText(fmtPrice(property), 60, 1280)
+      const priceText = fmtPrice(property)
+      ctx.font = priceText.length > 12 ? '800 56px Arial' : '800 90px Arial'
+      ctx.fillText(priceText, 50, 1330)
 
+      // Details row
+      ctx.fillStyle = '#CBD5E1'
+      ctx.font = '38px Arial'
       const details = [
         property.bhk?.length ? `${property.bhk.join('/')} BHK` : null,
         property.property_category,
         property.rera_number ? 'RERA Verified' : null,
       ].filter(Boolean).join('   ·   ')
-      ctx.fillStyle = '#D1D5DB'
-      ctx.font = '40px Arial'
-      ctx.fillText(details, 60, 1350)
+      ctx.fillText(details, 50, 1410)
 
+      // Divider line
+      ctx.strokeStyle = '#334155'
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.moveTo(50, 1460)
+      ctx.lineTo(1030, 1460)
+      ctx.stroke()
+
+      // Link box — orange rounded rect
       ctx.fillStyle = '#FB923C'
-      roundRect(ctx, 60, 1420, 960, 100, 20)
+      roundRect(ctx, 50, 1490, 980, 100, 20)
       ctx.fill()
       ctx.fillStyle = '#FFFFFF'
+      ctx.font = '800 34px Arial'
+      const link = `orenzaa.com/property/${property.id}`
+      ctx.fillText(link.length > 42 ? link.slice(0, 42) : link, 80, 1552)
+
+      // Expert / owner contact
+      ctx.fillStyle = '#64748B'
+      ctx.font = '34px Arial'
+      if (property.owner_contact) ctx.fillText(`Contact: ${property.owner_contact}`, 50, 1640)
+
+      // Powered by
+      ctx.fillStyle = '#475569'
+      ctx.font = '30px Arial'
+      ctx.fillText('Powered by Orenzaa.com', 50, 1690)
+
+      // Bottom orange strip with tagline
+      ctx.fillStyle = '#FB923C'
+      ctx.fillRect(0, 1820, 1080, 100)
+      ctx.fillStyle = '#FFFFFF'
       ctx.font = '800 36px Arial'
-      ctx.fillText(`orenzaa.com/property/${property.id}`, 90, 1482)
+      ctx.textAlign = 'center'
+      ctx.fillText('Find Where Life Belongs', 540, 1878)
+      ctx.textAlign = 'left'
 
-      ctx.fillStyle = '#9CA3AF'
-      ctx.font = '38px Arial'
-      if (property.owner_contact) ctx.fillText(`Contact: ${property.owner_contact}`, 60, 1620)
-      ctx.fillText('Powered by Orenzaa.com', 60, 1670)
-
-      const link = document.createElement('a')
-      link.download = `orenzaa-${property.title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.png`
-      link.href = canvas.toDataURL('image/png')
-      link.click()
+      const linkEl = document.createElement('a')
+      linkEl.download = `orenzaa-${property.title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.png`
+      linkEl.href = canvas.toDataURL('image/png')
+      linkEl.click()
     } finally {
       setGenerating(false)
     }
