@@ -34,9 +34,10 @@ export async function POST(req: Request) {
     const { error: insertError } = await supabase.from('payment_orders').insert({
       user_id: user.id,
       razorpay_order_id: order.id,
-      plan,
-      role,
+      plan_type: plan,
+      plan_role: role,
       amount,
+      currency: 'INR',
       status: 'created'
     })
     if (insertError) {

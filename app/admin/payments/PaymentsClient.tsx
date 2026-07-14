@@ -9,8 +9,8 @@ type Order = {
   id: string
   amount: number | null
   status: string
-  plan: string
-  role: string
+  plan_type: string
+  plan_role: string
   created_at: string
   razorpay_payment_id: string | null
   profiles: { full_name?: string | null; email?: string | null } | { full_name?: string | null; email?: string | null }[] | null
@@ -40,11 +40,11 @@ export default function PaymentsClient({ orders }: { orders: Order[] }) {
     ? Math.round(((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100)
     : null
 
-  const expertRegistrations = paid.filter(o => o.plan === 'expert-registration').length
-  const proUpgrades = paid.filter(o => o.plan === 'expert-pro').length
+  const expertRegistrations = paid.filter(o => o.plan_type === 'expert-registration').length
+  const proUpgrades = paid.filter(o => o.plan_type === 'expert-pro').length
 
   const planTotals = new Map<string, number>()
-  paid.forEach(o => planTotals.set(o.plan, (planTotals.get(o.plan) || 0) + (o.amount || 0)))
+  paid.forEach(o => planTotals.set(o.plan_type, (planTotals.get(o.plan_type) || 0) + (o.amount || 0)))
   const planBreakdown = [...planTotals.entries()]
     .map(([plan, revenue]) => ({ plan, revenue }))
     .sort((a, b) => b.revenue - a.revenue)
@@ -121,7 +121,7 @@ export default function PaymentsClient({ orders }: { orders: Order[] }) {
                       <td className="px-5 py-3 text-[#111827] truncate max-w-[180px]">
                         {profile?.email || profile?.full_name || '—'}
                       </td>
-                      <td className="px-5 py-3 text-[#6B7280]">{order.role} · {order.plan}</td>
+                      <td className="px-5 py-3 text-[#6B7280]">{order.plan_role} · {order.plan_type}</td>
                       <td className="px-5 py-3 font-700 text-[#111827]">{fmt(order.amount || 0)}</td>
                       <td className="px-5 py-3">
                         <span className="text-[10px] font-700 px-2.5 py-0.5 rounded-full"
