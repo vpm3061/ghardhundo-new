@@ -80,7 +80,7 @@ export default function PaymentsClient({ orders }: { orders: Order[] }) {
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" horizontal={false} />
                 <XAxis type="number" tick={{ fontSize: 11, fill: '#9CA3AF' }} tickFormatter={v => fmt(v)} />
                 <YAxis type="category" dataKey="plan" width={140} tick={{ fontSize: 11, fill: '#6B7280' }} />
-                <Tooltip {...CHART_STYLE} formatter={(v: number) => fmt(v)} />
+                <Tooltip {...CHART_STYLE} formatter={(v) => fmt(Number(v))} />
                 <Bar dataKey="revenue" fill="#FB923C" radius={[0, 6, 6, 0]} />
               </BarChart>
             </ResponsiveContainer>
