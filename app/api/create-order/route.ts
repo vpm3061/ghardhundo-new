@@ -31,16 +31,19 @@ export async function POST(req: Request) {
       notes: { plan, role, userId: user.id }
     })
 
-    try {
-      await supabase.from('payment_orders').insert({
-        user_id: user.id,
-        razorpay_order_id: order.id,
-        plan,
-        role,
-        amount,
-        status: 'created'
-      })
-    } catch { /* table may not exist yet */ }
+    const { error: insertError } = await supabase.from('payment_orders').insert({
+      user_id: user.id,
+      razorpay_order_id: order.id,
+      plan,
+      role,
+      amount,
+      status: 'created'
+    })
+    if (insertError) {
+      console.error('[create-order] payment_orders insert failed:', insertError.message)
+    } else {
+      console.log('[create-order] payment_orders insert success:', order.id)
+    }
 
     return NextResponse.json({
       orderId: order.id,
