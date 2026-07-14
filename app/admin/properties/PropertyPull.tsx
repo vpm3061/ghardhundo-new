@@ -2,10 +2,12 @@
 import { useState } from 'react'
 
 export type PullResult = {
+  property_category?: string | null
   title?: string | null
   builder?: string | null
   city?: string | null
   sector?: string | null
+  locality?: string | null
   price_min?: string | number | null
   price_max?: string | number | null
   bhk?: string | null
@@ -15,14 +17,18 @@ export type PullResult = {
   description?: string | null
   amenities?: string | null
   youtube_url?: string | null
+  plot_area_sqyard?: string | number | null
+  monthly_rent?: string | number | null
+  commercial_type?: string | null
   confidence?: number | null
 }
 
 const FIELD_LABELS: [keyof PullResult, string][] = [
+  ['property_category', 'Property Type'],
   ['title',          'Title'],
   ['builder',        'Builder'],
   ['city',           'City'],
-  ['sector',         'Sector'],
+  ['locality',       'Locality'],
   ['price_min',      'Min Price'],
   ['price_max',      'Max Price'],
   ['bhk',            'BHK'],
@@ -31,6 +37,9 @@ const FIELD_LABELS: [keyof PullResult, string][] = [
   ['possession_date','Possession'],
   ['description',    'Description'],
   ['amenities',      'Amenities'],
+  ['plot_area_sqyard', 'Plot Area'],
+  ['monthly_rent',   'Monthly Rent'],
+  ['commercial_type','Commercial Type'],
 ]
 
 function ConfidenceBadge({ score }: { score: number }) {
