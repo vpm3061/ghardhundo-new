@@ -27,48 +27,52 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
-  const { data: p } = await supabase
+  const { data: property } = await supabase
     .from('properties')
-    .select('title, builder, sector, city, price_min, bhk, rera_number, description, photos')
+    .select('id, title, locality, sector, city, price_min, monthly_rent, bhk, rera_number, description, photos, property_category')
     .eq('id', id)
     .eq('is_active', true)
     .single()
 
-  if (!p) return { title: 'Property | Orenzaa' }
+  if (!property) return { title: 'Property | Orenzaa' }
 
-  const fmt = (n: number) => n >= 1e7 ? `${(n / 1e7).toFixed(1)}Cr` : `${(n / 1e5).toFixed(0)}L`
-  const bhkStr = p.bhk?.join('/') || ''
-  const location = [p.sector, p.city].filter(Boolean).join(', ')
-  const priceStr = p.price_min ? `₹${fmt(p.price_min)}` : ''
-  const title = `${p.title} — ${bhkStr ? bhkStr + ' BHK in ' : ''}${p.city || ''}`
-  const description = [
-    bhkStr && `${bhkStr} BHK flat`,
-    location && `in ${location}`,
-    priceStr && `Price: ${priceStr}`,
-    p.rera_number && `RERA: ${p.rera_number}`,
-    'Book free site visit.',
-  ].filter(Boolean).join('. ')
+  const priceText = property.property_category === 'rental'
+    ? `₹${Number(property.monthly_rent || 0).toLocaleString('en-IN')}/month`
+    : property.price_min
+    ? `₹${Math.round(Number(property.price_min) / 100000)} Lakh`
+    : ''
+
+  const bhkText = property.bhk?.length
+    ? `${Array.isArray(property.bhk) ? property.bhk[0] : property.bhk} BHK `
+    : ''
+
+  const typeText = property.property_category === 'flat' ? 'Flat'
+    : property.property_category === 'plot' ? 'Plot'
+    : property.property_category === 'rental' ? 'Rental'
+    : 'Commercial Property'
+
+  const place = property.locality || property.sector || ''
+  const title = `${bhkText}${typeText} in ${place} ${property.city || ''} — ${priceText} | Orenzaa`.replace(/\s+/g, ' ').trim()
+
+  const description = `${bhkText}${typeText} for ${property.property_category === 'rental' ? 'rent' : 'sale'} in ${place} ${property.city || ''}. ${priceText}. ${property.rera_number ? 'RERA: ' + property.rera_number + '.' : ''} ${property.description?.substring(0, 100) || ''} Contact on Orenzaa.com`.replace(/\s+/g, ' ').trim()
 
   return {
     title,
     description,
-    keywords: [
-      bhkStr && `${bhkStr} BHK ${p.city}`,
-      p.builder || '',
-      p.sector && `${p.sector} flat`,
-      p.rera_number || '',
-    ].filter(Boolean) as string[],
     openGraph: {
       title,
       description,
-      images: p.photos?.[0] ? [p.photos[0]] : ['/og-image.jpg'],
+      url: `https://orenzaa.com/property/${property.id}`,
+      images: property.photos?.[0]
+        ? [{ url: property.photos[0], width: 1200, height: 630 }]
+        : ['/og-image.jpg'],
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: p.photos?.[0] ? [p.photos[0]] : ['/og-image.jpg'],
+      images: property.photos?.[0] ? [property.photos[0]] : ['/og-image.jpg'],
     },
   }
 }
@@ -264,6 +268,30 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
         </div>
       </main>
       <MobileNav />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'RealEstateListing',
+            name: p.title,
+            description: p.description,
+            url: `https://orenzaa.com/property/${p.id}`,
+            image: p.photos?.[0] || '',
+            address: {
+              '@type': 'PostalAddress',
+              addressLocality: p.locality || p.city,
+              addressRegion: p.city,
+              addressCountry: 'IN',
+            },
+            offers: {
+              '@type': 'Offer',
+              price: p.price_min || p.monthly_rent || 0,
+              priceCurrency: 'INR',
+            },
+          }),
+        }}
+      />
     </>
   )
 }

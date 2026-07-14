@@ -7,7 +7,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: origin,                  lastModified: new Date(), changeFrequency: 'daily',   priority: 1   },
     { url: `${origin}/properties`,  lastModified: new Date(), changeFrequency: 'daily',   priority: 0.9 },
-    { url: `${origin}/pricing`,     lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${origin}/advertise`,   lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     { url: `${origin}/ai`,          lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
   ]
 
@@ -19,13 +19,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const supabase = createClient(url, key)
     const { data: properties } = await supabase
       .from('properties')
-      .select('id, updated_at')
+      .select('id, created_at')
       .eq('is_active', true)
-      .order('updated_at', { ascending: false })
+      .order('created_at', { ascending: false })
 
     const propertyUrls: MetadataRoute.Sitemap = (properties || []).map(p => ({
       url: `${origin}/property/${p.id}`,
-      lastModified: new Date(p.updated_at || Date.now()),
+      lastModified: new Date(p.created_at),
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     }))

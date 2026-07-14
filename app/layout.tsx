@@ -22,11 +22,15 @@ export const metadata: Metadata = {
     default: 'Orenzaa — Find Where Life Belongs',
     template: '%s | Orenzaa',
   },
-  description: 'Premium AI-powered property platform. RERA verified homes in Lucknow, Noida, Ayodhya. Zero pressure. AI matched.',
-  keywords: ['property in Lucknow', 'flats in Noida', 'RERA verified property', '2BHK Lucknow', 'buy flat Noida', 'Orenzaa'],
+  description: 'AI-powered property platform for Lucknow, Noida and UP. Find flats, plots, rental and commercial properties. RERA verified. Zero pressure.',
+  keywords: [
+    'property in Lucknow', 'flats in Noida', 'plots in Greater Noida', 'RERA verified property',
+    '2BHK Lucknow', 'buy flat Noida', 'property dealer Lucknow', 'real estate UP', 'Orenzaa',
+  ],
   openGraph: {
     title: 'Orenzaa — Find Where Life Belongs',
-    description: 'AI-powered property platform for home buyers and investors.',
+    description: 'AI-powered property platform for Lucknow, Noida and UP.',
+    url: 'https://orenzaa.com',
     images: ['/og-image.jpg'],
     type: 'website',
     locale: 'en_IN',
@@ -35,8 +39,12 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Orenzaa — Find Where Life Belongs',
-    description: 'Premium AI-Powered Property Platform',
+    description: 'AI-powered property platform for Lucknow, Noida and UP.',
     images: ['/og-image.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
   manifest: '/manifest.json',
   appleWebApp: {
