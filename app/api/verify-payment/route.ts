@@ -112,9 +112,12 @@ export async function POST(req: Request) {
 
   /* Update payment record — non-critical, ignore errors */
   try {
-    await supabase.from('payment_orders').update({
-      razorpay_payment_id, status: 'paid',
-    }).eq('razorpay_order_id', razorpay_order_id)
+    console.log('[verify-payment] updating payment_orders:', razorpay_order_id)
+    const { error: updateError } = await supabase
+      .from('payment_orders')
+      .update({ status: 'paid', razorpay_payment_id })
+      .eq('razorpay_order_id', razorpay_order_id)
+    console.log('[verify-payment] update result:', updateError?.message || 'success')
   } catch { /* table may not exist yet */ }
 
   return NextResponse.json({ success: true })
