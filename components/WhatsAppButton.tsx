@@ -6,26 +6,20 @@ interface WhatsAppButtonProps {
   price: string
   location: string
   propertyId: string
-  referralUserId?: string
-  tags?: string[]
   label?: string
   className?: string
 }
 
 export default function WhatsAppButton({
-  propertyTitle, price, location, propertyId, referralUserId, tags, label = 'Share', className = '',
+  propertyId, label = 'Share', className = '',
 }: WhatsAppButtonProps) {
   const [href, setHref] = useState('https://wa.me/')
 
   useEffect(() => {
-    const path = referralUserId
-      ? `/p/${propertyId}?ref=${referralUserId}`
-      : `/property/${propertyId}`
-    const url = window.location.origin + path
-    const tagLine = tags?.length ? `\n\n${tags.join(' ')}` : ''
-    const text = `Dekho ye property Orenzaa pe — ${propertyTitle}, ${price}, ${location}: ${url}${tagLine}`
+    const url = window.location.origin + `/property/${propertyId}`
+    const text = `Check out this property on Orenzaa: ${url}`
     setHref('https://wa.me/?text=' + encodeURIComponent(text))
-  }, [propertyTitle, price, location, propertyId, referralUserId, tags])
+  }, [propertyId])
 
   return (
     <a

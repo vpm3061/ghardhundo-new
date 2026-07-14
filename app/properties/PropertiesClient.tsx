@@ -1,8 +1,18 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import PropertyCard from '@/components/PropertyCard'
 import type { Property } from '@/lib/supabase/types'
+import { createClient } from '@/lib/supabase/client'
 import { generatePropertyTags } from '@/lib/property-tags'
+
+const TYPE_OPTIONS = [
+  { id: 'all',        label: '🏘️ All'        },
+  { id: 'flat',       label: '🏢 Flat'       },
+  { id: 'plot',       label: '🌍 Plot'       },
+  { id: 'rental',     label: '🏠 Rental'     },
+  { id: 'commercial', label: '🏪 Commercial' },
+] as const
+type TypeOption = typeof TYPE_OPTIONS[number]['id']
 
 const CITIES = ['Lucknow', 'Noida', 'Greater Noida', 'Ayodhya']
 const BHK_OPTIONS = ['1', '2', '3', '4']
@@ -23,13 +33,13 @@ const SORT_OPTIONS = [
 type SortOption = typeof SORT_OPTIONS[number]['value']
 
 type Filters = {
-  search: string; cities: string[]; bhk: string[]
+  search: string; type: TypeOption; cities: string[]; bhk: string[]
   budget: number | null; status: string[]; sort: SortOption; tag: string
 }
-const DEFAULT: Filters = { search: '', cities: [], bhk: [], budget: null, status: [], sort: 'featured', tag: '' }
+const DEFAULT: Filters = { search: '', type: 'all', cities: [], bhk: [], budget: null, status: [], sort: 'featured', tag: '' }
 
 function countActive(f: Filters) {
-  return (f.cities.length > 0 ? 1 : 0) + (f.bhk.length > 0 ? 1 : 0) +
+  return (f.type !== 'all' ? 1 : 0) + (f.cities.length > 0 ? 1 : 0) + (f.bhk.length > 0 ? 1 : 0) +
     (f.budget !== null ? 1 : 0) + (f.status.length > 0 ? 1 : 0) +
     (f.tag ? 1 : 0) + (f.sort !== 'featured' ? 1 : 0)
 }
@@ -53,6 +63,18 @@ export default function PropertiesClient({
 }) {
   const [f, setF] = useState<Filters>({ ...DEFAULT, tag: initialTag })
   const [showFilters, setShowFilters] = useState(false)
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    if (!userId) return
+    const supabase = createClient()
+    supabase.from('saved_properties')
+      .select('property_id')
+      .eq('user_id', userId)
+      .then(({ data }) => {
+        if (data) setSavedIds(new Set(data.map(d => d.property_id)))
+      })
+  }, [userId])
 
   const toggle = <K extends 'cities' | 'bhk' | 'status'>(key: K, val: string) =>
     setF(prev => ({
@@ -74,6 +96,7 @@ export default function PropertiesClient({
             !p.city?.toLowerCase().includes(q) &&
             !p.sector?.toLowerCase().includes(q)) return false
       }
+      if (f.type !== 'all' && p.property_category !== f.type) return false
       if (f.cities.length && !f.cities.some(c => p.city?.toLowerCase() === c.toLowerCase())) return false
       if (f.bhk.length && !f.bhk.some(b => p.bhk?.includes(b))) return false
       if (f.status.length && !f.status.includes(p.status || '')) return false
@@ -99,11 +122,28 @@ export default function PropertiesClient({
 
   const FilterPanel = () => (
     <div className="flex flex-col gap-5">
+      <div>
+        <p className="text-xs text-[#9CA3AF] font-700 uppercase tracking-wider mb-2">Property Type</p>
+        <div className="flex flex-wrap gap-2">
+          {TYPE_OPTIONS.map(opt => (
+            <Chip key={opt.id} active={f.type === opt.id}
+              onClick={() => setF(p => ({
+                ...p,
+                type: opt.id,
+                bhk: (opt.id === 'rental' || opt.id === 'plot') ? [] : p.bhk,
+              }))}>
+              {opt.label}
+            </Chip>
+          ))}
+        </div>
+      </div>
+
       {[
         { label: 'City',   items: CITIES,                                       key: 'cities' as const },
         { label: 'BHK',    items: BHK_OPTIONS,                                  key: 'bhk'    as const, labelFn: (b: string) => `${b} BHK` },
         { label: 'Status', items: STATUS_OPTIONS as unknown as string[],         key: 'status' as const },
-      ].map(({ label, items, key, labelFn }) => (
+      ].filter(({ key }) => !(key === 'bhk' && (f.type === 'rental' || f.type === 'plot')))
+      .map(({ label, items, key, labelFn }) => (
         <div key={label}>
           <p className="text-xs text-[#9CA3AF] font-700 uppercase tracking-wider mb-2">{label}</p>
           <div className="flex flex-wrap gap-2">
@@ -221,6 +261,12 @@ export default function PropertiesClient({
           {/* Active chips row */}
           {(activeCount > 0) && (
             <div className="flex flex-wrap gap-2 mb-4">
+              {f.type !== 'all' && (
+                <button onClick={() => setF(p => ({ ...p, type: 'all' }))} suppressHydrationWarning
+                  className="flex items-center gap-1 text-xs px-3 py-1 rounded-full font-600 bg-orange-50 text-[#FB923C] border border-orange-200">
+                  {TYPE_OPTIONS.find(t => t.id === f.type)?.label} ✕
+                </button>
+              )}
               {f.tag && (
                 <button onClick={() => setF(p => ({ ...p, tag: '' }))} suppressHydrationWarning
                   className="flex items-center gap-1 text-xs px-3 py-1 rounded-full font-600 bg-orange-50 text-[#FB923C] border border-orange-200">
@@ -262,7 +308,7 @@ export default function PropertiesClient({
 
           {filtered.length > 0 ? (
             <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
-              {filtered.map(p => <PropertyCard key={p.id} property={p} userId={userId} />)}
+              {filtered.map(p => <PropertyCard key={p.id} property={p} userId={userId} savedIds={savedIds} />)}
             </div>
           ) : (
             <div className="text-center py-20 bg-white border border-[#E5E7EB] rounded-2xl">

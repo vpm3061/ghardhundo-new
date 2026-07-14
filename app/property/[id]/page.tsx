@@ -11,7 +11,7 @@ import NearbyInfo from '@/components/NearbyInfo'
 import WhatsAppButton from '@/components/WhatsAppButton'
 import PropertyDetailClient from './PropertyDetailClient'
 import type { Property } from '@/lib/supabase/types'
-import { generatePropertyTags, getShareTags } from '@/lib/property-tags'
+import { generatePropertyTags } from '@/lib/property-tags'
 import OffersDisplay from '@/components/OffersDisplay'
 import HeartButton from '@/components/HeartButton'
 import BannerAd from '@/components/BannerAd'
@@ -106,7 +106,6 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
 
   const sc = p.status ? statusConfig[p.status] : null
   const allTags = generatePropertyTags(p)
-  const shareTags = getShareTags(p)
 
   return (
     <>
@@ -156,7 +155,6 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                   price={priceStr}
                   location={[p.sector, p.city].filter(Boolean).join(', ') || ''}
                   propertyId={p.id}
-                  tags={shareTags}
                 />
                 </div>
               </div>

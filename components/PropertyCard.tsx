@@ -3,7 +3,6 @@ import Link from 'next/link'
 import WhatsAppButton from './WhatsAppButton'
 import HeartButton from './HeartButton'
 import type { Property } from '@/lib/supabase/types'
-import { getShareTags, getCardTags } from '@/lib/property-tags'
 
 const AMENITY_ICONS: Record<string, string> = {
   'Swimming Pool': '🏊',
@@ -22,27 +21,34 @@ const STATUS_LABEL: Record<string, string> = {
   'New Launch':         'New Launch',
 }
 
-function fmtPrice(n: number): string {
-  if (n >= 1e7) return `₹${(n / 1e7).toFixed(2)}Cr`
-  if (n >= 1e5) return `₹${(n / 1e5).toFixed(2)}L`
-  return `₹${n.toLocaleString('en-IN')}`
+function getPriceDisplay(property: Property): string {
+  if (property.property_category === 'rental') {
+    return `₹${Number(property.monthly_rent || 0).toLocaleString('en-IN')}/mo`
+  }
+  if (property.price_min) {
+    return `₹${Math.round(Number(property.price_min) / 100000)}L`
+  }
+  return 'Price on request'
 }
 
-function priceRange(min: number | null, max: number | null): string {
-  if (min && max) return `${fmtPrice(min)} – ${fmtPrice(max)}`
-  if (min) return `From ${fmtPrice(min)}`
-  if (max) return `Up to ${fmtPrice(max)}`
-  return 'Price on request'
+function getSubtitle(property: Property): string {
+  const place = property.locality || property.city || ''
+  if (property.property_category === 'plot') {
+    return `${property.plot_area_sqyard || ''} sq.yd • ${place}`
+  }
+  if (property.property_category === 'commercial') {
+    return `${property.super_area || ''} sqft • ${place}`
+  }
+  const bhk = Array.isArray(property.bhk) ? property.bhk[0] : property.bhk
+  return `${bhk || ''} BHK • ${place}`
 }
 
 export default function PropertyCard({ property, userId, savedIds }: { property: Property; userId?: string; savedIds?: Set<string> }) {
   const photo = property.photos?.[0]
-  const price = priceRange(property.price_min, property.price_max)
-  const location = [property.sector, property.city].filter(Boolean).join(', ')
-  const bhkStr = property.bhk?.length ? property.bhk.join('/') + ' BHK' : null
+  const price = getPriceDisplay(property)
+  const subtitle = getSubtitle(property)
+  const location = [property.locality || property.sector, property.city].filter(Boolean).join(', ')
   const statusText = property.status ? STATUS_LABEL[property.status] : null
-  const shareTags = getShareTags(property)
-  const cardTags = getCardTags(property)
 
   return (
     <div
@@ -101,39 +107,16 @@ export default function PropertyCard({ property, userId, savedIds }: { property:
           </h3>
         </Link>
 
-        {/* Location */}
-        {location && (
-          <p className="text-xs mb-3 flex items-center gap-1 truncate text-[#6B7280]">
-            <span className="shrink-0">📍</span>
-            <span className="truncate">{location}</span>
-          </p>
-        )}
-
         {/* Price */}
         <p className="font-heading font-800 text-lg mb-0.5 leading-tight text-[#111827]">
           {price}
         </p>
 
-        {/* BHK */}
-        {bhkStr && (
-          <p className="text-xs mb-2 text-[#6B7280]">{bhkStr}</p>
-        )}
-
-        {/* Hashtag chips */}
-        {cardTags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            {cardTags.map(tag => (
-              <a
-                key={tag}
-                href={`/properties?tag=${encodeURIComponent(tag.replace('#', ''))}`}
-                onClick={e => e.stopPropagation()}
-                className="text-[10px] font-600 px-2 py-0.5 rounded-full transition-all bg-orange-50 text-orange-600 border border-orange-100 hover:border-orange-300"
-              >
-                {tag}
-              </a>
-            ))}
-          </div>
-        )}
+        {/* Subtitle — BHK/area + location, per property type */}
+        <p className="text-xs mb-2 flex items-center gap-1 truncate text-[#6B7280]">
+          <span className="shrink-0">📍</span>
+          <span className="truncate">{subtitle}</span>
+        </p>
 
         {/* Status + amenities */}
         <div className="flex items-center justify-between mt-auto pt-3 mb-3">
@@ -169,8 +152,6 @@ export default function PropertyCard({ property, userId, savedIds }: { property:
             price={price}
             location={location || property.city || ''}
             propertyId={property.id}
-            referralUserId={userId}
-            tags={shareTags}
             label="Share & Earn"
             className="flex-1 justify-center"
           />
