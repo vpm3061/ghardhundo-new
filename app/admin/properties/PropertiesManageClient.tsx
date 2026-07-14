@@ -27,7 +27,7 @@ type FormState = {
   title: string; builder: string; sector: string; city: string
   price_min: string; price_max: string; bhk: string[]; status: FormStatus
   rera_number: string; description: string; amenities: string[]
-  photos: string[]; floor_plan_url: string; youtube_url: string
+  photos: string[]; floor_plan: string; youtube_url: string
   is_active: boolean; is_featured: boolean
   offers: OfferForm[]
 }
@@ -36,7 +36,7 @@ const EMPTY_FORM: FormState = {
   title: '', builder: '', sector: '', city: '',
   price_min: '', price_max: '', bhk: [], status: '',
   rera_number: '', description: '', amenities: [],
-  photos: [], floor_plan_url: '', youtube_url: '',
+  photos: [], floor_plan: '', youtube_url: '',
   is_active: true, is_featured: false,
   offers: [],
 }
@@ -55,7 +55,7 @@ function toFormState(p: Property): FormState {
     description: p.description || '',
     amenities: p.amenities || [],
     photos: p.photos || [],
-    floor_plan_url: p.floor_plan || '',
+    floor_plan: p.floor_plan || '',
     youtube_url: p.youtube_url || '',
     is_active: p.is_active,
     is_featured: p.is_featured,
@@ -173,7 +173,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
         description: form.description || null,
         amenities: form.amenities.length ? form.amenities : null,
         photos: form.photos.length ? form.photos : null,
-        floor_plan_url: form.floor_plan_url || null,
+        floor_plan: form.floor_plan || null,
         youtube_url: form.youtube_url || null,
         is_active: form.is_active,
         is_featured: form.is_featured,
@@ -349,8 +349,8 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
               <div>
                 <SectionLabel>Floor Plan</SectionLabel>
                 <PhotoUpload
-                  photos={form.floor_plan_url ? [form.floor_plan_url] : []}
-                  setPhotos={urls => set('floor_plan_url', urls[0] || '')}
+                  photos={form.floor_plan ? [form.floor_plan] : []}
+                  setPhotos={urls => set('floor_plan', urls[0] || '')}
                   maxFiles={1}
                 />
               </div>

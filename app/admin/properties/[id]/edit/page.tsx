@@ -37,7 +37,7 @@ export default function EditPropertyPage() {
     possession_date:  '',
     description:      '',
     youtube_url:      '',
-    floor_plan_url:   '',
+    floor_plan:   '',
     amenities:        [] as string[],
     tags:             '',
     is_active:        true,
@@ -74,7 +74,7 @@ export default function EditPropertyPage() {
         possession_date: data.possession_date ?? '',
         description:     data.description     ?? '',
         youtube_url:     data.youtube_url     ?? '',
-        floor_plan_url:  data.floor_plan_url  ?? '',
+        floor_plan:  data.floor_plan  ?? '',
         amenities:       Array.isArray(data.amenities) ? data.amenities : [],
         tags:            Array.isArray(data.tags) ? data.tags.join(', ') : '',
         is_active:       data.is_active  ?? true,
@@ -109,7 +109,7 @@ export default function EditPropertyPage() {
       is_active:       form.is_active,
       is_featured:     form.is_featured,
       photos:          photos,
-      floor_plan_url:  form.floor_plan_url || null,
+      floor_plan:  form.floor_plan || null,
       updated_at:      new Date().toISOString(),
     }
 
@@ -170,8 +170,8 @@ export default function EditPropertyPage() {
         style={{ background: '#FFFFFF', border: '1px solid rgba(255,255,255,0.05)' }}>
         <h2 className="font-600 text-sm" style={{ color: '#111827' }}>Floor Plan</h2>
         <PhotoUpload
-          photos={form.floor_plan_url ? [form.floor_plan_url] : []}
-          setPhotos={urls => setF('floor_plan_url', urls[0] || '')}
+          photos={form.floor_plan ? [form.floor_plan] : []}
+          setPhotos={urls => setF('floor_plan', urls[0] || '')}
           maxFiles={1}
         />
       </section>
@@ -332,7 +332,7 @@ export default function EditPropertyPage() {
         <p>Property ID: {id}</p>
         <p>Title: {form.title || '(empty)'}</p>
         <p>Photos: {photos.length} {photos.length > 0 ? `✓ [${photos[0]?.slice(-30)}…]` : '✗ none'}</p>
-        <p>Floor Plan URL: {form.floor_plan_url ? `✓ ${form.floor_plan_url.slice(-30)}…` : '✗ none'}</p>
+        <p>Floor Plan URL: {form.floor_plan ? `✓ ${form.floor_plan.slice(-30)}…` : '✗ none'}</p>
         <p>YouTube: {form.youtube_url || '(none)'}</p>
         <p>Price: ₹{form.price_min || '?'}L – ₹{form.price_max || '?'}L</p>
       </div>

@@ -28,7 +28,7 @@ export default async function CommissionsPage() {
 
   return (
     <div>
-      <h1 className="font-heading text-2xl font-700 mb-6" style={{ color: '#111827' }}>Revenue Dashboard</h1>
+      <h1 className="font-heading text-2xl font-700 mb-6" style={{ color: '#111827' }}>Commissions & Payouts</h1>
       <CommissionsClient
         commissions={(commissionsRaw || []) as Parameters<typeof CommissionsClient>[0]['commissions']}
         dealLeads={dealLeads}

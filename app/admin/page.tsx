@@ -46,8 +46,8 @@ export default async function AdminOverviewPage() {
     { href: '/admin/experts',     label: 'Expert Accounts',   icon: '🤝' },
     { href: '/admin/cpl',         label: 'CPL Deals',         icon: '🎯' },
     { href: '/admin/banners',     label: 'Banner Ads',        icon: '🖼️' },
-    { href: '/admin/commissions', label: 'Revenue Dashboard', icon: '💰' },
-    { href: '/admin/payments',    label: 'Payment Orders',    icon: '💳' },
+    { href: '/admin/commissions', label: 'Commissions & Payouts', icon: '💰' },
+    { href: '/admin/payments',    label: 'Revenue Dashboard', icon: '💳' },
   ]
 
   return (
