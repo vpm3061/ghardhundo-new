@@ -37,6 +37,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
+  /* Signature is valid — the payment genuinely happened. Record that fact
+     before attempting any account-activation side effects below, so a
+     failure in those steps can never leave a real payment stuck as
+     "created". */
+  console.log('[verify-payment] updating payment_orders:', razorpay_order_id)
+  const { error: paidUpdateError } = await supabase
+    .from('payment_orders')
+    .update({ status: 'paid', razorpay_payment_id })
+    .eq('razorpay_order_id', razorpay_order_id)
+  console.log('[verify-payment] update result:', paidUpdateError?.message || 'success')
+
   /* Activate role */
   const { error: roleError } = await supabase.from('profiles').update({ role }).eq('id', user.id)
   if (roleError) {
@@ -109,16 +120,6 @@ export async function POST(req: Request) {
       status:         'Active',
     })
   }
-
-  /* Update payment record — non-critical, ignore errors */
-  try {
-    console.log('[verify-payment] updating payment_orders:', razorpay_order_id)
-    const { error: updateError } = await supabase
-      .from('payment_orders')
-      .update({ status: 'paid', razorpay_payment_id })
-      .eq('razorpay_order_id', razorpay_order_id)
-    console.log('[verify-payment] update result:', updateError?.message || 'success')
-  } catch { /* table may not exist yet */ }
 
   return NextResponse.json({ success: true })
 }
