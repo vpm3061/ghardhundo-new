@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister'
 import { Toaster } from 'react-hot-toast'
@@ -69,6 +70,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${jakarta.variable}`}>
       <body className="min-h-dvh bg-[#FAFAF9] text-[#111827] antialiased">
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7632015928190157"
+          crossOrigin="anonymous"
+          strategy="beforeInteractive"
+        />
         <ServiceWorkerRegister />
         {children}
         <Toaster
