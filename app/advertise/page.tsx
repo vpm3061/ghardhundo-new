@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import MobileNav from '@/components/MobileNav'
 import AdvertiseForm from './AdvertiseForm'
@@ -69,6 +70,9 @@ export default function AdvertisePage() {
               <div>
                 <h3 className="font-heading text-2xl font-800 text-white mb-1">CPL Package — ₹1,500/lead</h3>
                 <p className="text-orange-50 text-sm">AI-scored buyers only · Minimum 10 leads = ₹15,000</p>
+                <Link href="/cpl-terms" className="inline-block mt-2 text-sm text-white underline underline-offset-2">
+                  View full CPL terms & pricing →
+                </Link>
               </div>
               <a href="https://wa.me/919643693090?text=Hi%2C%20I%27m%20interested%20in%20the%20Orenzaa%20CPL%20package"
                 target="_blank" rel="noopener noreferrer"
