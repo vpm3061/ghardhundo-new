@@ -45,8 +45,8 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#E5E7EB] shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="font-heading font-800 text-xl tracking-tight text-[#111827]">
-          ORENZ<span className="text-[#FB923C]">AA</span>
+        <Link href="/" className="flex items-center">
+          <img src="/logo.png" alt="Orenzaa" width={1020} height={474} className="h-9 w-auto" />
         </Link>
 
         {/* Desktop links */}

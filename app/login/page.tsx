@@ -24,9 +24,7 @@ function LoginContent() {
       <div className="w-full max-w-sm animate-fade-in-up">
         {/* Logo */}
         <div className="text-center mb-10">
-          <h1 className="font-heading text-4xl font-800 tracking-tight text-[#111827] mb-2">
-            ORENZ<span className="text-[#FB923C]">AA</span>
-          </h1>
+          <img src="/logo.png" alt="Orenzaa" width={1020} height={474} className="h-14 w-auto mx-auto mb-2" />
           <p className="text-[#6B7280] text-sm">Premium AI-powered property platform</p>
         </div>
 

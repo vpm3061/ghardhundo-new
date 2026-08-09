@@ -138,9 +138,7 @@ export default function VisitBookingModal({ propertyId, propertyTitle, userId }:
 
                 <div className="border-2 border-dashed border-[#FB923C] rounded-2xl p-5 mb-5 bg-[#FFF7ED]">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="font-heading font-800 text-[#111827] text-lg">
-                      ORENZ<span className="text-[#FB923C]">AA</span>
-                    </span>
+                    <img src="/logo.png" alt="Orenzaa" width={1020} height={474} className="h-6 w-auto" />
                     <span className="text-xs px-3 py-1 rounded-full bg-orange-100 text-[#FB923C] font-700">
                       SITE VISIT SLIP
                     </span>

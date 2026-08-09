@@ -62,12 +62,8 @@ export default function AdminLayoutClient({
         {/* Logo */}
         <div className="p-5 border-b border-[#E5E7EB]">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0"
-              style={{ background: 'linear-gradient(135deg, #FB923C, #F59E0B)' }}>
-              O
-            </div>
+            <img src="/logo.png" alt="Orenzaa" width={1020} height={474} className="h-7 w-auto shrink-0" />
             <div className="min-w-0">
-              <p className="font-heading font-800 text-sm text-[#111827]">ORENZ<span style={{ color: '#FB923C' }}>AA</span></p>
               <p className="text-[10px] text-[#9CA3AF]">Admin Panel</p>
             </div>
           </div>
