@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Navbar from '@/components/Navbar'
 import MobileNav from '@/components/MobileNav'
+import { PAYMENTS_ENABLED } from '@/lib/billing'
 
 export default function ListPropertyClient({ userId }: { userId: string }) {
   const router = useRouter()
@@ -72,17 +73,17 @@ export default function ListPropertyClient({ userId }: { userId: string }) {
                 Property Expert
               </h2>
               <p className="text-sm text-[#6B7280] mb-4">
-                List properties and earn on closures. Subscription unlocks full buyer details.
+                List properties and earn on closures. {PAYMENTS_ENABLED ? 'Subscription unlocks full buyer details.' : 'Full buyer details are free for now.'}
               </p>
               <ul className="space-y-2 text-sm text-[#374151] mb-6">
                 <li className="flex items-center gap-2">
-                  <span className="text-[#FB923C]">✓</span> ₹599/month or ₹999/6-months
+                  <span className="text-[#FB923C]">✓</span> {PAYMENTS_ENABLED ? '₹599/month or ₹999/6-months' : 'Free registration for now'}
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-[#FB923C]">✓</span> 55/45 deal split with Orenzaa
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-[#FB923C]">✓</span> Up to 5 listings free
+                  <span className="text-[#FB923C]">✓</span> {PAYMENTS_ENABLED ? 'Up to 5 listings free' : 'Unlimited free listings for now'}
                 </li>
               </ul>
               <div className="w-full py-2.5 rounded-xl bg-[#F59E0B] text-white text-sm font-700 text-center">

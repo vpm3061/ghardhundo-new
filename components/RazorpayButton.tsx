@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import { PAYMENTS_ENABLED } from '@/lib/billing'
 
 interface Props {
   amount: number
@@ -33,8 +34,8 @@ export default function RazorpayButton({ amount, plan, role, label, free, classN
       if (!res.ok) throw new Error('Could not activate account')
       toast.success('Account activated!')
       setTimeout(() => { window.location.href = `/${role}` }, 1000)
-    } catch (e: any) {
-      toast.error(e.message || 'Error activating account')
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Error activating account')
     } finally {
       setLoading(false)
     }
@@ -52,6 +53,11 @@ export default function RazorpayButton({ amount, plan, role, label, free, classN
   }
 
   const handlePayment = async () => {
+    if (!PAYMENTS_ENABLED) {
+      toast('Registration and listings are free for now.')
+      window.location.href = '/list-property'
+      return
+    }
     setLoading(true)
     try {
       const loaded = await loadRazorpay()
@@ -90,7 +96,7 @@ export default function RazorpayButton({ amount, plan, role, label, free, classN
         order_id: orderId,
         prefill: { name: name || '' },
         theme: { color: '#FB923C' },
-        handler: async (response: any) => {
+        handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
           try {
             const verify = await fetch('/api/verify-payment', {
               method: 'POST',

@@ -1,14 +1,12 @@
 import Razorpay from 'razorpay'
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { PAYMENTS_ENABLED } from '@/lib/billing'
 
 export async function POST(req: Request) {
-  console.log('ENV CHECK:', {
-    hasKeyId: !!process.env.RAZORPAY_KEY_ID,
-    keyIdPrefix: process.env.RAZORPAY_KEY_ID?.substring(0, 10),
-    hasSecret: !!process.env.RAZORPAY_KEY_SECRET,
-    secretPrefix: process.env.RAZORPAY_KEY_SECRET?.substring(0, 5),
-  })
+  if (!PAYMENTS_ENABLED) {
+    return NextResponse.json({ error: 'Payments are paused. Registration and listings are free for now.' }, { status: 403 })
+  }
   try {
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
       return NextResponse.json({ error: 'Razorpay not configured' }, { status: 500 })
@@ -52,8 +50,8 @@ export async function POST(req: Request) {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
       name: user.email
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Order creation error:', error)
-    return NextResponse.json({ error: error.message || 'Order failed' }, { status: 500 })
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Order failed' }, { status: 500 })
   }
 }

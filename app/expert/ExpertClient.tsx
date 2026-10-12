@@ -5,6 +5,7 @@ import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import RazorpayButton from '@/components/RazorpayButton'
+import { PAYMENTS_ENABLED } from '@/lib/billing'
 import StatusCard from '@/components/StatusCard'
 import type { Property } from '@/lib/supabase/types'
 
@@ -124,8 +125,9 @@ export default function ExpertClient({
 
   const FREE_LIMIT = 5
   const PRO_LIMIT = 20
+  const hasLeadAccess = !PAYMENTS_ENABLED || isSubscribed
   const listingLimit = isSubscribed ? PRO_LIMIT : FREE_LIMIT
-  const overLimit = properties.length >= listingLimit
+  const overLimit = PAYMENTS_ENABLED && properties.length >= listingLimit
   const initials = (fullName || email).slice(0, 1).toUpperCase()
 
   return (
@@ -199,7 +201,7 @@ export default function ExpertClient({
 
       {/* Tab bar */}
       <div className="flex gap-1 bg-[#F5F5F4] rounded-xl p-1 mb-6 overflow-x-auto">
-        {TABS.map(t => (
+        {TABS.filter(t => PAYMENTS_ENABLED || t !== 'Upgrade').map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -218,7 +220,7 @@ export default function ExpertClient({
         <div>
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm text-[#6B7280]">
-              {properties.length} / {listingLimit} listings used
+              {properties.length} / {PAYMENTS_ENABLED ? listingLimit : '∞'} listings used
             </p>
             {!overLimit && (
               <Link
@@ -296,7 +298,7 @@ export default function ExpertClient({
       {/* My Leads */}
       {tab === 'My Leads' && (
         <div>
-          {!isSubscribed && (
+          {!hasLeadAccess && (
             <div className="mb-4 p-4 rounded-xl bg-orange-50 border border-orange-200 text-sm flex items-start gap-3">
               <span className="text-xl">🔒</span>
               <div>
@@ -335,7 +337,7 @@ export default function ExpertClient({
                     {lead.propertyTitle && (
                       <p className="text-xs text-[#6B7280] mb-1">Enquired: {lead.propertyTitle}</p>
                     )}
-                    {isSubscribed ? (
+                    {hasLeadAccess ? (
                       <p className="text-sm" style={{ color: '#374151' }}>{lead.phone}</p>
                     ) : (
                       <p className="text-sm" style={{ color: '#374151' }}>
@@ -385,7 +387,7 @@ export default function ExpertClient({
       )}
 
       {/* Upgrade */}
-      {tab === 'Upgrade' && (
+      {PAYMENTS_ENABLED && tab === 'Upgrade' && (
         <div>
           {isSubscribed ? (
             <div className="bg-green-50 border border-green-200 rounded-2xl p-6 mb-6">

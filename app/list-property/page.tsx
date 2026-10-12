@@ -34,7 +34,7 @@ export default async function ListPropertyPage({
             Couldn&apos;t verify your account
           </h1>
           <p className="text-sm mb-6" style={{ color: '#6B7280' }}>
-            Please refresh and try again. If you&apos;ve already paid, you won&apos;t be charged again.
+            Please refresh and try again. Your account details could not be loaded.
           </p>
         </main>
         <MobileNav />
@@ -61,7 +61,7 @@ export default async function ListPropertyPage({
           userId={user.id}
           initialRole={initialRole}
           expertRegistered={isAuthorizedExpert}
-          initialStep={isAuthorizedExpert ? 1 : 0}
+          initialStep={initialRole ? 1 : 0}
         />
       </main>
       <MobileNav />

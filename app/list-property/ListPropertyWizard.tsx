@@ -5,6 +5,7 @@ import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import PhotoUpload from '@/components/PhotoUpload'
 import RazorpayButton from '@/components/RazorpayButton'
+import { PAYMENTS_ENABLED } from '@/lib/billing'
 import FlatFields from '@/components/wizard/FlatFields'
 import PlotFields from '@/components/wizard/PlotFields'
 import RentalFields from '@/components/wizard/RentalFields'
@@ -179,8 +180,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
       role: 'expert',
       expert_registered: true,
       profile_complete: true,
-      registration_paid_at: new Date().toISOString(),
-    }).eq('id', user.id)
+    }).eq('id', user.id).select('id').single()
 
     if (error) { toast.error('Error: ' + error.message); setRegSaving(false); return }
 
@@ -249,15 +249,15 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
             <div className="text-4xl mb-3">🤝</div>
             <h2 className="font-heading text-xl font-800 mb-2" style={{ color: '#111827' }}>Property Expert</h2>
             <ul className="text-sm space-y-1.5 mb-5" style={{ color: '#6B7280' }}>
-              <li>✅ ₹49 one-time — lifetime access</li>
-              <li>✅ 5 free property listings</li>
+              <li>✅ {PAYMENTS_ENABLED ? '₹49 one-time — lifetime access' : 'Free registration — no payment needed'}</li>
+              <li>✅ {PAYMENTS_ENABLED ? '5 free property listings' : 'Unlimited free property listings for now'}</li>
               <li>✅ AI-scored buyer leads HOT🔥 WARM🌡️ COLD❄️</li>
               <li>✅ WhatsApp Status Card for each property</li>
               <li>✅ Orenzaa Verified Expert badge</li>
               <li>✅ WhatsApp alerts on new leads</li>
               <li>✅ Expert dashboard with analytics</li>
             </ul>
-            <RazorpayButton
+            {PAYMENTS_ENABLED ? <RazorpayButton
               amount={49}
               plan="expert-registration"
               role="expert"
@@ -265,7 +265,11 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
               onVerified={() => setStep('register')}
               redirectTo={false}
               className="btn-accent w-full"
-            />
+            /> : (
+              <button type="button" onClick={() => setStep('register')} className="btn-accent w-full">
+                Start Listing for Free →
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -283,7 +287,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
             <>
               <div className="text-center mb-6">
                 <div className="text-5xl mb-3">✅</div>
-                <h1 className="text-2xl font-bold text-[#111827]">Payment Successful!</h1>
+                <h1 className="text-2xl font-bold text-[#111827]">{PAYMENTS_ENABLED ? 'Payment Successful!' : 'Register for Free'}</h1>
                 <p className="text-[#6B7280] mt-1">Ab apni details bharo — almost done!</p>
               </div>
 

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts'
 import StatusCard from '@/components/StatusCard'
+import { PAYMENTS_ENABLED } from '@/lib/billing'
 import type { Property } from '@/lib/supabase/types'
 
 const CHART_STYLE = {
@@ -98,19 +99,19 @@ export default function BuilderClient({
           <div>
             <div className="text-xs font-700 uppercase tracking-wider mb-1" style={{ color: '#9CA3AF' }}>Package</div>
             <div className="flex items-center gap-2">
-              <span className="font-heading text-2xl font-800" style={{ color: planInfo.color }}>{plan}</span>
+              <span className="font-heading text-2xl font-800" style={{ color: planInfo.color }}>{PAYMENTS_ENABLED ? plan : 'Free Access'}</span>
               <span className="text-xs px-2 py-0.5 rounded-full font-700"
                 style={{ background: 'rgba(0,0,0,0.05)', color: '#6B7280', border: '1px solid rgba(0,0,0,0.06)' }}>
-                {planInfo.price}
+                {PAYMENTS_ENABLED ? planInfo.price : 'Free for now'}
               </span>
             </div>
-            {pkgExpiry && (
+            {PAYMENTS_ENABLED && pkgExpiry && (
               <div className="text-xs mt-0.5" style={{ color: '#6B7280' }}>
                 Expires {new Date(pkgExpiry).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' })}
               </div>
             )}
           </div>
-          {plan !== 'Premium' && (
+          {PAYMENTS_ENABLED && plan !== 'Premium' && (
             <a href="/pricing" className="shrink-0 text-xs px-4 py-2 rounded-xl font-700"
               style={{ background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.25)', color: '#FB923C' }}>
               Upgrade ↗
@@ -120,12 +121,12 @@ export default function BuilderClient({
         <div className="mt-4">
           <div className="flex justify-between text-xs mb-1.5" style={{ color: '#9CA3AF' }}>
             <span>Listings used</span>
-            <span>{listingCount} / {listingLimit === 999 ? '∞' : listingLimit}</span>
+            <span>{listingCount} / {!PAYMENTS_ENABLED || listingLimit === 999 ? '∞' : listingLimit}</span>
           </div>
           <div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(0,0,0,0.05)' }}>
             <div className="h-full rounded-full transition-all"
               style={{
-                width: listingLimit === 999 ? '20%' : `${Math.min((listingCount / listingLimit) * 100, 100)}%`,
+                width: !PAYMENTS_ENABLED || listingLimit === 999 ? '20%' : `${Math.min((listingCount / listingLimit) * 100, 100)}%`,
                 background: `linear-gradient(90deg, ${planInfo.color}88, ${planInfo.color})`,
               }} />
           </div>
@@ -162,9 +163,9 @@ export default function BuilderClient({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <p className="text-sm" style={{ color: '#6B7280' }}>
-                {listingCount}/{listingLimit === 999 ? '∞' : listingLimit} listings used
+                {listingCount}/{!PAYMENTS_ENABLED || listingLimit === 999 ? '∞' : listingLimit} listings used
               </p>
-              {listingCount < listingLimit && (
+              {(!PAYMENTS_ENABLED || listingCount < listingLimit) && (
                 <Link href="/list-property?new=1"
                   className="px-4 py-2 rounded-xl text-sm font-700 text-white transition-all"
                   style={{ background: '#FB923C' }}>
