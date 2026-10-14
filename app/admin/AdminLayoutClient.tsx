@@ -62,7 +62,7 @@ export default function AdminLayoutClient({
         {/* Logo */}
         <div className="p-5 border-b border-[#E5E7EB]">
           <div className="flex items-center gap-2.5">
-            <img src="/orenzaa-logo.png" alt="Orenzaa" width={1808} height={870} className="h-12 w-auto object-contain shrink-0" />
+            <img src="/orenzaa-brand.svg" alt="Orenzaa" width={270} height={64} className="h-auto w-36 object-contain shrink-0" />
             <div className="min-w-0">
               <p className="text-[10px] text-[#9CA3AF]">Admin Panel</p>
             </div>

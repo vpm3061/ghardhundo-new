@@ -138,7 +138,7 @@ export default function VisitBookingModal({ propertyId, propertyTitle, userId }:
 
                 <div className="border-2 border-dashed border-[#FB923C] rounded-2xl p-5 mb-5 bg-[#FFF7ED]">
                   <div className="flex items-center justify-between mb-4">
-                    <img src="/orenzaa-logo.png" alt="Orenzaa" width={1808} height={870} className="h-12 w-auto object-contain" />
+                    <img src="/orenzaa-brand.svg" alt="Orenzaa" width={270} height={64} className="h-auto w-36 max-w-[55%] object-contain" />
                     <span className="text-xs px-3 py-1 rounded-full bg-orange-100 text-[#FB923C] font-700">
                       SITE VISIT SLIP
                     </span>
