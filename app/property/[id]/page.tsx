@@ -7,6 +7,7 @@ import MobileNav from '@/components/MobileNav'
 import PhoneModal from '@/components/PhoneModal'
 import LeadForm from '@/components/LeadForm'
 import EMICalculator from '@/components/EMICalculator'
+import PriceBreakdown from '@/components/PriceBreakdown'
 import NearbyInfo from '@/components/NearbyInfo'
 import WhatsAppButton from '@/components/WhatsAppButton'
 import PropertyDetailClient from './PropertyDetailClient'
@@ -147,7 +148,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                 )}
                 {p.rera_number && (
                   <span className="text-xs px-3 py-1 rounded-full text-[#22C55E] bg-green-50 border border-green-100">
-                    RERA: {p.rera_number}
+                    {p.orenzaa_verified ? '✓ Orenzaa Verified & RERA Tagged' : 'RERA Number Listed'}: {p.rera_number}
                   </span>
                 )}
               </div>
@@ -254,6 +255,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
             )}
 
             <NearbyInfo city={p.city} />
+            <PriceBreakdown property={p} />
             <EMICalculator defaultAmount={p.price_min || 5000000} />
           </div>
 

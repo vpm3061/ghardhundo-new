@@ -1,8 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { AI_QUESTIONS, calculateScore } from '@/lib/ai-scoring'
 import type { AIAnswers } from '@/lib/supabase/types'
-import { createClient } from '@/lib/supabase/client'
+import ZeroSpamBadge from './ZeroSpamBadge'
 import { useRouter } from 'next/navigation'
 
 type Step = 'intro' | 'questions' | 'result'
@@ -43,6 +43,8 @@ export default function AIQuestionnaire({ userId }: { userId: string }) {
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const router = useRouter()
+  const requestId = useRef('')
+  const [error, setError] = useState('')
 
   const handleAnswer = (value: string) => {
     const q = AI_QUESTIONS[currentQ]
@@ -60,29 +62,18 @@ export default function AIQuestionnaire({ userId }: { userId: string }) {
     e.preventDefault()
     if (!result) return
     setSubmitting(true)
-    const fullAnswers = answers as AIAnswers
-    const { data: inserted } = await createClient()
-      .from('leads')
-      .insert({
-        user_id: userId, name: formData.name, phone: formData.phone,
-        budget: fullAnswers.budget, timeline: fullAnswers.timeline,
-        loan_status: fullAnswers.loan_status, purpose: fullAnswers.purpose,
-        city: fullAnswers.city, ai_score: result.score, tier: result.tier, status: 'New',
+    setError('')
+    try {
+      requestId.current ||= crypto.randomUUID()
+      const response = await fetch('/api/leads', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...answers, ...formData, request_id: requestId.current }),
       })
-      .select('id')
-      .single()
-
-    // Fire-and-forget: notify admin on HOT leads (score >= 70)
-    if (inserted?.id && result.tier === 'HOT') {
-      fetch('/api/notify-hot-lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ leadId: inserted.id }),
-      }).catch(() => {/* non-blocking */})
-    }
-
-    setSubmitting(false)
-    setSubmitted(true)
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Could not save your request')
+      setSubmitted(true)
+    } catch (error) { setError(error instanceof Error ? error.message : 'Please try again') }
+    finally { setSubmitting(false) }
   }
 
   const progress = step === 'questions' ? (currentQ / AI_QUESTIONS.length) * 100 : 0
@@ -191,20 +182,26 @@ export default function AIQuestionnaire({ userId }: { userId: string }) {
         </div>
 
         {!submitted ? (
+          <>
+          <ZeroSpamBadge />
+          {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
           <form onSubmit={handleSubmitLead} className="flex flex-col gap-3" suppressHydrationWarning>
+            <fieldset disabled={submitting} className="flex min-w-0 flex-col gap-3">
             <h4 className="font-heading font-700 text-sm text-[#111827]">Get personalized recommendations</h4>
             <input
               type="text" className="input-dark" placeholder="Your name" required
-              value={formData.name} onChange={e => setFormData(d => ({ ...d, name: e.target.value }))} suppressHydrationWarning
+              value={formData.name} onChange={e => { requestId.current = ''; setFormData(d => ({ ...d, name: e.target.value })) }} suppressHydrationWarning
             />
             <input
               type="tel" className="input-dark" placeholder="Phone number" required
-              value={formData.phone} onChange={e => setFormData(d => ({ ...d, phone: e.target.value }))} suppressHydrationWarning
+              value={formData.phone} onChange={e => { requestId.current = ''; setFormData(d => ({ ...d, phone: e.target.value })) }} suppressHydrationWarning
             />
             <button type="submit" disabled={submitting} className="btn-accent disabled:opacity-50" suppressHydrationWarning>
               {submitting ? 'Saving…' : 'Get Recommendations →'}
             </button>
+            </fieldset>
           </form>
+          </>
         ) : (
           <div className="text-center">
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3"

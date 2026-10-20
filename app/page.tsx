@@ -4,6 +4,7 @@ import { pageMetadata, SITE_URL, SITE_DESCRIPTION, jsonLd } from '@/lib/seo'
 
 export const metadata = pageMetadata('Properties in Lucknow, Noida & Ayodhya', SITE_DESCRIPTION, '/')
 import Navbar from '@/components/Navbar'
+import ZeroSpamBadge from '@/components/ZeroSpamBadge'
 import MobileNav from '@/components/MobileNav'
 import PropertyCard from '@/components/PropertyCard'
 import AIQuestionnaire from '@/components/AIQuestionnaire'
@@ -70,6 +71,7 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <div className="mx-auto max-w-3xl px-6 pb-6"><ZeroSpamBadge /></div>
       {/* Search bar */}
       <section className="bg-[#FAFAF9] py-10 px-6 border-y border-[#E5E7EB]">
         <div className="max-w-4xl mx-auto">
@@ -106,10 +108,10 @@ export default async function HomePage() {
       <section className="bg-white py-16 px-6">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
-            { num: '500+', label: 'RERA Verified Properties' },
-            { num: '2,000+', label: 'Happy Buyers' },
-            { num: '50+', label: 'Trusted Builders' },
-            { num: '₹0', label: 'Buyer Fee' },
+            { num: 'Private', label: 'Buyer Contact Details' },
+            { num: 'Clear', label: 'Property Cost Estimates' },
+            { num: 'Saved', label: 'Digital VIP Visit Passes' },
+            { num: 'Local', label: 'Property Assistance' },
           ].map(stat => (
             <div key={stat.label}>
               <p className="text-4xl font-heading font-800 text-[#111827]">{stat.num}</p>
@@ -172,7 +174,7 @@ export default async function HomePage() {
           {[
             { step: '01', icon: '🤖', title: 'AI Match', desc: 'Answer 5 questions. Get your property match score instantly.' },
             { step: '02', icon: '🏠', title: 'Site Visit', desc: 'Book a free site visit. We arrange everything for you.' },
-            { step: '03', icon: '✅', title: 'Move In', desc: 'RERA verified purchase. Plus 2 years after-sale support.' },
+            { step: '03', icon: '✅', title: 'Review & Decide', desc: 'Review the property documents and final written quote before you decide.' },
           ].map(item => (
             <div key={item.step} className="bg-white border border-[#E5E7EB] rounded-2xl p-8 hover:border-[#FB923C] hover:shadow-lg transition-all">
               <p className="text-xs font-bold text-[#FB923C] mb-4">{item.step}</p>
@@ -220,6 +222,8 @@ export default async function HomePage() {
               <div className="space-y-2">
                 {[
                   { label: 'Properties', href: '/properties' },
+                  { label: 'Trust & Transparency', href: '/trust' },
+                  { label: 'My Visit Passes', href: '/visits' },
                   { label: 'List Property', href: '/list-property' },
                 ].map(l => (
                   <Link key={l.href} href={l.href} className="block text-gray-400 text-sm hover:text-white transition-colors">{l.label}</Link>
@@ -242,12 +246,12 @@ export default async function HomePage() {
               <p className="font-semibold text-sm mb-4">Contact</p>
               <p className="text-gray-400 text-sm">WhatsApp: +91 96436 93090</p>
               <p className="text-gray-400 text-sm mt-1">hello@orenzaa.com</p>
-              <p className="text-gray-400 text-sm mt-4">RERA Verified Platform</p>
+              <p className="text-gray-400 text-sm mt-4">Private Enquiries · Transparent Estimates</p>
             </div>
           </div>
           <div className="border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-gray-500 text-xs">© 2025 Orenzaa. All rights reserved.</p>
-            <p className="text-gray-500 text-xs">AI-Powered · RERA Verified · Zero Pressure</p>
+            <p className="text-gray-500 text-xs">AI-Powered · Privacy First · Zero Pressure</p>
           </div>
         </div>
       </footer>

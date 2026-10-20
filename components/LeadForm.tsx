@@ -1,7 +1,9 @@
 'use client'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import ZeroSpamBadge from './ZeroSpamBadge'
+import DigitalVipPass from './DigitalVipPass'
+import { indiaToday, type VipPass } from '@/lib/trust'
 
 const BHK_OPTIONS = ['1 BHK', '2 BHK', '3 BHK', '4 BHK', '5+ BHK']
 const TIMELINE_OPTIONS = ['1-3 months', '3-6 months', '6-12 months', 'More than 1 year']
@@ -22,13 +24,15 @@ interface LeadFormProps {
 }
 
 export default function LeadForm({ userId, propertyId, propertyTitle, onSuccess }: LeadFormProps) {
-  const [form, setForm] = useState({ name: '', phone: '', budget: '', bhk: '', timeline: '', loan_status: '', purpose: '' })
+  const [form, setForm] = useState({ name: '', phone: '', budget: '', bhk: '', timeline: '', loan_status: '', purpose: '', visit_date: '', whatsapp_consent: false })
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+  const [pass, setPass] = useState<VipPass | null>(null)
+  const requestId = useRef('')
 
-  const set = (f: string, v: string) => setForm(prev => ({ ...prev, [f]: v }))
+  const set = (f: string, v: string | boolean) => { requestId.current = ''; setForm(prev => ({ ...prev, [f]: v })) }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,21 +40,22 @@ export default function LeadForm({ userId, propertyId, propertyTitle, onSuccess 
       router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`)
       return
     }
-    if (!form.phone.match(/^[+]?[0-9]{10,13}$/)) { setError('Please enter a valid phone number'); return }
     setSubmitting(true); setError('')
-    const supabase = createClient()
-    const { error: err } = await supabase.from('leads').insert({
-      user_id: userId, property_id: propertyId,
-      name: form.name, phone: form.phone,
-      budget: form.budget || null, bhk: form.bhk || null,
-      timeline: form.timeline || null, loan_status: form.loan_status || null,
-      purpose: form.purpose || null, referrer_id: getReferrerId(),
-      ai_score: 0, tier: 'COLD', status: 'New',
-    })
-    setSubmitting(false)
-    if (err) { setError('Failed to submit. Please try again.'); return }
-    setSubmitted(true); onSuccess?.()
+    try {
+      requestId.current ||= crypto.randomUUID()
+      const response = await fetch('/api/leads', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, property_id: propertyId, request_id: requestId.current, referrer_id: getReferrerId() }),
+      })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'Could not save your request')
+      setPass(result.pass); setSubmitted(true); onSuccess?.()
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Could not save your request. Please try again.')
+    } finally { setSubmitting(false) }
   }
+
+  if (submitted && pass) return <DigitalVipPass pass={pass} />
 
   if (submitted) {
     return (
@@ -72,11 +77,13 @@ export default function LeadForm({ userId, propertyId, propertyTitle, onSuccess 
       <h3 className="font-heading font-700 mb-0.5 text-[#111827]">Schedule a Site Visit</h3>
       <p className="text-[#6B7280] text-xs mb-4">Get expert guidance from our property advisors</p>
 
-      {error && <p className="text-red-600 text-xs mb-3 bg-red-50 border border-red-200 rounded-xl px-3 py-2">{error}</p>}
+      <div className="mb-4"><ZeroSpamBadge /></div>
+      {error && <p role="alert" className="text-red-600 text-xs mb-3 bg-red-50 border border-red-200 rounded-xl px-3 py-2">{error}</p>}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3" suppressHydrationWarning>
-        <input type="text" placeholder="Full name" required className="input-dark" value={form.name} onChange={e => set('name', e.target.value)} suppressHydrationWarning />
-        <input type="tel" placeholder="Phone number" required className="input-dark" value={form.phone} onChange={e => set('phone', e.target.value)} suppressHydrationWarning />
+        <fieldset disabled={submitting} className="flex min-w-0 flex-col gap-3">
+        <input type="text" aria-label="Full name" autoComplete="name" maxLength={100} placeholder="Full name" required className="input-dark" value={form.name} onChange={e => set('name', e.target.value)} suppressHydrationWarning />
+        <input type="tel" aria-label="Phone number" autoComplete="tel" maxLength={25} placeholder="Phone number" required className="input-dark" value={form.phone} onChange={e => set('phone', e.target.value)} suppressHydrationWarning />
         <input type="text" placeholder="Budget (e.g. ₹80L – ₹1.2Cr)" className="input-dark" value={form.budget} onChange={e => set('budget', e.target.value)} suppressHydrationWarning />
         <div className="grid grid-cols-2 gap-2">
           {([
@@ -85,15 +92,24 @@ export default function LeadForm({ userId, propertyId, propertyTitle, onSuccess 
             ['loan_status', 'Loan Status', LOAN_OPTIONS],
             ['purpose', 'Purpose', PURPOSE_OPTIONS],
           ] as [string, string, string[]][]).map(([key, label, opts]) => (
-            <select key={key} className="input-dark text-sm" value={(form as Record<string, string>)[key]} onChange={e => set(key, e.target.value)} suppressHydrationWarning>
+            <select key={key} className="input-dark text-sm" value={String(form[key as keyof typeof form] || '')} onChange={e => set(key, e.target.value)} suppressHydrationWarning>
               <option value="">{label}</option>
               {opts.map(o => <option key={o} value={o}>{o}</option>)}
             </select>
           ))}
         </div>
+        <label className="text-sm text-slate-700">Preferred visit date
+          <input type="date" required min={indiaToday()} className="input-dark mt-1 w-full" value={form.visit_date} onChange={e => set('visit_date', e.target.value)} />
+        </label>
+        <label className="flex items-start gap-2 text-xs leading-relaxed text-slate-600">
+          <input type="checkbox" className="mt-0.5" checked={form.whatsapp_consent} onChange={e => set('whatsapp_consent', e.target.checked)} />
+          I agree to receive WhatsApp updates about this visit from Orenzaa.
+        </label>
+        <p className="text-xs text-slate-500">The team will confirm the visit time. No marketing consent is required.</p>
         <button type="submit" disabled={submitting} className="btn-accent mt-1 disabled:opacity-50" suppressHydrationWarning>
           {submitting ? 'Submitting…' : 'Book Site Visit →'}
         </button>
+        </fieldset>
       </form>
     </div>
   )

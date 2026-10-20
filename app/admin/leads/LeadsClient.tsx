@@ -32,7 +32,7 @@ const STATUS_STYLE: Record<string, { bg: string; color: string; border: string }
 }
 
 const TIERS   = ['ALL', 'HOT', 'WARM', 'COLD'] as const
-const STATUSES = ['New', 'Called', 'Visit Fixed', 'Deal Done', 'Not Interested', 'Lost']
+const STATUSES = ['New', 'Tagged', 'Visited', 'Closed', 'Called', 'Visit Fixed', 'Deal Done', 'Not Interested', 'Lost']
 const SORTS   = ['score', 'newest', 'oldest'] as const
 
 export default function LeadsClient({ leads, cities }: { leads: Lead[]; cities: string[] }) {

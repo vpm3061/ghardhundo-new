@@ -116,7 +116,7 @@ export default function StatusCard({ property }: { property: Property }) {
       const details = [
         property.bhk?.length ? `${property.bhk.join('/')} BHK` : null,
         property.property_category,
-        property.rera_number ? 'RERA Verified' : null,
+        property.rera_number && property.orenzaa_verified ? 'Orenzaa Verified' : null,
       ].filter(Boolean).join('   ·   ')
       ctx.fillText(details, 50, 1410)
 

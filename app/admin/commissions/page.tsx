@@ -12,7 +12,7 @@ export default async function CommissionsPage() {
     { data: coinConvRaw },
   ] = await Promise.all([
     supabase.from('commissions').select('*, leads(name, phone, tier)').order('created_at', { ascending: false }),
-    supabase.from('leads').select('id, name, phone, tier, properties(title)').eq('status', 'Deal Done'),
+    supabase.from('leads').select('id, name, phone, tier, properties(title)').in('status', ['Deal Done', 'Closed']),
     supabase.from('dealer_subscriptions').select('*, profiles!dealer_id(full_name, email)').order('created_at', { ascending: false }),
     supabase.from('referrals').select('*, profiles!referrer_id(full_name, email), leads(deal_amount, properties(title))').order('created_at', { ascending: false }),
     supabase.from('coin_conversions').select('*, profiles!user_id(full_name, email)').order('created_at', { ascending: false }),

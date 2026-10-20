@@ -30,7 +30,7 @@ export function generatePropertyTags(p: Property): string[] {
   if (p.status === 'New Launch')         tags.push('#NewLaunch', '#EarlyBirdOffer')
 
   // RERA
-  if (p.rera_number) tags.push('#RERAVerified', '#RERAApproved')
+  if (p.rera_number && p.orenzaa_verified) tags.push('#RERAVerified', '#RERAApproved')
 
   // Sector — "#Sector50" or "#GomtiNagar" etc.
   if (p.sector) {
@@ -71,7 +71,7 @@ export function getShareTags(p: Property): string[] {
   const tags: string[] = []
   if (p.bhk?.length)   tags.push(`#${p.bhk[0]}BHK`)
   if (p.city)          tags.push(CITY_TAGS[p.city]?.[0] ?? `#${toSlug(p.city)}`)
-  if (p.rera_number)   tags.push('#RERAVerified')
+  if (p.rera_number && p.orenzaa_verified)   tags.push('#RERAVerified')
   if (p.status === 'Ready to Move') tags.push('#ReadyToMove')
   if (p.status === 'New Launch')    tags.push('#NewLaunch')
   tags.push('#Orenzaa')
@@ -83,7 +83,7 @@ export function getCardTags(p: Property): string[] {
   const tags: string[] = []
   if (p.bhk?.[0])      tags.push(`#${p.bhk[0]}BHK`)
   if (p.city)          tags.push(CITY_TAGS[p.city]?.[0] ?? `#${toSlug(p.city)}Property`)
-  if (p.rera_number)   tags.push('#RERAVerified')
+  if (p.rera_number && p.orenzaa_verified)   tags.push('#RERAVerified')
   else if (p.status)   tags.push(p.status === 'Ready to Move' ? '#ReadyToMove' : p.status === 'New Launch' ? '#NewLaunch' : '#UnderConstruction')
   return tags.slice(0, 3)
 }

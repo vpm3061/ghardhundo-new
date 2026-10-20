@@ -22,6 +22,14 @@ export type Profile = {
 export type PropertyCategory = 'flat' | 'plot' | 'rental' | 'commercial'
 
 export type Property = {
+  orenzaa_verified?: boolean
+  verified_at?: string | null
+  base_carpet_rate?: number | null
+  government_charges_estimate?: number | null
+  gst_estimate?: number | null
+  maintenance_estimate?: number | null
+  other_charges_estimate?: number | null
+  direct_builder_pricing?: boolean
   id: string
   title: string
   builder: string | null
@@ -100,7 +108,7 @@ export type Lead = {
   city: string | null
   ai_score: number
   tier: 'HOT' | 'WARM' | 'COLD' | null
-  status: 'New' | 'Called' | 'Visit Fixed' | 'Deal Done' | 'Not Interested'
+  status: 'New' | 'Tagged' | 'Visited' | 'Closed' | 'Called' | 'Visit Fixed' | 'Deal Done' | 'Not Interested' | 'Lost'
   referrer_id: string | null
   deal_amount: number | null
   created_at: string

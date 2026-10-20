@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import LeadDetailClient from './LeadDetailClient'
 import AppointmentSlip from '@/components/AppointmentSlip'
 import PurchaseSlip from '@/components/PurchaseSlip'
+import DigitalVipPass from '@/components/DigitalVipPass'
 
 export default async function LeadDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -58,6 +59,8 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
             { label: 'BHK',         value: lead.bhk         },
             { label: 'Loan Status', value: lead.loan_status },
             { label: 'Purpose',     value: lead.purpose     },
+            { label: 'Source',      value: lead.source_tag  },
+            { label: 'Requested visit date', value: lead.visit_date },
           ].filter(({ value }) => value).map(({ label, value }) => (
             <div key={label} className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(0,0,0,0.03)' }}>
               <div className="text-[#9CA3AF] text-[10px] uppercase tracking-wider mb-0.5">{label}</div>
@@ -79,6 +82,12 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
         <LeadDetailClient leadId={lead.id} currentStatus={lead.status} />
       </div>
 
+      {lead.vip_pass_id && (
+        <div className="mb-6">
+          <DigitalVipPass pass={{ id: lead.vip_pass_id, name: lead.name, project: lead.project_name, visitDate: lead.visit_date }} />
+          <a href={`/api/admin/lead-payload/${lead.id}`} className="mt-4 block text-sm text-orange-700 underline">Download provider-ready payload</a>
+        </div>
+      )}
       {/* Appointment Slip */}
       {lead.status === 'Visit Fixed' && (
         <div>
@@ -93,7 +102,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
       )}
 
       {/* Purchase Slip */}
-      {lead.status === 'Deal Done' && (
+      {(lead.status === 'Deal Done' || lead.status === 'Closed') && (
         <div>
           <h2 className="font-heading font-700 mb-4 text-[#111827]">Purchase Confirmation</h2>
           <PurchaseSlip

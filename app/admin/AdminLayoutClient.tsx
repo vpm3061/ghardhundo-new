@@ -3,6 +3,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import AdminLeadAlerts from '@/components/AdminLeadAlerts'
 
 const MENU = [
   { href: '/admin',             icon: '📊', label: 'Dashboard'   },
@@ -138,6 +139,7 @@ export default function AdminLayoutClient({
 
         {/* Page content */}
         <div className="flex-1 p-4 sm:p-6 bg-[#FAFAF9]">
+          <AdminLeadAlerts />
           {children}
         </div>
 

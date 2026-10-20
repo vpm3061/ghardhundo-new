@@ -91,7 +91,7 @@ export default function PropertyCard({ property, userId, savedIds }: { property:
           )}
           {property.rera_number && (
             <span className="text-[10px] font-700 px-2.5 py-1 rounded-full bg-white/90 text-[#22C55E] border border-green-100">
-              ✓ RERA
+              {property.orenzaa_verified ? '✓ Orenzaa Verified & RERA Tagged' : 'RERA Number Listed'}
             </span>
           )}
         </div>

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import MobileNav from '@/components/MobileNav'
 import ProfileClient from './ProfileClient'
+import DigitalVipPass from '@/components/DigitalVipPass'
 import type { Metadata } from 'next'
 import type { Property } from '@/lib/supabase/types'
 
@@ -19,7 +20,7 @@ export default async function ProfilePage() {
     { data: savedRaw },
   ] = await Promise.all([
     supabase.from('profiles').select('full_name, email, phone, whatsapp_number, avatar_url, role, verification_status, expert_registered').eq('id', user.id).single(),
-    supabase.from('leads').select('id, name, tier, ai_score, status, created_at, properties(title)').eq('user_id', user.id).order('created_at', { ascending: false }).limit(10),
+    supabase.from('leads').select('id, name, tier, ai_score, status, created_at, vip_pass_id, visit_date, project_name, properties(title)').eq('user_id', user.id).order('created_at', { ascending: false }).limit(10),
     supabase.from('saved_properties').select('property_id, properties(*)').eq('user_id', user.id).order('created_at', { ascending: false }),
   ])
 
@@ -47,6 +48,9 @@ export default async function ProfilePage() {
     <>
       <Navbar />
       <main className="max-w-lg mx-auto px-4 sm:px-6 py-8 pb-28 md:pb-12">
+        {(enquiries || []).filter(lead => lead.vip_pass_id).map(lead => <div key={lead.id} className="mb-6">
+          <DigitalVipPass pass={{ id: lead.vip_pass_id, name: lead.name, project: lead.project_name, visitDate: lead.visit_date }} />
+        </div>)}
         <ProfileClient
           userId={user.id}
           email={user.email || ''}

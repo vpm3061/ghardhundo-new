@@ -25,7 +25,7 @@ export default async function AdminOverviewPage() {
 
   const hotToday    = (leads || []).filter(l => l.tier === 'HOT' && new Date(l.created_at) >= today).length
   const totalLeads  = (leads || []).length
-  const dealsDone   = (leads || []).filter(l => l.status === 'Deal Done').length
+  const dealsDone   = (leads || []).filter(l => (l.status === 'Deal Done' || l.status === 'Closed')).length
   const activeProperties = (properties || []).filter(p => p.is_active).length
   const cplRevenue  = (cplDeals || []).reduce((s, d) => s + (d.cost_per_lead || 0) * (d.leads_delivered || 0), 0)
 

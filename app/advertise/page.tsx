@@ -14,7 +14,7 @@ const PACKAGES = [
 
 const WHY = [
   { icon: '🎯', title: 'Targeted UP buyers', desc: 'Reach active buyers in Lucknow, Noida & Ayodhya specifically.' },
-  { icon: '🤖', title: 'AI qualified leads', desc: 'Every CPL lead is AI-scored HOT/WARM/COLD before it reaches you.' },
+  { icon: '🤖', title: 'AI qualified leads', desc: 'Our team uses AI scores to prioritise enquiries and coordinate visits.' },
   { icon: '💰', title: 'Affordable rates', desc: 'No agency mark-ups — pay directly for placement or per lead.' },
   { icon: '📊', title: 'Real-time analytics', desc: 'Track views, clicks and leads on your campaign as it runs.' },
 ]
@@ -68,10 +68,10 @@ export default function AdvertisePage() {
             <div className="mt-6 rounded-2xl p-6 sm:p-8 text-center sm:text-left sm:flex items-center justify-between gap-6"
               style={{ background: 'linear-gradient(135deg, #FB923C, #F59E0B)' }}>
               <div>
-                <h3 className="font-heading text-2xl font-800 text-white mb-1">CPL Package — ₹1,500/lead</h3>
-                <p className="text-orange-50 text-sm">AI-scored buyers only · Minimum 10 leads = ₹15,000</p>
+                <h3 className="font-heading text-2xl font-800 text-white mb-1">Managed Property Enquiries</h3>
+                <p className="text-orange-50 text-sm">Orenzaa coordinates buyer enquiries and visits. Buyer contact details are not sold.</p>
                 <Link href="/cpl-terms" className="inline-block mt-2 text-sm text-white underline underline-offset-2">
-                  View full CPL terms & pricing →
+                  View partner enquiry guidelines →
                 </Link>
               </div>
               <a href="https://wa.me/919643693090?text=Hi%2C%20I%27m%20interested%20in%20the%20Orenzaa%20CPL%20package"

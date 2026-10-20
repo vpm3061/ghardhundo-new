@@ -4,6 +4,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import PhotoUpload from '@/components/PhotoUpload'
+import AdminPropertyTrust from '@/components/AdminPropertyTrust'
 
 const CITIES    = ['Lucknow', 'Noida', 'Greater Noida', 'Ayodhya', 'Ghaziabad']
 const AMENITIES = ['Swimming Pool', 'Club House', 'Gym', '24hr Security', 'Power Backup', 'Parking', 'Garden', 'Kids Zone', 'Lift', 'CCTV']
@@ -325,6 +326,7 @@ export default function EditPropertyPage() {
         </div>
       </section>
 
+      <AdminPropertyTrust propertyId={id} />
       {/* Debug panel — shows exactly what will be saved */}
       <div className="rounded-xl p-3 text-xs space-y-1"
         style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', color: '#FCD34D' }}>
