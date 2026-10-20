@@ -1,4 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192">
-  <rect width="192" height="192" rx="38" fill="#FB923C"/>
-  <text x="96" y="130" font-family="Arial" font-size="110" font-weight="bold" fill="white" text-anchor="middle">O</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="365 45 678 678"><path fill="#2B3F59" d="M438 461C431 437 427 411 427 384C427 235 551 115 704 115C857 115 981 235 981 384C981 411 977 437 970 461L867 373C861 282 793 210 704 210C615 210 547 282 541 373Z"/><path fill="#2B3F59" d="M467 527L553 454C575 516 632 558 704 558C776 558 833 516 855 454L941 527C891 605 804 653 704 653C604 653 517 605 467 527Z"/><path fill="#FF6000" d="M395 522L704 257L1013 522H963L704 299L445 522Z"/></svg>

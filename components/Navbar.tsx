@@ -46,7 +46,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center">
-          <img src="/orenzaa-brand.svg" alt="Orenzaa — Find Where Life Belongs" width={270} height={64} className="h-12 sm:h-14 w-auto object-contain" />
+          <img src="/orenzaa-brand.svg" alt="Orenzaa — REAL ESTATE AND PROPTECH" width={270} height={64} className="h-12 sm:h-14 w-auto object-contain" />
         </Link>
 
         {/* Desktop links */}

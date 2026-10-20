@@ -153,7 +153,7 @@ export default function StatusCard({ property }: { property: Property }) {
       ctx.fillStyle = '#FFFFFF'
       ctx.font = '800 36px Arial'
       ctx.textAlign = 'center'
-      ctx.fillText('Find Where Life Belongs', 540, 1878)
+      ctx.fillText('REAL ESTATE AND PROPTECH', 540, 1878)
       ctx.textAlign = 'left'
 
       const linkEl = document.createElement('a')

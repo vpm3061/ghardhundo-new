@@ -202,7 +202,7 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-10 mb-12">
             <div>
-              <p className="font-heading font-800 text-xl mb-3">ORENZ<span className="text-[#FB923C]">AA</span></p>
+              <img src="/orenzaa-brand.svg" alt="ORENZAA ? REAL ESTATE AND PROPTECH" width={270} height={64} className="w-60 max-w-full h-auto bg-white rounded-lg p-2 mb-3" />
               <p className="text-gray-400 text-sm leading-relaxed">Premium PropTech platform for home buyers, builders, agents and investors.</p>
             </div>
             <div>

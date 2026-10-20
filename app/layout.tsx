@@ -19,7 +19,7 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orenzaa.com'),
   title: {
-    default: 'Orenzaa — Find Where Life Belongs',
+    default: 'Orenzaa — REAL ESTATE AND PROPTECH',
     template: '%s | Orenzaa',
   },
   description: 'AI-powered property platform for Lucknow, Noida and UP. Find flats, plots, rental and commercial properties. RERA verified. Zero pressure.',
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     '2BHK Lucknow', 'buy flat Noida', 'property dealer Lucknow', 'real estate UP', 'Orenzaa',
   ],
   openGraph: {
-    title: 'Orenzaa — Find Where Life Belongs',
+    title: 'Orenzaa — REAL ESTATE AND PROPTECH',
     description: 'AI-powered property platform for Lucknow, Noida and UP.',
     url: 'https://orenzaa.com',
     images: ['/og-image.jpg'],
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Orenzaa — Find Where Life Belongs',
+    title: 'Orenzaa — REAL ESTATE AND PROPTECH',
     description: 'AI-powered property platform for Lucknow, Noida and UP.',
     images: ['/og-image.jpg'],
   },
@@ -53,8 +53,8 @@ export const metadata: Metadata = {
     title: 'Orenzaa',
   },
   icons: {
-    icon: '/icon-192.png',
-    apple: '/icon-192.png',
+    icon: '/orenzaa-icon.svg?v=2',
+    apple: '/apple-icon.png',
   },
 }
 
