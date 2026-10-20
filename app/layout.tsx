@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { SITE_URL, SITE_DESCRIPTION } from '@/lib/seo'
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister'
@@ -17,20 +18,20 @@ const jakarta = Plus_Jakarta_Sans({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orenzaa.com'),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'Orenzaa — REAL ESTATE AND PROPTECH',
     template: '%s | Orenzaa',
   },
-  description: 'AI-powered property platform for Lucknow, Noida and UP. Find flats, plots, rental and commercial properties. RERA verified. Zero pressure.',
+  description: SITE_DESCRIPTION,
   keywords: [
     'property in Lucknow', 'flats in Noida', 'plots in Greater Noida', 'RERA verified property',
     '2BHK Lucknow', 'buy flat Noida', 'property dealer Lucknow', 'real estate UP', 'Orenzaa',
   ],
   openGraph: {
     title: 'Orenzaa — REAL ESTATE AND PROPTECH',
-    description: 'AI-powered property platform for Lucknow, Noida and UP.',
-    url: 'https://orenzaa.com',
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
     images: ['/og-image.jpg'],
     type: 'website',
     locale: 'en_IN',
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Orenzaa — REAL ESTATE AND PROPTECH',
-    description: 'AI-powered property platform for Lucknow, Noida and UP.',
+    description: SITE_DESCRIPTION,
     images: ['/og-image.jpg'],
   },
   robots: {
@@ -62,7 +63,6 @@ export const viewport: Viewport = {
   themeColor: '#FB923C',
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

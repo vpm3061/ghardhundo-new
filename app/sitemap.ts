@@ -1,14 +1,17 @@
 import { createClient } from '@supabase/supabase-js'
 import type { MetadataRoute } from 'next'
+import { SITE_URL } from '@/lib/seo'
+
+export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'https://orenzaa.com'
+  const origin = SITE_URL
 
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: origin,                  lastModified: new Date(), changeFrequency: 'daily',   priority: 1   },
-    { url: `${origin}/properties`,  lastModified: new Date(), changeFrequency: 'daily',   priority: 0.9 },
-    { url: `${origin}/advertise`,   lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${origin}/ai`,          lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: origin,                  changeFrequency: 'daily',   priority: 1   },
+    { url: `${origin}/properties`,  changeFrequency: 'daily',   priority: 0.9 },
+    { url: `${origin}/advertise`,   changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${origin}/cpl-terms`,          changeFrequency: 'monthly', priority: 0.6 },
   ]
 
   try {
@@ -25,7 +28,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const propertyUrls: MetadataRoute.Sitemap = (properties || []).map(p => ({
       url: `${origin}/property/${p.id}`,
-      lastModified: new Date(p.created_at),
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     }))

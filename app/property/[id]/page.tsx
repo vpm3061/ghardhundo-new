@@ -18,10 +18,11 @@ import BannerAd from '@/components/BannerAd'
 import ViewTracker from './ViewTracker'
 import VisitBookingModal from './VisitBookingModal'
 import { isUUID } from '@/lib/is-uuid'
+import { SITE_URL, jsonLd } from '@/lib/seo'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params
-  if (!isUUID(id)) return { title: 'Property | Orenzaa' }
+  if (!isUUID(id)) return { title: 'Property not found', robots: { index: false } }
 
   const supabase = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -34,13 +35,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     .eq('is_active', true)
     .single()
 
-  if (!property) return { title: 'Property | Orenzaa' }
+  if (!property) return { title: 'Property not found', robots: { index: false } }
 
   const priceText = property.property_category === 'rental'
-    ? `₹${Number(property.monthly_rent || 0).toLocaleString('en-IN')}/month`
+    ? property.monthly_rent ? `₹${Number(property.monthly_rent).toLocaleString('en-IN')}/month` : 'Rent on request'
     : property.price_min
     ? `₹${Math.round(Number(property.price_min) / 100000)} Lakh`
-    : ''
+    : 'Price on request'
 
   const bhkText = property.bhk?.length
     ? `${Array.isArray(property.bhk) ? property.bhk[0] : property.bhk} BHK `
@@ -52,19 +53,20 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     : 'Commercial Property'
 
   const place = property.locality || property.sector || ''
-  const title = `${bhkText}${typeText} in ${place} ${property.city || ''} — ${priceText} | Orenzaa`.replace(/\s+/g, ' ').trim()
+  const title = `${bhkText}${typeText} in ${place} ${property.city || ''} — ${priceText}`.replace(/\s+/g, ' ').trim()
 
-  const description = `${bhkText}${typeText} for ${property.property_category === 'rental' ? 'rent' : 'sale'} in ${place} ${property.city || ''}. ${priceText}. ${property.rera_number ? 'RERA: ' + property.rera_number + '.' : ''} ${property.description?.substring(0, 100) || ''} Contact on Orenzaa.com`.replace(/\s+/g, ' ').trim()
+  const description = `${bhkText}${typeText} for ${property.property_category === 'rental' ? 'rent' : 'sale'} in ${place} ${property.city || ''}. ${priceText}. ${property.rera_number ? 'RERA: ' + property.rera_number + '.' : ''} ${property.description?.substring(0, 100) || ''} Contact on Orenzaa.`.replace(/\s+/g, ' ').trim()
 
   return {
     title,
     description,
+    alternates: { canonical: `${SITE_URL}/property/${property.id}` },
     openGraph: {
       title,
       description,
-      url: `https://orenzaa.com/property/${property.id}`,
+      url: `${SITE_URL}/property/${property.id}`,
       images: property.photos?.[0]
-        ? [{ url: property.photos[0], width: 1200, height: 630 }]
+        ? [{ url: property.photos[0], alt: property.title }]
         : ['/og-image.jpg'],
       type: 'website',
     },
@@ -268,27 +270,42 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
         </div>
       </main>
       <MobileNav />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd({
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+          { '@type': 'ListItem', position: 2, name: 'Properties', item: `${SITE_URL}/properties` },
+          { '@type': 'ListItem', position: 3, name: p.title, item: `${SITE_URL}/property/${p.id}` },
+        ],
+      }) }} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: jsonLd({
             '@context': 'https://schema.org',
             '@type': 'RealEstateListing',
             name: p.title,
             description: p.description,
-            url: `https://orenzaa.com/property/${p.id}`,
-            image: p.photos?.[0] || '',
-            address: {
-              '@type': 'PostalAddress',
-              addressLocality: p.locality || p.city,
-              addressRegion: p.city,
-              addressCountry: 'IN',
+            url: `${SITE_URL}/property/${p.id}`,
+            image: p.photos?.length ? p.photos : undefined,
+            mainEntity: {
+              '@type': p.property_category === 'flat' ? 'Apartment' : 'Place',
+              name: p.title,
+              address: {
+                '@type': 'PostalAddress',
+                addressLocality: p.city,
+                streetAddress: p.locality || undefined,
+                addressCountry: 'IN',
+              },
             },
-            offers: {
+            offers: (p.property_category === 'rental' ? p.monthly_rent : p.price_min) ? {
               '@type': 'Offer',
-              price: p.price_min || p.monthly_rent || 0,
+              price: p.property_category === 'rental' ? p.monthly_rent : p.price_min,
               priceCurrency: 'INR',
-            },
+              url: `${SITE_URL}/property/${p.id}`,
+              businessFunction: p.property_category === 'rental' ? 'http://purl.org/goodrelations/v1#LeaseOut' : 'http://purl.org/goodrelations/v1#Sell',
+            } : undefined,
           }),
         }}
       />

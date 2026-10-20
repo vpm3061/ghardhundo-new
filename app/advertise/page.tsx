@@ -2,9 +2,9 @@ import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import MobileNav from '@/components/MobileNav'
 import AdvertiseForm from './AdvertiseForm'
-import type { Metadata } from 'next'
+import { pageMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = { title: 'Advertise on Orenzaa' }
+export const metadata = pageMetadata('Advertise Your Real Estate Business', 'Explore property advertising and lead generation options for builders and real estate businesses in Lucknow, Noida and Ayodhya.', '/advertise')
 
 const PACKAGES = [
   { name: 'Property Page Banner', price: '₹10,000/month', desc: 'Shown on every property detail page' },

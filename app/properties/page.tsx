@@ -5,12 +5,9 @@ import PhoneModal from '@/components/PhoneModal'
 import BannerAd from '@/components/BannerAd'
 import PropertiesClient from './PropertiesClient'
 import type { Property } from '@/lib/supabase/types'
+import { pageMetadata, SITE_DESCRIPTION } from '@/lib/seo'
 
-export const metadata = {
-  title: 'Properties in Lucknow & Noida | Orenzaa',
-  description: 'Browse RERA verified flats, plots and apartments in Lucknow, Noida, Greater Noida and Ayodhya. AI matched properties. Free site visit.',
-  keywords: '2BHK Lucknow, flats Noida, RERA verified property, buy flat Lucknow, property in Noida',
-}
+export const metadata = pageMetadata('Flats, Plots & Rentals in Lucknow and Noida', SITE_DESCRIPTION, '/properties')
 
 export default async function PropertiesPage({ searchParams }: { searchParams: Promise<{ tag?: string }> }) {
   const { tag } = await searchParams

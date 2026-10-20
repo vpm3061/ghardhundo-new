@@ -1,5 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import { pageMetadata, SITE_URL, SITE_DESCRIPTION, jsonLd } from '@/lib/seo'
+
+export const metadata = pageMetadata('Properties in Lucknow, Noida & Ayodhya', SITE_DESCRIPTION, '/')
 import Navbar from '@/components/Navbar'
 import MobileNav from '@/components/MobileNav'
 import PropertyCard from '@/components/PropertyCard'
@@ -28,6 +31,13 @@ export default async function HomePage() {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd({
+        "@context": "https://schema.org",
+        "@graph": [
+          { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: "Orenzaa", url: SITE_URL, logo: `${SITE_URL}/icon-512.png` },
+          { "@type": "WebSite", "@id": `${SITE_URL}/#website`, name: "Orenzaa", url: SITE_URL, description: SITE_DESCRIPTION, publisher: { "@id": `${SITE_URL}/#organization` } },
+        ],
+      }) }} />
       {userId && profile && !profile.phone && <PhoneModal userId={userId} />}
       <Navbar />
 
@@ -47,7 +57,7 @@ export default async function HomePage() {
             <span className="text-[#FB923C]">Life Belongs.</span>
           </h1>
           <p className="text-xl text-[#6B7280] max-w-2xl mx-auto mb-10 leading-relaxed">
-            Discover homes, plots, apartments, and investment opportunities with confidence. AI-matched. RERA verified. Zero pressure.
+            Explore homes, plots, apartments and commercial properties in Lucknow, Noida, Greater Noida and Ayodhya. Compare listings and find a property that fits your needs.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/properties" className="px-8 py-4 bg-[#FB923C] hover:bg-[#F59E0B] text-white font-semibold rounded-xl transition-all shadow-lg shadow-orange-200">

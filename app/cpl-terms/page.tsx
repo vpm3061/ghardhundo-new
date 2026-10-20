@@ -1,11 +1,8 @@
 import Navbar from '@/components/Navbar'
 import MobileNav from '@/components/MobileNav'
-import type { Metadata } from 'next'
+import { pageMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = {
-  title: 'CPL Terms',
-  description: 'Cost Per Lead pricing and terms for builders on Orenzaa.',
-}
+export const metadata = pageMetadata('CPL Terms', 'Cost Per Lead pricing and terms for builders on Orenzaa.', '/cpl-terms')
 
 export default function CPLTermsPage() {
   return (

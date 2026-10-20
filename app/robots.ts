@@ -1,10 +1,11 @@
 import type { MetadataRoute } from 'next'
+import { SITE_URL } from '@/lib/seo'
 
 export default function robots(): MetadataRoute.Robots {
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'https://orenzaa.com'
+  const origin = SITE_URL
   return {
     rules: [
-      { userAgent: '*', allow: '/', disallow: ['/admin/', '/admin'] },
+      { userAgent: '*', allow: '/', disallow: ['/api/', '/auth/'] },
     ],
     sitemap: `${origin}/sitemap.xml`,
   }
