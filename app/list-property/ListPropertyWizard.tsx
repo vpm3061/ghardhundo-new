@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import PhotoUpload from '@/components/PhotoUpload'
 import RazorpayButton from '@/components/RazorpayButton'
 import { PAYMENTS_ENABLED } from '@/lib/billing'
+import { REGISTRATION_CITIES } from '@/lib/registration-cities'
 import FlatFields from '@/components/wizard/FlatFields'
 import PlotFields from '@/components/wizard/PlotFields'
 import RentalFields from '@/components/wizard/RentalFields'
@@ -13,7 +14,6 @@ import CommercialFields from '@/components/wizard/CommercialFields'
 import { BLANK_WIZARD_FORM, type WizardForm, type Persona, type Category } from '@/components/wizard/types'
 
 const CITIES = ['Lucknow', 'Noida', 'Greater Noida', 'Ayodhya', 'Ghaziabad']
-const EXPERT_CITIES = [...CITIES, 'Other']
 const EXPERIENCE_OPTIONS = ['0-1 year', '1-3 years', '3-5 years', '5-10 years', '10+ years']
 const SPECIALIZATIONS = ['Residential Flats', 'Plots', 'Rental', 'Commercial', 'All types']
 
@@ -160,7 +160,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!regForm.full_name.trim() || !regForm.phone.trim() || !regForm.city) {
+    if (!regForm.full_name.trim() || !regForm.phone.trim() || !regForm.city.trim()) {
       toast.error('Naam, phone aur city zaroori hain!')
       return
     }
@@ -173,7 +173,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
       full_name: regForm.full_name,
       phone: regForm.phone,
       whatsapp_number: regForm.whatsapp_number || regForm.phone,
-      city: regForm.city,
+      city: regForm.city.trim(),
       experience_years: regForm.experience_years || null,
       property_specialization: regForm.property_specialization.length > 0 ? regForm.property_specialization : null,
       rera_number: regForm.rera_number || null,
@@ -191,7 +191,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
         name: regForm.full_name,
         phone: regForm.phone,
         email: user.email,
-        city: regForm.city,
+        city: regForm.city.trim(),
       }),
     }).catch(() => {})
 
@@ -324,13 +324,16 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-[#374151] block mb-1">City *</label>
-                  <select value={regForm.city}
+                  <label htmlFor="registration-city" className="text-sm font-medium text-[#374151] block mb-1">City / Town *</label>
+                  <input id="registration-city" list="registration-cities" type="text" required maxLength={120}
+                    autoComplete="address-level2" placeholder="Search your city or town" value={regForm.city}
+                    aria-describedby="registration-city-help"
                     onChange={e => setRegForm(f => ({ ...f, city: e.target.value }))} suppressHydrationWarning
-                    className="w-full border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FB923C]">
-                    <option value="">Select city</option>
-                    {EXPERT_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
+                    className="w-full border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FB923C]" />
+                  <datalist id="registration-cities">
+                    {REGISTRATION_CITIES.map(city => <option key={city.value} value={city.value} label={city.label} />)}
+                  </datalist>
+                  <p id="registration-city-help" className="mt-1 text-xs text-[#6B7280]">Uttar Pradesh aur Delhi NCR ki city search karein. Naam na mile toh apni city likh sakte hain.</p>
                 </div>
 
                 <div>
