@@ -1,5 +1,5 @@
 'use client'
-import PropertyLocationOptions from '@/components/PropertyLocationOptions'
+import PropertyLocationFields from '@/components/PropertyLocationFields'
 import { useState, useTransition } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -375,10 +375,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
                     <input className="input-dark text-sm" placeholder="Locality / Sector / Area"
                       value={form.locality} onChange={e => setF('locality', e.target.value)} suppressHydrationWarning />
                   </div>
-                  <select className="input-dark text-sm" value={form.city}
-                    onChange={e => setF('city', e.target.value)} suppressHydrationWarning>
-                    <PropertyLocationOptions currentValue={form.city} />
-                  </select>
+                  <PropertyLocationFields value={form.city} onChange={city => setF('city', city)} />
                   <input className="input-dark text-sm" placeholder="Contact number for buyer enquiries"
                     value={form.owner_contact} onChange={e => setF('owner_contact', e.target.value)} suppressHydrationWarning />
                   <div>

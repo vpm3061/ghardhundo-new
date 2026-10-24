@@ -1,5 +1,5 @@
 'use client'
-import PropertyLocationOptions from '@/components/PropertyLocationOptions'
+import PropertyLocationFields from '@/components/PropertyLocationFields'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
@@ -160,10 +160,7 @@ export default function PropertyEditClient({ property }: { property: Property })
           value={form.title} onChange={e => setF('title', e.target.value)} suppressHydrationWarning />
 
         <div className="grid grid-cols-2 gap-3">
-          <select className="input-dark text-sm" value={form.city}
-            onChange={e => setF('city', e.target.value)} suppressHydrationWarning>
-            <PropertyLocationOptions currentValue={form.city} />
-          </select>
+          <PropertyLocationFields value={form.city} onChange={city => setF('city', city)} />
           <input className="input-dark text-sm" placeholder="Locality / Area *"
             value={form.locality} onChange={e => setF('locality', e.target.value)} suppressHydrationWarning />
         </div>

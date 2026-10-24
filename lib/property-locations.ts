@@ -19,3 +19,10 @@ export const OTHER_PROPERTY_CITIES = REGISTRATION_CITIES.map(city => city.value)
   .filter(city => !UP_DISTRICTS.includes(city))
 
 export const PROPERTY_LOCATIONS = [...UP_DISTRICTS, ...OTHER_PROPERTY_CITIES]
+
+// NCR overlaps UP; keep its familiar property markets available in this region.
+export const NCR_PROPERTY_LOCATIONS = Array.from(new Set([
+  ...REGISTRATION_CITIES.filter(city => city.label.includes('Delhi NCR')).map(city => city.value),
+  'Noida', 'Greater Noida', 'Greater Noida West', 'Ghaziabad', 'Gautam Buddha Nagar',
+  'Meerut', 'Hapur', 'Baghpat', 'Bulandshahr', 'Muzaffarnagar', 'Shamli',
+])).sort((a, b) => a.localeCompare(b, 'en'))

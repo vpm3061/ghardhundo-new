@@ -1,5 +1,5 @@
 'use client'
-import PropertyLocationOptions from '@/components/PropertyLocationOptions'
+import PropertyLocationFields from '@/components/PropertyLocationFields'
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -224,13 +224,7 @@ export default function EditPropertyPage() {
         ))}
 
         <div>
-          <label className="block text-xs mb-1" style={{ color: '#6B7280' }}>City</label>
-          <select value={form.city} onChange={e => setF('city', e.target.value)}
-            className="w-full rounded-xl px-4 py-3 text-sm"
-            style={{ background: '#F5F5F4', border: '1px solid rgba(255,255,255,0.1)', color: '#111827', outline: 'none' }}
-            suppressHydrationWarning>
-            <PropertyLocationOptions currentValue={form.city} />
-          </select>
+          <PropertyLocationFields value={form.city} onChange={city => setF('city', city)} />
         </div>
 
         <div>
