@@ -1,4 +1,5 @@
 'use client'
+import PropertyLocationOptions from '@/components/PropertyLocationOptions'
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -6,7 +7,6 @@ import toast from 'react-hot-toast'
 import PhotoUpload from '@/components/PhotoUpload'
 import AdminPropertyTrust from '@/components/AdminPropertyTrust'
 
-const CITIES    = ['Lucknow', 'Noida', 'Greater Noida', 'Ayodhya', 'Ghaziabad']
 const AMENITIES = ['Swimming Pool', 'Club House', 'Gym', '24hr Security', 'Power Backup', 'Parking', 'Garden', 'Kids Zone', 'Lift', 'CCTV']
 const STATUSES  = ['Under Construction', 'Ready to Move', 'New Launch']
 
@@ -229,8 +229,7 @@ export default function EditPropertyPage() {
             className="w-full rounded-xl px-4 py-3 text-sm"
             style={{ background: '#F5F5F4', border: '1px solid rgba(255,255,255,0.1)', color: '#111827', outline: 'none' }}
             suppressHydrationWarning>
-            <option value="">Select City</option>
-            {CITIES.map(c => <option key={c}>{c}</option>)}
+            <PropertyLocationOptions currentValue={form.city} />
           </select>
         </div>
 

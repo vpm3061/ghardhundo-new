@@ -1,4 +1,5 @@
 'use client'
+import PropertyLocationOptions from '@/components/PropertyLocationOptions'
 import { useState, useTransition } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -32,7 +33,6 @@ const EMPTY_FORM: FormState = {
   offers: [],
 }
 
-const CITY_OPTIONS = ['Lucknow', 'Noida', 'Greater Noida', 'Ayodhya']
 const STATUS_OPTIONS: { value: FormStatus; label: string }[] = [
   { value: 'Ready to Move',      label: 'Ready to Move' },
   { value: 'Under Construction', label: 'Under Construction' },
@@ -377,8 +377,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
                   </div>
                   <select className="input-dark text-sm" value={form.city}
                     onChange={e => setF('city', e.target.value)} suppressHydrationWarning>
-                    <option value="">Select City</option>
-                    {CITY_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+                    <PropertyLocationOptions currentValue={form.city} />
                   </select>
                   <input className="input-dark text-sm" placeholder="Contact number for buyer enquiries"
                     value={form.owner_contact} onChange={e => setF('owner_contact', e.target.value)} suppressHydrationWarning />

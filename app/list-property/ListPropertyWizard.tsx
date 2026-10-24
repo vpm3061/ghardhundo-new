@@ -1,4 +1,5 @@
 'use client'
+import PropertyLocationOptions from '@/components/PropertyLocationOptions'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
@@ -13,7 +14,6 @@ import RentalFields from '@/components/wizard/RentalFields'
 import CommercialFields from '@/components/wizard/CommercialFields'
 import { BLANK_WIZARD_FORM, type WizardForm, type Persona, type Category } from '@/components/wizard/types'
 
-const CITIES = ['Lucknow', 'Noida', 'Greater Noida', 'Ayodhya', 'Ghaziabad']
 const EXPERIENCE_OPTIONS = ['0-1 year', '1-3 years', '3-5 years', '5-10 years', '10+ years']
 const SPECIALIZATIONS = ['Residential Flats', 'Plots', 'Rental', 'Commercial', 'All types']
 
@@ -418,8 +418,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
           <div className="grid grid-cols-2 gap-3">
             <select className="input-dark text-sm" value={form.city}
               onChange={e => setF('city', e.target.value)} suppressHydrationWarning>
-              <option value="">Select City</option>
-              {CITIES.map(c => <option key={c}>{c}</option>)}
+              <PropertyLocationOptions currentValue={form.city} />
             </select>
             <input className="input-dark text-sm" placeholder="Locality / Area *"
               value={form.locality} onChange={e => setF('locality', e.target.value)} suppressHydrationWarning />

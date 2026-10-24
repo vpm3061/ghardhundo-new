@@ -1,4 +1,5 @@
 'use client'
+import PropertyLocationOptions from '@/components/PropertyLocationOptions'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
@@ -11,7 +12,6 @@ import CommercialFields from '@/components/wizard/CommercialFields'
 import type { WizardForm, Persona, Category } from '@/components/wizard/types'
 import type { Property } from '@/lib/supabase/types'
 
-const CITIES = ['Lucknow', 'Noida', 'Greater Noida', 'Ayodhya', 'Ghaziabad']
 
 function toWizardForm(p: Property): WizardForm {
   return {
@@ -162,8 +162,7 @@ export default function PropertyEditClient({ property }: { property: Property })
         <div className="grid grid-cols-2 gap-3">
           <select className="input-dark text-sm" value={form.city}
             onChange={e => setF('city', e.target.value)} suppressHydrationWarning>
-            <option value="">Select City</option>
-            {CITIES.map(c => <option key={c}>{c}</option>)}
+            <PropertyLocationOptions currentValue={form.city} />
           </select>
           <input className="input-dark text-sm" placeholder="Locality / Area *"
             value={form.locality} onChange={e => setF('locality', e.target.value)} suppressHydrationWarning />

@@ -1,5 +1,6 @@
 'use client'
 import { useState, useMemo, useEffect } from 'react'
+import PropertyLocationOptions from '@/components/PropertyLocationOptions'
 import PropertyCard from '@/components/PropertyCard'
 import type { Property } from '@/lib/supabase/types'
 import { createClient } from '@/lib/supabase/client'
@@ -14,7 +15,6 @@ const TYPE_OPTIONS = [
 ] as const
 type TypeOption = typeof TYPE_OPTIONS[number]['id']
 
-const CITIES = ['Lucknow', 'Noida', 'Greater Noida', 'Ayodhya']
 const BHK_OPTIONS = ['1', '2', '3', '4']
 const STATUS_OPTIONS = ['Ready to Move', 'Under Construction', 'New Launch'] as const
 const BUDGET_OPTIONS = [
@@ -138,8 +138,20 @@ export default function PropertiesClient({
         </div>
       </div>
 
+      <div>
+        <label className="text-xs text-[#9CA3AF] font-700 uppercase tracking-wider mb-2 block">
+          City / District
+          <select className="input-dark text-sm mt-2 font-normal normal-case" value=""
+            onChange={e => { if (e.target.value && !f.cities.includes(e.target.value)) toggle('cities', e.target.value) }}>
+            <PropertyLocationOptions />
+          </select>
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {f.cities.map(city => <Chip key={city} active onClick={() => toggle('cities', city)}>{city} ?</Chip>)}
+        </div>
+      </div>
+
       {[
-        { label: 'City',   items: CITIES,                                       key: 'cities' as const },
         { label: 'BHK',    items: BHK_OPTIONS,                                  key: 'bhk'    as const, labelFn: (b: string) => `${b} BHK` },
         { label: 'Status', items: STATUS_OPTIONS as unknown as string[],         key: 'status' as const },
       ].filter(({ key }) => !(key === 'bhk' && (f.type === 'rental' || f.type === 'plot')))
