@@ -24,7 +24,7 @@ interface LeadFormProps {
 }
 
 export default function LeadForm({ userId, propertyId, propertyTitle, onSuccess }: LeadFormProps) {
-  const [form, setForm] = useState({ name: '', phone: '', budget: '', bhk: '', timeline: '', loan_status: '', purpose: '', visit_date: '', whatsapp_consent: false })
+  const [form, setForm] = useState({ name: '', phone: '', budget: '', bhk: '', timeline: '', loan_status: '', purpose: '', visit_date: '', whatsapp_consent: false, disclaimer_accepted: false })
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
@@ -100,6 +100,10 @@ export default function LeadForm({ userId, propertyId, propertyTitle, onSuccess 
         </div>
         <label className="text-sm text-slate-700">Preferred visit date
           <input type="date" required min={indiaToday()} className="input-dark mt-1 w-full" value={form.visit_date} onChange={e => set('visit_date', e.target.value)} />
+        </label>
+        <label className="flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs leading-relaxed text-slate-800">
+          <input type="checkbox" required className="mt-0.5" checked={form.disclaimer_accepted} onChange={e => set('disclaimer_accepted', e.target.checked)} />
+          I understand Orenzaa is an aggregator and I will perform independent legal checks.
         </label>
         <label className="flex items-start gap-2 text-xs leading-relaxed text-slate-600">
           <input type="checkbox" className="mt-0.5" checked={form.whatsapp_consent} onChange={e => set('whatsapp_consent', e.target.checked)} />

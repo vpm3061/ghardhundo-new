@@ -19,7 +19,7 @@ export default function DigitalVipPass({ pass }: { pass: VipPass }) {
         <img src="/orenzaa-brand.svg" alt="Orenzaa" width={270} height={64} className="mb-5 h-auto w-48 max-w-full" />
         <h3 className="font-bold text-lg text-slate-800">Digital VIP Site Visit Pass</h3>
         <dl className="mt-4 space-y-3 text-sm text-slate-700">
-          {[['Client', pass.name], ['Project', pass.project], ['Pass ID', pass.id], ['Requested visit date', pass.visitDate]].map(([label, value]) => (
+          {[['Client', pass.name], ['Buyer phone', pass.maskedPhone || '****'], ['Project', pass.project], ['Micro-market', 'Prayagraj'], ['Pass ID', pass.id], ['Requested visit date', pass.visitDate]].map(([label, value]) => (
             <div key={label}><dt className="text-xs text-slate-500">{label}</dt><dd className="break-words font-semibold">{value}</dd></div>
           ))}
         </dl>
@@ -27,6 +27,7 @@ export default function DigitalVipPass({ pass }: { pass: VipPass }) {
         <p className="mt-2 text-xs text-slate-600">Your request is saved. Our team will confirm the visit time.</p>
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <a href={`/api/vip-pass/${encodeURIComponent(pass.id)}/pdf`} className="rounded-xl bg-slate-700 px-3 py-3 text-center text-sm font-semibold text-white">Download PDF</a>
         <button type="button" onClick={download} className="rounded-xl bg-slate-800 px-3 py-3 text-sm font-semibold text-white">Download Pass</button>
         <a href={`https://wa.me/?text=${encodeURIComponent(passMessage(pass))}`} target="_blank" rel="noopener noreferrer" className="rounded-xl bg-green-700 px-3 py-3 text-center text-sm font-semibold text-white">Share to WhatsApp</a>
       </div>

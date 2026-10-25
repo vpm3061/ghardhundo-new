@@ -4,6 +4,7 @@ import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister'
 import { Toaster } from 'react-hot-toast'
+import Footer from '@/components/Footer'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -78,6 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-dvh bg-[#FAFAF9] text-[#111827] antialiased">
         <ServiceWorkerRegister />
         {children}
+        <Footer />
         <Toaster
           position="top-center"
           toastOptions={{

@@ -19,14 +19,18 @@ export async function POST(request: Request) {
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : 'Invalid submission' }, { status: 400 })
   }
-  const fields = 'id, name, vip_pass_id, project_name, visit_date'
+  const fields = 'id, name, vip_pass_id, project_name, visit_date, property_id'
   const { data: existing } = await supabase.from('leads').select(fields)
     .eq('user_id', user.id).eq('request_id', input.request_id).maybeSingle()
-  const respond = (lead: { id: string; name: string; vip_pass_id: string | null; project_name: string | null; visit_date: string | null }) =>
-    NextResponse.json({
+  const respond = async (lead: { id: string; name: string; vip_pass_id: string | null; project_name: string | null; visit_date: string | null; property_id: string | null }) => {
+    const { data: passRecord } = lead.vip_pass_id
+      ? await supabase.from('vip_passes').select('buyer_phone_masked').eq('pass_id', lead.vip_pass_id).maybeSingle()
+      : { data: null }
+    return NextResponse.json({
       leadId: lead.id,
-      pass: lead.vip_pass_id ? { id: lead.vip_pass_id, name: lead.name, project: lead.project_name, visitDate: lead.visit_date } : null,
+      pass: lead.vip_pass_id ? { id: lead.vip_pass_id, name: lead.name, project: lead.project_name, visitDate: lead.visit_date, maskedPhone: passRecord?.buyer_phone_masked } : null,
     }, { headers: { 'Cache-Control': 'no-store' } })
+  }
   if (existing) return respond(existing)
   const score = calculateScore({
     budget: input.budget || '', city: input.city || '', timeline: input.timeline || '',
@@ -34,6 +38,7 @@ export async function POST(request: Request) {
   } as AIAnswers)
   const { data, error } = await supabase.from('leads').insert({
     ...input, user_id: user.id, source_tag: 'Orenzaa-001', status: 'New',
+    disclaimer_accepted_at: new Date().toISOString(),
     ai_score: score.score, tier: score.tier,
   }).select(fields).single()
   if (error) {

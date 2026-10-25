@@ -262,6 +262,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
           {/* Right — sticky form */}
           <div className="lg:col-span-1">
             <div className="sticky top-20">
+              <div role="note" className="mb-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm leading-relaxed text-amber-950">⚠️ <strong>Buyer Safety Advisory:</strong> Conduct independent legal title and registry verification before paying any advance token money. Orenzaa does not collect property payments; pay the dealer or builder directly.</div>
               <VisitBookingModal userId={user?.id ?? null} propertyId={p.id} propertyTitle={p.title} />
               <LeadForm userId={user?.id ?? null} propertyId={p.id} propertyTitle={p.title} />
               <div className="mt-4">

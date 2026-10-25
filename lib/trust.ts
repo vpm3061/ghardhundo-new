@@ -3,6 +3,7 @@ export type VipPass = {
   name: string
   project: string
   visitDate: string
+  maskedPhone?: string
 }
 
 export function indiaToday(now = new Date()): string {
@@ -38,6 +39,7 @@ export function validateLead(input: unknown, now = new Date()) {
       || new Date(timestamp).toISOString().slice(0, 10) !== visitDate || timestamp < today
       || timestamp > today + 90 * 86400000) throw new Error('Choose a visit date within the next 90 days')
   }
+  if (data.disclaimer_accepted !== true) throw new Error('Please accept the buyer safety and independent legal checks notice')
   return {
     name, phone, request_id: requestId, property_id: propertyId, referrer_id: referrerId,
     visit_date: visitDate, whatsapp_consent: data.whatsapp_consent === true,
@@ -47,7 +49,7 @@ export function validateLead(input: unknown, now = new Date()) {
 }
 
 export function passMessage(pass: VipPass) {
-  return `ORENZAA DIGITAL VIP SITE VISIT PASS\nClient: ${pass.name}\nProject: ${pass.project}\nPass ID: ${pass.id}\nRequested visit date: ${pass.visitDate}\nMapped under Orenzaa Partner Network\nOur team will confirm the visit time.`
+  return `ORENZAA DIGITAL VIP SITE VISIT PASS\nClient: ${pass.name}\n${pass.maskedPhone ? `Buyer phone: ${pass.maskedPhone}\n` : ''}Project: ${pass.project}\nMicro-market: Prayagraj\nPass ID: ${pass.id}\nRequested visit date: ${pass.visitDate}\nBuyer Safety Advisory: Independently verify legal title and registry before paying any advance token money.\nOrenzaa is an aggregator, not a developer, property owner, or title guarantor. Orenzaa has no financial or legal liability for property disputes. Verify all transactions independently.\nOrenzaa does not collect property booking funds. Pay the dealer or builder directly.\nOur team will confirm the visit time.`
 }
 
 export function priceBreakdown(values: {
