@@ -5,6 +5,8 @@ import MobileNav from '@/components/MobileNav'
 import BuilderClient from './BuilderClient'
 import type { Property } from '@/lib/supabase/types'
 import type { Metadata } from 'next'
+import type { DealerAudit } from '@/lib/dealer-audit'
+import { EMPTY_DEALER_AUDIT } from '@/lib/dealer-audit'
 
 export const metadata: Metadata = { title: 'Builder Dashboard' }
 
@@ -13,10 +15,11 @@ export default async function BuilderPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login?redirect=/builder')
 
-  const [{ data: profile }, { data: properties }, { data: pkgData }] = await Promise.all([
+  const [{ data: profile }, { data: properties }, { data: pkgData }, { data: auditData }] = await Promise.all([
     supabase.from('profiles').select('full_name, email, role').eq('id', user.id).single(),
     supabase.from('properties').select('*').eq('listed_by', user.id).order('created_at', { ascending: false }),
     supabase.from('builder_packages').select('*').eq('builder_id', user.id).eq('status', 'Active').limit(1),
+    supabase.rpc('get_dealer_audit'),
   ])
 
   const isAdmin = user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
@@ -29,14 +32,12 @@ export default async function BuilderPage() {
   const listingLimit = pkg?.listing_limit ?? PLAN_LIMITS[plan]
   const listingCount = properties?.length || 0
   const propIds = (properties || []).map(p => p.id)
+  const audit = (auditData || EMPTY_DEALER_AUDIT) as DealerAudit
 
   /* View & lead counts per property */
-  const [{ data: viewCounts }, { data: leadCounts }] = await Promise.all([
+  const [{ data: viewCounts }] = await Promise.all([
     propIds.length > 0
       ? supabase.from('property_views').select('property_id').in('property_id', propIds)
-      : Promise.resolve({ data: [] }),
-    propIds.length > 0
-      ? supabase.from('leads').select('property_id').in('property_id', propIds)
       : Promise.resolve({ data: [] }),
   ])
 
@@ -44,16 +45,11 @@ export default async function BuilderPage() {
   ;(viewCounts || []).forEach((v: { property_id: string }) => {
     viewMap[v.property_id] = (viewMap[v.property_id] || 0) + 1
   })
-  const leadMap: Record<string, number> = {}
-  ;(leadCounts || []).forEach((l: { property_id: string | null }) => {
-    if (l.property_id) leadMap[l.property_id] = (leadMap[l.property_id] || 0) + 1
-  })
-
   const propStats = (properties || []).map(p => ({
     id:     p.id,
     title:  p.title.length > 20 ? p.title.slice(0, 18) + '…' : p.title,
     views:  viewMap[p.id] || 0,
-    leads:  leadMap[p.id] || 0,
+    leads:  audit.properties.find(metric => metric.id === p.id)?.vip_passes || 0,
   }))
 
   return (
@@ -75,6 +71,7 @@ export default async function BuilderPage() {
           listingLimit={listingLimit}
           propStats={propStats}
           pkgExpiry={pkg?.expires_at ?? null}
+          audit={audit}
         />
       </main>
       <MobileNav />

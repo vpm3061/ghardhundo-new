@@ -20,6 +20,7 @@ import ViewTracker from './ViewTracker'
 import VisitBookingModal from './VisitBookingModal'
 import { isUUID } from '@/lib/is-uuid'
 import { SITE_URL, jsonLd } from '@/lib/seo'
+import { hideOwnerContact } from '@/lib/property-privacy'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params
@@ -31,14 +32,14 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   )
   const { data: property } = await supabase
     .from('properties')
-    .select('id, title, locality, sector, city, price_min, monthly_rent, bhk, rera_number, description, photos, property_category')
+    .select('id, title, locality, sector, city, price_min, monthly_rent, bhk, rera_number, description, photos, property_category, property_pillar, listing_intent, property_subtype')
     .eq('id', id)
     .eq('is_active', true)
     .single()
 
   if (!property) return { title: 'Property not found', robots: { index: false } }
 
-  const priceText = property.property_category === 'rental'
+  const priceText = property.listing_intent === 'rent' || property.property_category === 'rental'
     ? property.monthly_rent ? `₹${Number(property.monthly_rent).toLocaleString('en-IN')}/month` : 'Rent on request'
     : property.price_min
     ? `₹${Math.round(Number(property.price_min) / 100000)} Lakh`
@@ -48,15 +49,15 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     ? `${Array.isArray(property.bhk) ? property.bhk[0] : property.bhk} BHK `
     : ''
 
-  const typeText = property.property_category === 'flat' ? 'Flat'
+  const typeText = property.property_subtype || (property.property_pillar === 'residential' ? 'Residential Property' : property.property_pillar === 'industrial' ? 'Industrial Property' : property.property_pillar === 'land' ? 'Land / Plot' : property.property_category === 'flat' ? 'Flat'
     : property.property_category === 'plot' ? 'Plot'
     : property.property_category === 'rental' ? 'Rental'
-    : 'Commercial Property'
+    : 'Commercial Property')
 
   const place = property.locality || property.sector || ''
   const title = `${bhkText}${typeText} in ${place} ${property.city || ''} — ${priceText}`.replace(/\s+/g, ' ').trim()
 
-  const description = `${bhkText}${typeText} for ${property.property_category === 'rental' ? 'rent' : 'sale'} in ${place} ${property.city || ''}. ${priceText}. ${property.rera_number ? 'RERA: ' + property.rera_number + '.' : ''} ${property.description?.substring(0, 100) || ''} Contact on Orenzaa.`.replace(/\s+/g, ' ').trim()
+  const description = `${bhkText}${typeText} for ${property.listing_intent === 'rent' || property.property_category === 'rental' ? 'rent' : 'sale'} in ${place} ${property.city || ''}. ${priceText}. ${property.rera_number ? 'RERA: ' + property.rera_number + '.' : ''} ${property.description?.substring(0, 100) || ''} Contact on Orenzaa.`.replace(/\s+/g, ' ').trim()
 
   return {
     title,
@@ -97,7 +98,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
   const savedRow = savedResult.data
 
   if (propertyError || !property) notFound()
-  const p = property as Property
+  const p = hideOwnerContact(property as Property)
   const offers = offersData || []
   const isSaved = !!savedRow
 
@@ -293,7 +294,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
             url: `${SITE_URL}/property/${p.id}`,
             image: p.photos?.length ? p.photos : undefined,
             mainEntity: {
-              '@type': p.property_category === 'flat' ? 'Apartment' : 'Place',
+              '@type': p.property_pillar === 'residential' || p.property_category === 'flat' ? 'Apartment' : 'Place',
               name: p.title,
               address: {
                 '@type': 'PostalAddress',
@@ -302,12 +303,12 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                 addressCountry: 'IN',
               },
             },
-            offers: (p.property_category === 'rental' ? p.monthly_rent : p.price_min) ? {
+            offers: (p.listing_intent === 'rent' || p.property_category === 'rental' ? p.monthly_rent : p.price_min) ? {
               '@type': 'Offer',
-              price: p.property_category === 'rental' ? p.monthly_rent : p.price_min,
+              price: p.listing_intent === 'rent' || p.property_category === 'rental' ? p.monthly_rent : p.price_min,
               priceCurrency: 'INR',
               url: `${SITE_URL}/property/${p.id}`,
-              businessFunction: p.property_category === 'rental' ? 'http://purl.org/goodrelations/v1#LeaseOut' : 'http://purl.org/goodrelations/v1#Sell',
+              businessFunction: p.listing_intent === 'rent' || p.property_category === 'rental' ? 'http://purl.org/goodrelations/v1#LeaseOut' : 'http://purl.org/goodrelations/v1#Sell',
             } : undefined,
           }),
         }}

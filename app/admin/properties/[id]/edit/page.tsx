@@ -90,6 +90,7 @@ export default function EditPropertyPage() {
 
   async function handleSave() {
     if (!form.title.trim()) { toast.error('Title is required'); return }
+    if (photos.length < 2 || photos.length > 4) { toast.error('Listings require 2 to 4 original site photos'); return }
     setSaving(true)
 
     const updateData = {
@@ -161,9 +162,10 @@ export default function EditPropertyPage() {
       <section className="rounded-2xl p-5 space-y-3"
         style={{ background: '#FFFFFF', border: '1px solid rgba(255,255,255,0.05)' }}>
         <h2 className="font-600 text-sm" style={{ color: '#111827' }}>
-          Photos ({photos.length}/15)
+          Original site photos ({photos.length}/4)
         </h2>
-        <PhotoUpload photos={photos} setPhotos={setPhotos} maxFiles={15} />
+        <p className="text-xs text-slate-500">No posters, promotional graphics, 3D renders, phone overlays, or watermarks. A photo edit hides the listing until it is reviewed again.</p>
+        <PhotoUpload photos={photos} setPhotos={setPhotos} maxFiles={4} />
       </section>
 
       {/* Floor Plan */}

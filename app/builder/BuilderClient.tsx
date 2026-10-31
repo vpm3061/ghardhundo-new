@@ -5,8 +5,10 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts'
 import StatusCard from '@/components/StatusCard'
+import DealerAuditDashboard from '@/components/DealerAuditDashboard'
 import { PAYMENTS_ENABLED } from '@/lib/billing'
 import type { Property } from '@/lib/supabase/types'
+import type { DealerAudit } from '@/lib/dealer-audit'
 
 const CHART_STYLE = {
   contentStyle: { background: '#F5F5F4', border: '1px solid rgba(0,0,0,0.06)', borderRadius: '8px', color: '#111827', fontSize: '12px' }
@@ -25,7 +27,7 @@ const PLAN_INFO: Record<Plan, { color: string; border: string; limit: number; pr
 }
 
 export default function BuilderClient({
-  properties, plan, listingCount, listingLimit, propStats, pkgExpiry,
+  properties, plan, listingCount, listingLimit, propStats, pkgExpiry, audit,
 }: {
   properties: Property[]
   plan: Plan
@@ -33,10 +35,11 @@ export default function BuilderClient({
   listingLimit: number
   propStats: PropStat[]
   pkgExpiry: string | null
+  audit: DealerAudit
 }) {
   const router = useRouter()
   const [authLoading, setAuthLoading] = useState(true)
-  const [tab, setTab]     = useState<'listings' | 'analytics' | 'offers'>('listings')
+  const [tab, setTab]     = useState<'listings' | 'analytics' | 'offers' | 'audit'>('listings')
   const [selProp, setSelProp] = useState('')
   const [offers, setOffers]   = useState<Offer[]>([{ title: '', description: '', valid_till: '' }])
   const [offerMsg, setOfferMsg] = useState('')
@@ -86,6 +89,7 @@ export default function BuilderClient({
     { id: 'listings',  label: 'My Listings' },
     { id: 'analytics', label: 'Analytics' },
     { id: 'offers',    label: 'Offers' },
+    { id: 'audit',     label: 'Dealer Audit' },
   ] as const
 
   return (
@@ -263,6 +267,8 @@ export default function BuilderClient({
           )}
         </div>
       )}
+
+      {tab === 'audit' && <DealerAuditDashboard audit={audit} />}
 
       {/* ── OFFERS ── */}
       {tab === 'offers' && (

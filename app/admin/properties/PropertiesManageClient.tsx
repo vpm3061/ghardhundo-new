@@ -8,11 +8,8 @@ import toast from 'react-hot-toast'
 import type { Property } from '@/lib/supabase/types'
 import PropertyPull, { type PullResult } from './PropertyPull'
 import PhotoUpload from '@/components/PhotoUpload'
-import FlatFields from '@/components/wizard/FlatFields'
-import PlotFields from '@/components/wizard/PlotFields'
-import RentalFields from '@/components/wizard/RentalFields'
-import CommercialFields from '@/components/wizard/CommercialFields'
-import { BLANK_WIZARD_FORM, type WizardForm, type Category } from '@/components/wizard/types'
+import PillarFields from '@/components/wizard/PillarFields'
+import { BLANK_WIZARD_FORM, type WizardForm, type Category, type PropertyPillar } from '@/components/wizard/types'
 
 type FormStatus = Property['status'] | ''
 type OfferForm = { title: string; description: string; valid_till: string }
@@ -39,15 +36,21 @@ const STATUS_OPTIONS: { value: FormStatus; label: string }[] = [
   { value: 'New Launch',         label: 'New Launch' },
 ]
 const PROPERTY_TYPES: { id: Category; icon: string; label: string }[] = [
-  { id: 'flat',       icon: '🏢', label: 'Flat / Apartment' },
-  { id: 'plot',       icon: '🌍', label: 'Plot / Zameen' },
-  { id: 'rental',     icon: '🏠', label: 'Rental / Room / PG' },
-  { id: 'commercial', icon: '🏪', label: 'Commercial' },
+  { id: 'flat',       icon: '🏠', label: 'Residential' },
+  { id: 'plot',       icon: '📐', label: 'Land & Plots' },
+  { id: 'rental',     icon: '🏠', label: 'Residential' },
+  { id: 'commercial', icon: '🏢', label: 'Commercial / Industrial' },
 ]
 
 function toFormState(p: Property): FormState {
   return {
     ...BLANK_WIZARD_FORM,
+    pillar: p.property_pillar ?? (p.property_category === 'plot' ? 'land' : p.property_category === 'commercial' ? 'commercial' : 'residential'),
+    intent: p.listing_intent ?? (p.property_category === 'rental' || p.monthly_rent != null ? 'rent' : 'sale'),
+    property_subtype: p.property_subtype || '', land_area_unit: p.land_area_unit || 'sq. yard',
+    stamp_duty_estimate: p.stamp_duty_estimate?.toString() || '', legal_fees_estimate: p.legal_fees_estimate?.toString() || '',
+    security_deposit_amount: p.security_deposit_amount?.toString() || '', advance_terms: p.advance_terms || '',
+    lease_duration_months: p.lease_duration_months?.toString() || '',
     title: p.title,
     city: p.city || '',
     locality: p.locality || p.sector || '',
@@ -117,20 +120,25 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
   const [showForm, setShowForm] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
   const [category, setCategory] = useState<Category | null>(null)
+  const pillar = (form.pillar || 'residential') as PropertyPillar
+  const [mediaReviewed, setMediaReviewed] = useState(false)
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
-  const openAdd = () => { setForm(EMPTY_FORM); setCategory(null); setEditId(null); setShowForm(true) }
+  const openAdd = () => { setForm(EMPTY_FORM); setCategory(null); setMediaReviewed(false); setEditId(null); setShowForm(true) }
 
   const openEdit = async (p: Property) => {
     const base = toFormState(p)
     setForm(base)
     setCategory(p.property_category)
+    setMediaReviewed(p.media_review_status === 'approved')
     setEditId(p.id)
     setShowForm(true)
 
     try {
+      const { data: contact } = await createClient().rpc('get_my_property_contact', { p_property_id: p.id })
+      if (typeof contact === 'string') setForm(prev => ({ ...prev, owner_contact: contact }))
       const { data: offers } = await createClient()
         .from('offers')
         .select('title, description, valid_till')
@@ -184,9 +192,15 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
     const validCategories: Category[] = ['flat', 'plot', 'rental', 'commercial']
     const parsedCategory = validCategories.includes(data.property_category as Category)
       ? (data.property_category as Category) : 'flat'
+    const parsedPillar: PropertyPillar = ['residential', 'commercial', 'industrial', 'land'].includes(data.property_pillar || '')
+      ? data.property_pillar as PropertyPillar
+      : parsedCategory === 'plot' ? 'land' : parsedCategory === 'commercial' ? 'commercial' : 'residential'
 
     setForm({
       ...EMPTY_FORM,
+      pillar: parsedPillar,
+      intent: data.listing_intent || (parsedCategory === 'rental' || data.monthly_rent != null ? 'rent' : 'sale'),
+      property_subtype: data.property_subtype || (parsedCategory === 'plot' ? 'Residential Gated Plot' : parsedCategory === 'commercial' ? (data.commercial_type || 'Retail Shop') : parsedCategory === 'rental' ? 'House' : (parsedBhk[0] ? `${parsedBhk[0]}BHK Apartment` : 'House')),
       title: data.title || '',
       builder: data.builder || '',
       city: data.city || '',
@@ -217,11 +231,13 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
     })
   }
 
-  const usesMonthlyRent = category === 'rental' || (category === 'commercial' && form.commercial_deal === 'Rent')
+  const usesMonthlyRent = form.intent === 'rent'
 
   const handleSubmit = (e: { preventDefault(): void }) => {
     e.preventDefault()
-    if (!category) { toast.error('Select a property type'); return }
+    if (!form.pillar || !form.property_subtype) { toast.error('Select a property pillar and subtype'); return }
+    if (form.photos.length < 2 || form.photos.length > 4) { toast.error('Add 2 to 4 original site photos'); return }
+    if (!usesMonthlyRent && (!form.stamp_duty_estimate || !form.legal_fees_estimate)) { toast.error('Add stamp duty and legal fee estimates (enter 0 if none)'); return }
     startTransition(async () => {
       const supabase = createClient()
       const payload = {
@@ -234,12 +250,23 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
         photos: form.photos.length ? form.photos : null,
         contact_preference: form.contact_preference,
         owner_contact: form.owner_contact || null,
-        property_category: category,
+        property_category: pillar === 'land' ? 'plot' : pillar === 'commercial' || pillar === 'industrial' ? 'commercial' : usesMonthlyRent ? 'rental' : 'flat',
+        property_pillar: pillar,
+        listing_intent: form.intent,
+        property_subtype: form.property_subtype || null,
+        land_area_unit: form.land_area_unit,
+        stamp_duty_estimate: form.stamp_duty_estimate ? parseFloat(form.stamp_duty_estimate) : null,
+        legal_fees_estimate: form.legal_fees_estimate ? parseFloat(form.legal_fees_estimate) : null,
+        security_deposit_amount: form.security_deposit_amount ? parseFloat(form.security_deposit_amount) : null,
+        advance_terms: form.advance_terms || null,
+        lease_duration_months: form.lease_duration_months ? parseInt(form.lease_duration_months) : null,
         listing_type: 'builder' as const,
-        status: category === 'flat' ? ((form.status || null) as Property['status'] | null) : null,
-        is_active: form.is_active,
+        status: pillar === 'residential' ? ((form.status || null) as Property['status'] | null) : null,
+        is_active: form.is_active && mediaReviewed,
+        media_review_status: mediaReviewed ? 'approved' : 'pending',
         is_featured: form.is_featured,
         price_min: usesMonthlyRent ? null : (form.price_min ? parseFloat(form.price_min) : null),
+        monthly_rent: usesMonthlyRent && form.monthly_rent ? parseFloat(form.monthly_rent) : null,
         price_max: usesMonthlyRent ? null : (form.price_max ? parseFloat(form.price_max) : null),
         rera_number: form.rera_number || null,
         // flat
@@ -285,6 +312,13 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
           .from('properties').insert(payload).select('id').single()
         if (error) { console.error('Insert error:', error); toast.error('Save failed: ' + error.message); return }
         propertyId = inserted?.id ?? null
+      }
+
+      if (propertyId) {
+        if (form.owner_contact.trim()) {
+          const { error: contactError } = await supabase.rpc('set_my_property_contact', { p_property_id: propertyId, p_owner_contact: form.owner_contact })
+          if (contactError) { toast.error('Contact update failed: ' + contactError.message); return }
+        }
       }
 
       /* Save offers */
@@ -347,17 +381,17 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
             <form onSubmit={handleSubmit}
               className="overflow-y-auto flex-1 px-6 py-5 flex flex-col gap-5" suppressHydrationWarning>
 
-              {/* Property Type */}
+              {/* Property Pillar */}
               <div>
-                <SectionLabel>Property Type</SectionLabel>
+                <SectionLabel>Property Pillar</SectionLabel>
                 <div className="grid grid-cols-2 gap-2">
-                  {PROPERTY_TYPES.map(t => (
-                    <button key={t.id} type="button" onClick={() => setCategory(t.id)} suppressHydrationWarning
+                  {([['residential','Residential'],['commercial','Commercial'],['industrial','Industrial'],['land','Land & Plots']] as [PropertyPillar,string][]).map(([pillarId,label]) => (
+                    <button key={pillarId} type="button" onClick={() => { setF('pillar', pillarId); setF('property_subtype', ''); setCategory(pillarId === 'land' ? 'plot' : pillarId === 'residential' ? (form.intent === 'rent' ? 'rental' : 'flat') : 'commercial') }} suppressHydrationWarning
                       className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-600 border transition-all"
-                      style={category === t.id
+                      style={pillar === pillarId
                         ? { background: 'rgba(251,146,60,0.15)', color: '#FB923C', borderColor: 'rgba(251,146,60,0.5)' }
                         : { background: 'transparent', color: '#6B7280', borderColor: 'rgba(0,0,0,0.05)' }}>
-                      <span>{t.icon}</span> {t.label}
+                      {label}
                     </button>
                   ))}
                 </div>
@@ -392,7 +426,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
               </div>
 
               {/* Status — flat only */}
-              {category === 'flat' && (
+              {pillar === 'residential' && (
                 <div>
                   <SectionLabel>Status</SectionLabel>
                   <select className="input-dark text-sm" value={form.status ?? ''}
@@ -430,36 +464,16 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
                   value={form.description} onChange={e => setF('description', e.target.value)} suppressHydrationWarning />
               </div>
 
-              {/* Type-specific fields */}
-              {category === 'flat' && (
-                <div>
-                  <SectionLabel>Flat Details</SectionLabel>
-                  <FlatFields form={form} persona="builder" setF={setF} toggleArr={toggleArr} />
-                </div>
-              )}
-              {category === 'plot' && (
-                <div>
-                  <SectionLabel>Plot Details</SectionLabel>
-                  <PlotFields form={form} persona="builder" setF={setF} toggleArr={toggleArr} />
-                </div>
-              )}
-              {category === 'rental' && (
-                <div>
-                  <SectionLabel>Rental Details</SectionLabel>
-                  <RentalFields form={form} persona="builder" setF={setF} toggleArr={toggleArr} />
-                </div>
-              )}
-              {category === 'commercial' && (
-                <div>
-                  <SectionLabel>Commercial Details</SectionLabel>
-                  <CommercialFields form={form} persona="builder" setF={setF} toggleArr={toggleArr} />
-                </div>
-              )}
+              <div><PillarFields form={form} pillar={pillar} persona="builder" setF={setF} toggleArr={toggleArr} /></div>
 
               {/* ── Photos ── */}
               <div>
-                <SectionLabel>Photos (up to 15)</SectionLabel>
-                <PhotoUpload photos={form.photos} setPhotos={urls => set('photos', urls)} maxFiles={15} />
+                <SectionLabel>Original site photos (2-4)</SectionLabel>
+                <PhotoUpload photos={form.photos} setPhotos={urls => set('photos', urls)} maxFiles={4} />
+                <label className="mt-3 flex items-start gap-2 text-xs text-slate-600">
+                  <input type="checkbox" checked={mediaReviewed} onChange={e => setMediaReviewed(e.target.checked)} />
+                  I reviewed these original site photos: no banners, flyers, 3D renders, text overlays, phone numbers, or watermarks.
+                </label>
               </div>
 
               {/* ── Special Offers ── */}

@@ -24,11 +24,23 @@ export async function POST(request: Request) {
     .eq('user_id', user.id).eq('request_id', input.request_id).maybeSingle()
   const respond = async (lead: { id: string; name: string; vip_pass_id: string | null; project_name: string | null; visit_date: string | null; property_id: string | null }) => {
     const { data: passRecord } = lead.vip_pass_id
-      ? await supabase.from('vip_passes').select('buyer_phone_masked').eq('pass_id', lead.vip_pass_id).maybeSingle()
+      ? await supabase.from('vip_passes').select('buyer_phone_masked,base_price_amount,stamp_duty_amount,legal_fees_amount,purpose,urgency_timeline').eq('pass_id', lead.vip_pass_id).maybeSingle()
       : { data: null }
+    const base = passRecord?.base_price_amount == null ? null : Number(passRecord.base_price_amount)
+    const stampDuty = passRecord?.stamp_duty_amount == null ? null : Number(passRecord.stamp_duty_amount)
+    const legalFees = passRecord?.legal_fees_amount == null ? null : Number(passRecord.legal_fees_amount)
     return NextResponse.json({
       leadId: lead.id,
-      pass: lead.vip_pass_id ? { id: lead.vip_pass_id, name: lead.name, project: lead.project_name, visitDate: lead.visit_date, maskedPhone: passRecord?.buyer_phone_masked } : null,
+      pass: lead.vip_pass_id ? {
+        id: lead.vip_pass_id, name: lead.name, project: lead.project_name, visitDate: lead.visit_date,
+        maskedPhone: passRecord?.buyer_phone_masked ? `+91 XXXXX-${passRecord.buyer_phone_masked.slice(-4)}` : undefined,
+        purpose: passRecord?.purpose ?? undefined,
+        urgencyTimeline: passRecord?.urgency_timeline ?? undefined,
+        costBreakdown: {
+          base, stampDuty, legalFees,
+          onRoad: base == null || stampDuty == null || legalFees == null ? null : base + stampDuty + legalFees,
+        },
+      } : null,
     }, { headers: { 'Cache-Control': 'no-store' } })
   }
   if (existing) return respond(existing)

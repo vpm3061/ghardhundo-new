@@ -31,7 +31,7 @@ export default function PhotoUpload({ photos, setPhotos, maxFiles = 15 }: Props)
 
     for (let i = 0; i < toUpload.length; i++) {
       const file = toUpload[i]
-      if (!file.type.startsWith('image/')) { setError('Only image files allowed'); continue }
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { setError('Upload a JPG, PNG or WEBP site photograph'); continue }
       if (file.size > 10 * 1024 * 1024) { setError(`${file.name} is too large — max 10MB`); continue }
 
       const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
@@ -139,10 +139,10 @@ export default function PhotoUpload({ photos, setPhotos, maxFiles = 15 }: Props)
               )}
             </>
           )}
-          <input
+            <input
             ref={inputRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
+            accept="image/jpeg,image/png,image/webp"
             multiple={!isSingle}
             className="sr-only"
             onChange={e => uploadFiles(e.target.files)}

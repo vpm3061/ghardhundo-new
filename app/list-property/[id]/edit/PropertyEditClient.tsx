@@ -1,20 +1,24 @@
 'use client'
 import PropertyLocationFields from '@/components/PropertyLocationFields'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import PhotoUpload from '@/components/PhotoUpload'
-import FlatFields from '@/components/wizard/FlatFields'
-import PlotFields from '@/components/wizard/PlotFields'
-import RentalFields from '@/components/wizard/RentalFields'
-import CommercialFields from '@/components/wizard/CommercialFields'
-import type { WizardForm, Persona, Category } from '@/components/wizard/types'
+import PillarFields from '@/components/wizard/PillarFields'
+import type { WizardForm, PropertyPillar } from '@/components/wizard/types'
 import type { Property } from '@/lib/supabase/types'
 
 
 function toWizardForm(p: Property): WizardForm {
   return {
+    pillar: p.property_pillar ?? (p.property_category === 'plot' ? 'land' : p.property_category === 'commercial' ? 'commercial' : 'residential'),
+    intent: p.listing_intent ?? (p.property_category === 'rental' || p.monthly_rent != null ? 'rent' : 'sale'),
+    property_subtype: p.property_subtype ?? '', land_area_unit: p.land_area_unit ?? 'sq. yard',
+    stamp_duty_estimate: p.stamp_duty_estimate != null ? String(p.stamp_duty_estimate) : '',
+    legal_fees_estimate: p.legal_fees_estimate != null ? String(p.legal_fees_estimate) : '',
+    security_deposit_amount: p.security_deposit_amount != null ? String(p.security_deposit_amount) : '',
+    advance_terms: p.advance_terms ?? '', lease_duration_months: p.lease_duration_months != null ? String(p.lease_duration_months) : '',
     title: p.title ?? '',
     city: p.city ?? '',
     locality: p.locality ?? p.sector ?? '',
@@ -58,12 +62,17 @@ function toWizardForm(p: Property): WizardForm {
 
 export default function PropertyEditClient({ property }: { property: Property }) {
   const router = useRouter()
-  const category = property.property_category as Category
-  const persona = (property.listing_type ?? 'expert') as Persona
   const [form, setForm] = useState<WizardForm>(toWizardForm(property))
+  const pillar = (form.pillar || property.property_pillar || 'residential') as PropertyPillar
   const [isActive, setIsActive] = useState(property.is_active)
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
+
+  useEffect(() => {
+    createClient().rpc('get_my_property_contact', { p_property_id: property.id }).then(({ data }) => {
+      if (typeof data === 'string') setForm(current => ({ ...current, owner_contact: data }))
+    })
+  }, [property.id])
 
   const setF = (k: keyof WizardForm, v: unknown) => setForm(p => ({ ...p, [k]: v }))
   const toggleArr = (k: 'bhk' | 'amenities', val: string) =>
@@ -71,20 +80,16 @@ export default function PropertyEditClient({ property }: { property: Property })
       ? (form[k] as string[]).filter(x => x !== val)
       : [...(form[k] as string[]), val])
 
-  const usesMonthlyRent = category === 'rental' || (category === 'commercial' && form.commercial_deal === 'Rent')
-
-  const TypeFields = category === 'flat' ? FlatFields
-    : category === 'plot' ? PlotFields
-    : category === 'rental' ? RentalFields
-    : category === 'commercial' ? CommercialFields
-    : null
+  const usesMonthlyRent = form.intent === 'rent'
 
   const validate = (): string | null => {
     if (!form.title.trim()) return 'Title required hai'
     if (!form.city) return 'City select karo'
     if (!form.locality.trim()) return 'Locality / area required hai'
     if (usesMonthlyRent ? !form.monthly_rent : !form.price_min) return 'Price required hai'
-    if (form.photos.length < 3) return 'Kam se kam 3 photos upload karo'
+    if (!usesMonthlyRent && (!form.stamp_duty_estimate || !form.legal_fees_estimate)) return 'Stamp duty and legal fee estimates required hain (enter 0 if none)'
+    if (form.photos.length < 2 || form.photos.length > 4) return '2 se 4 original photos upload karo'
+    if (!form.property_subtype) return 'Property subtype select karo'
     if (!form.owner_contact.trim()) return 'Contact number required hai'
     return null
   }
@@ -97,11 +102,20 @@ export default function PropertyEditClient({ property }: { property: Property })
 
     const supabase = createClient()
     const { error } = await supabase.from('properties').update({
+      property_pillar: pillar, listing_intent: form.intent, property_subtype: form.property_subtype,
+      land_area_unit: form.land_area_unit,
+      stamp_duty_estimate: form.stamp_duty_estimate ? parseFloat(form.stamp_duty_estimate) : null,
+      legal_fees_estimate: form.legal_fees_estimate ? parseFloat(form.legal_fees_estimate) : null,
+      security_deposit_amount: form.security_deposit_amount ? parseFloat(form.security_deposit_amount) : null,
+      advance_terms: form.advance_terms || null,
+      lease_duration_months: form.lease_duration_months ? parseInt(form.lease_duration_months) : null,
+      property_category: pillar === 'land' ? 'plot' : pillar === 'commercial' || pillar === 'industrial' ? 'commercial' : usesMonthlyRent ? 'rental' : 'flat',
+      monthly_rent: usesMonthlyRent && form.monthly_rent ? parseFloat(form.monthly_rent) : null,
       title: form.title,
       city: form.city || null,
       locality: form.locality || null,
       sector: form.locality || null,
-      price_min: form.price_min ? parseFloat(form.price_min) : null,
+      price_min: !usesMonthlyRent && form.price_min ? parseFloat(form.price_min) : null,
       description: form.description || null,
       photos: form.photos.length > 0 ? form.photos : null,
       contact_preference: form.contact_preference,
@@ -140,7 +154,12 @@ export default function PropertyEditClient({ property }: { property: Property })
 
     setSaving(false)
     if (error) { setMsg(error.message); return }
-    toast.success('Listing updated')
+    if (form.owner_contact.trim()) {
+      const { error: contactError } = await supabase.rpc('set_my_property_contact', { p_property_id: property.id, p_owner_contact: form.owner_contact })
+      if (contactError) { setMsg(contactError.message); return }
+    }
+    const photosChanged = JSON.stringify(form.photos) !== JSON.stringify(property.photos ?? [])
+    toast.success(photosChanged ? 'Listing updated. Photos are hidden while Orenzaa reviews them.' : 'Listing updated')
     router.push('/expert')
     router.refresh()
   }
@@ -152,8 +171,8 @@ export default function PropertyEditClient({ property }: { property: Property })
 
       <div className="glass p-5 flex flex-col gap-4">
         <div>
-          <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Photos (3–10)</label>
-          <PhotoUpload photos={form.photos} setPhotos={v => setF('photos', v)} maxFiles={10} />
+          <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Original site photos (2-4)</label>
+          <PhotoUpload photos={form.photos} setPhotos={v => setF('photos', v)} maxFiles={4} />
         </div>
 
         <input className="input-dark text-sm" placeholder="Property title *"
@@ -170,7 +189,7 @@ export default function PropertyEditClient({ property }: { property: Property })
             value={form.price_min} onChange={e => setF('price_min', e.target.value)} suppressHydrationWarning />
         )}
 
-        {TypeFields && <TypeFields form={form} persona={persona} setF={setF} toggleArr={toggleArr} />}
+        <PillarFields form={form} pillar={pillar} persona="expert" setF={setF} toggleArr={toggleArr} />
 
         <textarea className="input-dark text-sm resize-none" rows={3} placeholder="Description"
           value={form.description} onChange={e => setF('description', e.target.value)} suppressHydrationWarning />

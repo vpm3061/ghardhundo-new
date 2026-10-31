@@ -7,11 +7,11 @@ import { createClient } from '@/lib/supabase/client'
 import { generatePropertyTags } from '@/lib/property-tags'
 
 const TYPE_OPTIONS = [
-  { id: 'all',        label: '🏘️ All'        },
-  { id: 'flat',       label: '🏢 Flat'       },
-  { id: 'plot',       label: '🌍 Plot'       },
-  { id: 'rental',     label: '🏠 Rental'     },
-  { id: 'commercial', label: '🏪 Commercial' },
+  { id: 'all', label: 'All properties' },
+  { id: 'residential', label: 'Residential' },
+  { id: 'commercial', label: 'Commercial' },
+  { id: 'industrial', label: 'Industrial' },
+  { id: 'land', label: 'Land & Plots' },
 ] as const
 type TypeOption = typeof TYPE_OPTIONS[number]['id']
 
@@ -96,14 +96,17 @@ export default function PropertiesClient({
             !p.city?.toLowerCase().includes(q) &&
             !p.sector?.toLowerCase().includes(q)) return false
       }
-      if (f.type !== 'all' && p.property_category !== f.type) return false
+      const pillar = p.property_pillar || (p.property_category === 'plot' ? 'land' : p.property_category === 'commercial' ? 'commercial' : 'residential')
+      if (f.type !== 'all' && pillar !== f.type) return false
       if (f.cities.length && !f.cities.some(c => p.city?.toLowerCase() === c.toLowerCase())) return false
       if (f.bhk.length && !f.bhk.some(b => p.bhk?.includes(b))) return false
       if (f.status.length && !f.status.includes(p.status || '')) return false
       if (f.budget !== null) {
         const { min, max } = BUDGET_OPTIONS[f.budget]
-        if ((p.price_max ?? Infinity) < min) return false
-        if (max < Infinity && (p.price_min ?? 0) > max) return false
+        const minPrice = p.listing_intent === 'rent' ? p.monthly_rent : p.price_min
+        const maxPrice = p.price_max ?? minPrice
+        if ((maxPrice ?? Infinity) < min) return false
+        if (max < Infinity && (minPrice ?? 0) > max) return false
       }
       if (f.tag) {
         const propTags = generatePropertyTags(p).map(t => t.replace('#', '').toLowerCase())

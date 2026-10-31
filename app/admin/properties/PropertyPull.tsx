@@ -2,6 +2,9 @@
 import { useState } from 'react'
 
 export type PullResult = {
+  property_pillar?: 'residential' | 'commercial' | 'industrial' | 'land' | null
+  listing_intent?: 'sale' | 'rent' | null
+  property_subtype?: string | null
   property_category?: string | null
   title?: string | null
   builder?: string | null
@@ -24,6 +27,9 @@ export type PullResult = {
 }
 
 const FIELD_LABELS: [keyof PullResult, string][] = [
+  ['property_pillar', 'Pillar'],
+  ['listing_intent', 'Intent'],
+  ['property_subtype', 'Property subtype'],
   ['property_category', 'Property Type'],
   ['title',          'Title'],
   ['builder',        'Builder'],

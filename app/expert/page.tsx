@@ -5,6 +5,8 @@ import MobileNav from '@/components/MobileNav'
 import ExpertClient from './ExpertClient'
 import type { Metadata } from 'next'
 import type { Property } from '@/lib/supabase/types'
+import type { DealerAudit, DealerAuditLead } from '@/lib/dealer-audit'
+import { EMPTY_DEALER_AUDIT } from '@/lib/dealer-audit'
 
 export const metadata: Metadata = { title: 'Expert Dashboard | Orenzaa' }
 
@@ -36,32 +38,24 @@ export default async function ExpertPage() {
 
   const propIds = (properties || []).map(p => p.id)
 
-  type LeadRow = {
-    id: string; name: string; phone: string; message: string | null; created_at: string
-    property_id: string | null; ai_score: number; tier: 'HOT' | 'WARM' | 'COLD' | null
-    properties: { title: string } | { title: string }[] | null
-  }
-  const { data: leadRows } = propIds.length > 0
-    ? await supabase.from('leads')
-        .select('id, name, phone, message, created_at, property_id, ai_score, tier, properties(title)')
-        .in('property_id', propIds).order('created_at', { ascending: false })
-    : { data: [] as LeadRow[] }
-
-  const leads = ((leadRows || []) as LeadRow[]).map(l => ({
+  const [{ data: auditData }, { data: views }] = await Promise.all([
+    supabase.rpc('get_dealer_audit'),
+    propIds.length > 0
+      ? supabase.from('property_views').select('property_id, viewed_at').in('property_id', propIds)
+      : Promise.resolve({ data: [] as { property_id: string; viewed_at: string }[] }),
+  ])
+  const audit = (auditData || EMPTY_DEALER_AUDIT) as DealerAudit
+  const leads = ((audit.leads || []) as DealerAuditLead[]).map(l => ({
     id: l.id,
-    name: l.name,
-    phone: l.phone,
-    message: l.message,
+    buyer_label: `User #${l.id.slice(-4).toUpperCase()}`,
+    phoneMasked: l.phone_masked,
+    message: null as string | null,
     created_at: l.created_at,
-    property_id: l.property_id,
+    property_id: l.property_id ?? null,
     ai_score: l.ai_score,
     tier: l.tier,
-    propertyTitle: Array.isArray(l.properties) ? l.properties[0]?.title ?? null : l.properties?.title ?? null,
+    propertyTitle: l.property_title,
   }))
-
-  const { data: views } = propIds.length > 0
-    ? await supabase.from('property_views').select('property_id, viewed_at').in('property_id', propIds)
-    : { data: [] as { property_id: string; viewed_at: string }[] }
 
   const startOfMonth = new Date()
   startOfMonth.setDate(1)
@@ -116,6 +110,7 @@ export default async function ExpertPage() {
           activePlan={subData?.[0]?.plan ?? null}
           planExpiry={subData?.[0]?.expires_at ?? null}
           analytics={analytics}
+          audit={audit}
         />
       </main>
       <MobileNav />

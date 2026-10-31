@@ -1,7 +1,9 @@
 'use client'
 import Link from 'next/link'
+import { useEffect, useRef } from 'react'
 import WhatsAppButton from './WhatsAppButton'
 import HeartButton from './HeartButton'
+import { createClient } from '@/lib/supabase/client'
 import type { Property } from '@/lib/supabase/types'
 
 const AMENITY_ICONS: Record<string, string> = {
@@ -22,7 +24,7 @@ const STATUS_LABEL: Record<string, string> = {
 }
 
 function getPriceDisplay(property: Property): string {
-  if (property.property_category === 'rental') {
+  if (property.listing_intent === 'rent' || property.property_category === 'rental') {
     return `₹${Number(property.monthly_rent || 0).toLocaleString('en-IN')}/mo`
   }
   if (property.price_min) {
@@ -33,17 +35,28 @@ function getPriceDisplay(property: Property): string {
 
 function getSubtitle(property: Property): string {
   const place = property.locality || property.city || ''
-  if (property.property_category === 'plot') {
-    return `${property.plot_area_sqyard || ''} sq.yd • ${place}`
-  }
-  if (property.property_category === 'commercial') {
-    return `${property.super_area || ''} sqft • ${place}`
-  }
+  const pillar = property.property_pillar || (property.property_category === 'plot' ? 'land' : property.property_category === 'commercial' ? 'commercial' : 'residential')
+  if (pillar === 'land') return `${property.plot_area_sqyard || ''} ${property.land_area_unit || 'sq. yard'} · ${place}`
+  if (pillar === 'commercial' || pillar === 'industrial') return `${property.super_area || ''} sqft · ${place}`
   const bhk = Array.isArray(property.bhk) ? property.bhk[0] : property.bhk
-  return `${bhk || ''} BHK • ${place}`
+  return `${bhk ? `${bhk} BHK` : property.property_subtype || 'Residential'} · ${place}`
 }
 
 export default function PropertyCard({ property, userId, savedIds }: { property: Property; userId?: string; savedIds?: Set<string> }) {
+  const cardRef = useRef<HTMLDivElement>(null)
+  const impressionRecorded = useRef(false)
+  useEffect(() => {
+    const element = cardRef.current
+    if (!element || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(entries => {
+      if (impressionRecorded.current || !entries.some(entry => entry.isIntersecting && entry.intersectionRatio >= 0.5)) return
+      impressionRecorded.current = true
+      void createClient().from('property_impressions').insert({ property_id: property.id, user_id: userId ?? null })
+      observer.disconnect()
+    }, { threshold: 0.5 })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [property.id, userId])
   const photo = property.photos?.[0]
   const price = getPriceDisplay(property)
   const subtitle = getSubtitle(property)
@@ -51,7 +64,7 @@ export default function PropertyCard({ property, userId, savedIds }: { property:
   const statusText = property.status ? STATUS_LABEL[property.status] : null
 
   return (
-    <div
+    <div ref={cardRef}
       className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden group flex flex-col hover:shadow-lg hover:border-[#FB923C]/30 transition-all property-card"
       style={property.is_featured
         ? { border: '1.5px solid #FED7AA', boxShadow: '0 0 20px rgba(251,146,60,0.08)' }

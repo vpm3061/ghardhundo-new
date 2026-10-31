@@ -8,11 +8,8 @@ import PhotoUpload from '@/components/PhotoUpload'
 import RazorpayButton from '@/components/RazorpayButton'
 import { PAYMENTS_ENABLED } from '@/lib/billing'
 import { REGISTRATION_CITIES } from '@/lib/registration-cities'
-import FlatFields from '@/components/wizard/FlatFields'
-import PlotFields from '@/components/wizard/PlotFields'
-import RentalFields from '@/components/wizard/RentalFields'
-import CommercialFields from '@/components/wizard/CommercialFields'
-import { BLANK_WIZARD_FORM, type WizardForm, type Persona, type Category } from '@/components/wizard/types'
+import PillarFields from '@/components/wizard/PillarFields'
+import { BLANK_WIZARD_FORM, type WizardForm, type Persona, type PropertyPillar } from '@/components/wizard/types'
 
 const EXPERIENCE_OPTIONS = ['0-1 year', '1-3 years', '3-5 years', '5-10 years', '10+ years']
 const SPECIALIZATIONS = ['Residential Flats', 'Plots', 'Rental', 'Commercial', 'All types']
@@ -37,11 +34,11 @@ const BLANK_REG_FORM: RegForm = {
   rera_number: '',
 }
 
-const PROPERTY_TYPES: { id: Category; icon: string; label: string }[] = [
-  { id: 'flat', icon: '🏢', label: 'Flat / Apartment' },
-  { id: 'plot', icon: '🌍', label: 'Plot / Zameen' },
-  { id: 'rental', icon: '🏠', label: 'Rental / Room / PG' },
-  { id: 'commercial', icon: '🏪', label: 'Commercial' },
+const PROPERTY_TYPES: { id: PropertyPillar; icon: string; label: string }[] = [
+  { id: 'residential', icon: '🏠', label: 'Residential' },
+  { id: 'commercial', icon: '🏢', label: 'Commercial' },
+  { id: 'industrial', icon: '🏭', label: 'Industrial' },
+  { id: 'land', icon: '📐', label: 'Land & Plots' },
 ]
 
 type Props = {
@@ -58,7 +55,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
   const alreadyAuthorized = !!initialRole || expertRegistered
   const [step, setStep] = useState<Step>((initialStep as Step | undefined) ?? (alreadyAuthorized ? 1 : 0))
   const [persona] = useState<Persona>(initialRole ?? 'expert')
-  const [category, setCategory] = useState<Category | null>(null)
+  const [pillar, setPillar] = useState<PropertyPillar | null>(null)
   const [form, setForm] = useState<WizardForm>(BLANK_WIZARD_FORM)
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
@@ -83,36 +80,48 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
       ? (form[k] as string[]).filter(x => x !== val)
       : [...(form[k] as string[]), val])
 
-  const usesMonthlyRent = category === 'rental' || (category === 'commercial' && form.commercial_deal === 'Rent')
+  const usesMonthlyRent = form.intent === 'rent'
 
   const validateForm = (): string | null => {
+    if (!pillar) return 'Choose a property pillar'
+    if (!form.property_subtype) return 'Choose a property type'
     if (!form.title.trim()) return 'Title required hai'
     if (!form.city) return 'City select karo'
     if (!form.locality.trim()) return 'Locality / area required hai'
     if (usesMonthlyRent ? !form.monthly_rent : !form.price_min) return 'Price required hai'
-    if (form.photos.length < 3) return 'Kam se kam 3 photos upload karo'
+    if (!usesMonthlyRent && (!form.stamp_duty_estimate || !form.legal_fees_estimate)) return 'Stamp duty and legal fee estimates required hain (enter 0 if none)'
+    if (form.photos.length < 2 || form.photos.length > 4) return '2 se 4 original property photos upload karo'
     if (!form.owner_contact.trim()) return 'Contact number required hai'
-    if (persona === 'builder' && (category === 'flat' || category === 'plot') && !form.rera_number.trim()) {
+    if (persona === 'builder' && (pillar === 'residential' || pillar === 'land') && !form.rera_number.trim()) {
       return 'RERA number mandatory hai (Builder)'
     }
     return null
   }
 
   const buildPayload = () => ({
+    property_pillar: pillar,
+    listing_intent: form.intent,
+    property_subtype: form.property_subtype,
+    land_area_unit: pillar === 'land' ? form.land_area_unit : null,
+    stamp_duty_estimate: form.intent === 'sale' && form.stamp_duty_estimate ? parseFloat(form.stamp_duty_estimate) : null,
+    legal_fees_estimate: form.intent === 'sale' && form.legal_fees_estimate ? parseFloat(form.legal_fees_estimate) : null,
+    security_deposit_amount: form.intent === 'rent' && form.security_deposit_amount ? parseFloat(form.security_deposit_amount) : null,
+    advance_terms: form.intent === 'rent' ? form.advance_terms || null : null,
+    lease_duration_months: form.intent === 'rent' && form.lease_duration_months ? parseInt(form.lease_duration_months) : null,
     title: form.title,
     city: form.city || null,
     locality: form.locality || null,
     sector: form.locality || null,
-    price_min: form.price_min ? parseFloat(form.price_min) : null,
+    price_min: form.intent === 'sale' && form.price_min ? parseFloat(form.price_min) : null,
     description: form.description || null,
     photos: form.photos.length > 0 ? form.photos : null,
     contact_preference: form.contact_preference,
     owner_contact: form.owner_contact || null,
-    property_category: category,
+    property_category: pillar === 'residential' ? (form.intent === 'rent' ? 'rental' : 'flat') : pillar === 'land' ? 'plot' : 'commercial',
     listing_type: persona,
     created_by: userId,
     listed_by: userId,
-    is_active: true,
+    is_active: false,
     is_featured: false,
     bhk: form.bhk.length > 0 ? form.bhk : null,
     floor_number: form.floor_number ? parseInt(form.floor_number) : null,
@@ -129,18 +138,18 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
     tags: form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : null,
     floor_plan: form.floor_plan || null,
     plot_area_sqyard: form.plot_area_sqyard ? parseFloat(form.plot_area_sqyard) : null,
-    plot_type: form.plot_type || null,
+    plot_type: pillar === 'land' ? (form.property_subtype.includes('Agricultural') ? 'Agricultural' : form.property_subtype.includes('Commercial') ? 'Commercial' : 'Residential') : null,
     corner_plot: form.corner_plot,
     facing: form.facing || null,
     registry_done: form.registry_done,
     boundary_wall: form.boundary_wall,
-    monthly_rent: form.monthly_rent ? parseFloat(form.monthly_rent) : null,
+    monthly_rent: form.intent === 'rent' && form.monthly_rent ? parseFloat(form.monthly_rent) : null,
     deposit_months: form.deposit_months ? parseInt(form.deposit_months) : null,
     available_from: form.available_from || null,
     tenant_preference: form.tenant_preference || null,
     gender_preference: form.gender_preference || null,
     pets_allowed: form.pets_allowed,
-    commercial_type: form.commercial_type || null,
+    commercial_type: pillar === 'commercial' || pillar === 'industrial' ? form.property_subtype : null,
     power_load: form.power_load || null,
     frontage_width: form.frontage_width ? parseFloat(form.frontage_width) : null,
   })
@@ -218,12 +227,6 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
     if (error) { setMsg(error.message); return }
     router.push(persona === 'builder' ? '/builder?welcome=1' : '/expert?welcome=1')
   }
-
-  const TypeFields = category === 'flat' ? FlatFields
-    : category === 'plot' ? PlotFields
-    : category === 'rental' ? RentalFields
-    : category === 'commercial' ? CommercialFields
-    : null
 
   const STEP_ORDER: Step[] = [0, 'register', 1, 2]
   const stepPos = STEP_ORDER.indexOf(step)
@@ -391,7 +394,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
             {PROPERTY_TYPES.map(t => (
               <div key={t.id} className="glass p-5 text-center cursor-pointer"
                 style={{ border: '2px solid rgba(0,0,0,0.06)' }}
-                onClick={() => { setCategory(t.id); setStep(2) }}>
+                onClick={() => { setPillar(t.id); setF('pillar', t.id); setStep(2) }}>
                 <div className="text-3xl mb-2">{t.icon}</div>
                 <div className="text-sm font-700" style={{ color: '#111827' }}>{t.label}</div>
               </div>
@@ -405,11 +408,14 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
       )}
 
       {/* STEP 2 — form + submit (payment already done, if it was needed) */}
-      {step === 2 && TypeFields && (
+      {step === 2 && pillar && (
         <div className="glass p-5 flex flex-col gap-4">
+          <PillarFields form={form} persona={persona} setF={setF} toggleArr={toggleArr} pillar={pillar} />
+
           <div>
-            <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Photos (3–10)</label>
-            <PhotoUpload photos={form.photos} setPhotos={v => setF('photos', v)} maxFiles={10} />
+            <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Original property photos (2–4)</label>
+            <p className="mb-2 text-xs text-slate-500">Upload clean, actual site photos only. No posters, 3D renders, graphics, contact details or watermarks. Listings stay hidden until Orenzaa visually reviews the photos.</p>
+            <PhotoUpload photos={form.photos} setPhotos={v => setF('photos', v)} maxFiles={4} />
           </div>
 
           <input className="input-dark text-sm" placeholder="Property title *"
@@ -421,12 +427,6 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
               value={form.locality} onChange={e => setF('locality', e.target.value)} suppressHydrationWarning />
           </div>
 
-          {!usesMonthlyRent && (
-            <input className="input-dark text-sm" placeholder="Price (₹) *" type="number"
-              value={form.price_min} onChange={e => setF('price_min', e.target.value)} suppressHydrationWarning />
-          )}
-
-          <TypeFields form={form} persona={persona} setF={setF} toggleArr={toggleArr} />
 
           <textarea className="input-dark text-sm resize-none" rows={3} placeholder="Description"
             value={form.description} onChange={e => setF('description', e.target.value)} suppressHydrationWarning />

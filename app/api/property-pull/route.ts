@@ -5,6 +5,9 @@ const PROMPT = (content: string) => `You are a real-estate data extractor for In
 
 Return this exact schema (use null for any missing field):
 {
+  "property_pillar": "residential, commercial, industrial, or land",
+  "listing_intent": "sale or rent",
+  "property_subtype": "specific property type within the selected pillar",
   "property_category": "flat, plot, rental, or commercial",
   "title": "Project / property name",
   "builder": "Builder or developer name",
@@ -28,6 +31,8 @@ Return this exact schema (use null for any missing field):
 
 Rules:
 - property_category: pick "plot" for zameen/land/plot listings, "rental" for rent/PG/room/kiraya listings, "commercial" for shop/office/showroom/warehouse listings, otherwise "flat". This must always be set, never null.
+- Use the four pillars: residential (houses, apartments, villas, studios, PG/co-living), commercial (offices, shops, high-street, malls, showrooms), industrial (warehouses, factories, cold storage, logistics hubs), and land (gated residential plots, commercial enclaves, agricultural/raw land).
+- listing_intent is "rent" for any rent or lease offer, otherwise "sale". Set property_subtype to the closest matching specific type.
 - price_min / price_max / monthly_rent must be plain integers in INR (no symbols, no commas). Convert: "45 Lakh" → 4500000, "1.5 Cr" → 15000000, "₹35L" → 3500000, "₹15,000/month" → monthly_rent 15000.
 - For rental listings, put the monthly rent in monthly_rent and leave price_min/price_max null. For sale listings, use price_min/price_max and leave monthly_rent null.
 - plot_area_sqyard is a plain number in square yards, only relevant when property_category is "plot".

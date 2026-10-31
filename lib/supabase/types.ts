@@ -20,6 +20,8 @@ export type Profile = {
 }
 
 export type PropertyCategory = 'flat' | 'plot' | 'rental' | 'commercial'
+export type PropertyPillar = 'residential' | 'commercial' | 'industrial' | 'land'
+export type ListingIntent = 'sale' | 'rent'
 
 export type Property = {
   orenzaa_verified?: boolean
@@ -55,6 +57,17 @@ export type Property = {
   possession_date: string | null
   owner_contact: string | null
   property_category: PropertyCategory
+  property_pillar?: PropertyPillar | null
+  listing_intent?: ListingIntent | null
+  property_subtype?: string | null
+  land_area_unit?: string | null
+  stamp_duty_estimate?: number | null
+  legal_fees_estimate?: number | null
+  total_on_road_valuation?: number | null
+  security_deposit_amount?: number | null
+  advance_terms?: string | null
+  lease_duration_months?: number | null
+  media_review_status?: 'pending' | 'approved' | 'rejected' | null
   contact_preference: 'call' | 'whatsapp' | 'both'
   // flat / shared
   floor_number: number | null

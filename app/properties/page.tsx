@@ -6,6 +6,7 @@ import BannerAd from '@/components/BannerAd'
 import PropertiesClient from './PropertiesClient'
 import type { Property } from '@/lib/supabase/types'
 import { pageMetadata, SITE_DESCRIPTION } from '@/lib/seo'
+import { hideOwnerContact } from '@/lib/property-privacy'
 
 export const metadata = pageMetadata('Flats, Plots & Rentals in Lucknow and Noida', SITE_DESCRIPTION, '/properties')
 
@@ -37,7 +38,7 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
         <div className="mb-6">
           <BannerAd position="properties_top" />
         </div>
-        <PropertiesClient properties={(properties || []) as Property[]} userId={user?.id} initialTag={tag || ''} />
+        <PropertiesClient properties={(properties || []).map(p => hideOwnerContact(p as Property))} userId={user?.id} initialTag={tag || ''} />
       </main>
       <MobileNav />
     </>

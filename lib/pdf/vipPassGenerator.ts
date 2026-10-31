@@ -11,26 +11,35 @@ export function generateVipPassPdf(pass: VipPass): Uint8Array {
     `Phone: ${pass.maskedPhone || '****'}`, `Project: ${pass.project}`,
     'Micro-market: Prayagraj', `Requested visit date: ${pass.visitDate}`,
     'Tagging validity: 180 days from visit',
+    ...(pass.purpose ? [`Purpose: ${pass.purpose}`] : []),
+    ...(pass.costBreakdown ? [
+      `Base price: ${pass.costBreakdown.base == null ? 'Pending quote' : `INR ${pass.costBreakdown.base.toLocaleString('en-IN')}`}`,
+      `Stamp duty / registry: ${pass.costBreakdown.stampDuty == null ? 'Pending quote' : `INR ${pass.costBreakdown.stampDuty.toLocaleString('en-IN')}`}`,
+      `Legal fees: ${pass.costBreakdown.legalFees == null ? 'Pending quote' : `INR ${pass.costBreakdown.legalFees.toLocaleString('en-IN')}`}`,
+      `Estimated on-road total: ${pass.costBreakdown.onRoad == null ? 'Pending full quote' : `INR ${pass.costBreakdown.onRoad.toLocaleString('en-IN')}`}`,
+    ] : []),
   ]
   const stream: string[] = []
   stream.push('1 1 1 rg 0 0 612 710 re f')
   stream.push('0.059 0.090 0.165 rg 0 710 612 82 re f')
   stream.push('1 1 1 rg BT /F1 20 Tf 42 750 Td (ORENZAA | DIGITAL VIP PASS) Tj ET')
-  let y = 664
+  let y = 676
   for (const line of lines) {
-    stream.push(`0.059 0.090 0.165 rg BT /F1 12 Tf 48 ${y} Td (${pdfString(line)}) Tj ET`)
-    y -= 32
+    stream.push(`0.059 0.090 0.165 rg BT /F1 11 Tf 48 ${y} Td (${pdfString(line)}) Tj ET`)
+    y -= 22
   }
-  stream.push('0.95 0.96 0.97 rg 40 386 532 86 re f')
-  stream.push('0.059 0.090 0.165 rg BT /F1 12 Tf 54 445 Td (BUYER SAFETY ADVISORY) Tj ET')
-  stream.push('BT /F1 10 Tf 54 420 Td (Verify legal title and registry independently before paying any advance token money.) Tj ET')
-  stream.push('0.059 0.090 0.165 rg 40 54 532 194 re f')
-  stream.push('1 1 1 rg BT /F1 12 Tf 54 220 Td (ORENZAA AGGREGATOR DISCLAIMER) Tj ET')
-  stream.push('BT /F1 10 Tf 54 190 Td (Orenzaa is a technology-enabled Real Estate Aggregator & Discovery Platform.) Tj ET')
-  stream.push('BT /F1 10 Tf 54 166 Td (Orenzaa is not a developer, property owner, or title guarantor.) Tj ET')
-  stream.push('BT /F1 10 Tf 54 142 Td (Orenzaa holds zero financial or legal liability for property disputes.) Tj ET')
-  stream.push('BT /F1 10 Tf 54 118 Td (All transactions must be verified independently.) Tj ET')
-  stream.push('BT /F1 10 Tf 54 94 Td (Orenzaa does not collect property booking funds; pay the dealer or builder directly.) Tj ET')
+  stream.push('0.95 0.96 0.97 rg 40 290 532 66 re f')
+  stream.push('0.059 0.090 0.165 rg BT /F1 12 Tf 54 334 Td (BUYER SAFETY ADVISORY) Tj ET')
+  stream.push('BT /F1 10 Tf 54 310 Td (Verify legal title and registry independently before paying any advance token money.) Tj ET')
+  stream.push('0.059 0.090 0.165 rg 40 48 532 214 re f')
+  stream.push('1 1 1 rg BT /F1 12 Tf 54 230 Td (ORENZAA AGGREGATOR DISCLAIMER) Tj ET')
+  stream.push('BT /F1 10 Tf 54 202 Td (Orenzaa is a technology-enabled Real Estate Aggregator & Discovery Platform.) Tj ET')
+  stream.push('BT /F1 10 Tf 54 180 Td (Orenzaa is not a developer, property owner, or title guarantor.) Tj ET')
+  stream.push('BT /F1 10 Tf 54 158 Td (Orenzaa holds zero financial or legal liability for property disputes.) Tj ET')
+  stream.push('BT /F1 10 Tf 54 136 Td (All transactions must be verified independently.) Tj ET')
+  stream.push('BT /F1 10 Tf 54 114 Td (Orenzaa does not collect property booking funds; pay the seller directly.) Tj ET')
+  stream.push('BT /F1 9 Tf 54 84 Td (Verify all property details and payment terms directly with the seller.) Tj ET')
+  stream.push('BT /F1 9 Tf 54 64 Td (Property disputes are not Orenzaa liability. Independently verify every transaction.) Tj ET')
   const content = stream.join('\n')
   const objects = [
     '<< /Type /Catalog /Pages 2 0 R >>',

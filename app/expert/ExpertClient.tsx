@@ -7,12 +7,14 @@ import { createClient } from '@/lib/supabase/client'
 import RazorpayButton from '@/components/RazorpayButton'
 import { PAYMENTS_ENABLED } from '@/lib/billing'
 import StatusCard from '@/components/StatusCard'
+import DealerAuditDashboard from '@/components/DealerAuditDashboard'
 import type { Property } from '@/lib/supabase/types'
+import type { DealerAudit } from '@/lib/dealer-audit'
 
 type Lead = {
   id: string
-  name: string
-  phone: string
+  buyer_label: string
+  phoneMasked: string
   message: string | null
   created_at: string
   property_id: string | null
@@ -46,9 +48,10 @@ type Props = {
   activePlan: string | null
   planExpiry: string | null
   analytics: Analytics
+  audit: DealerAudit
 }
 
-const TABS = ['My Listings', 'My Leads', 'Analytics', 'Upgrade'] as const
+const TABS = ['My Listings', 'My Leads', 'Analytics', 'Dealer Audit', 'Upgrade'] as const
 type Tab = typeof TABS[number]
 
 const TIER_BADGE: Record<string, { label: string; className: string }> = {
@@ -63,7 +66,7 @@ const fmt = (n: number) =>
 export default function ExpertClient({
   userId, fullName, email, phone, whatsappNumber, avatarUrl, verificationStatus,
   city, experienceYears, reraNumber,
-  properties, leads, isSubscribed, activePlan, planExpiry, analytics,
+  properties, leads, isSubscribed, activePlan, planExpiry, analytics, audit,
 }: Props) {
   const router = useRouter()
   const [authLoading, setAuthLoading] = useState(true)
@@ -113,7 +116,6 @@ export default function ExpertClient({
 
   const FREE_LIMIT = 5
   const PRO_LIMIT = 20
-  const hasLeadAccess = !PAYMENTS_ENABLED || isSubscribed
   const listingLimit = isSubscribed ? PRO_LIMIT : FREE_LIMIT
   const overLimit = PAYMENTS_ENABLED && properties.length >= listingLimit
   const initials = (fullName || email).slice(0, 1).toUpperCase()
@@ -286,18 +288,9 @@ export default function ExpertClient({
       {/* My Leads */}
       {tab === 'My Leads' && (
         <div>
-          {!hasLeadAccess && (
-            <div className="mb-4 p-4 rounded-xl bg-orange-50 border border-orange-200 text-sm flex items-start gap-3">
-              <span className="text-xl">🔒</span>
-              <div>
-                <p className="font-700 text-[#FB923C]">Phone numbers are blurred</p>
-                <p className="text-[#6B7280]">Upgrade to Pro to unlock full lead details.</p>
-                <button onClick={() => setTab('Upgrade')} className="mt-1.5 text-[#FB923C] font-700 underline text-xs">
-                  Upgrade now →
-                </button>
-              </div>
-            </div>
-          )}
+          <div className="mb-4 rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-slate-700">
+            Buyer identities stay protected. Coordinate all contact and visits through the VIP ticket.
+          </div>
 
           {leads.length === 0 ? (
             <div className="text-center py-16 text-[#9CA3AF]">
@@ -313,7 +306,7 @@ export default function ExpertClient({
                   <div key={lead.id} className="bg-white border border-[#E5E7EB] rounded-xl px-5 py-4">
                     <div className="flex items-center justify-between gap-4 mb-1">
                       <div className="flex items-center gap-2">
-                        <p className="font-700 text-[#111827] text-sm">{lead.name}</p>
+                        <p className="font-700 text-[#111827] text-sm">{lead.buyer_label}</p>
                         {badge && (
                           <span className={`text-xs px-2 py-0.5 rounded-full font-700 ${badge.className}`}>{badge.label}</span>
                         )}
@@ -325,16 +318,7 @@ export default function ExpertClient({
                     {lead.propertyTitle && (
                       <p className="text-xs text-[#6B7280] mb-1">Enquired: {lead.propertyTitle}</p>
                     )}
-                    {hasLeadAccess ? (
-                      <p className="text-sm" style={{ color: '#374151' }}>{lead.phone}</p>
-                    ) : (
-                      <p className="text-sm" style={{ color: '#374151' }}>
-                        **** ****{lead.phone.slice(-2)}{' '}
-                        <button onClick={() => setTab('Upgrade')} className="text-[#FB923C] font-700 underline text-xs">
-                          Upgrade to reveal
-                        </button>
-                      </p>
-                    )}
+                    <p className="text-sm" style={{ color: '#374151' }}>{lead.phoneMasked}</p>
                     {lead.message && (
                       <p className="text-xs text-[#9CA3AF] mt-1 truncate">{lead.message}</p>
                     )}
@@ -373,6 +357,8 @@ export default function ExpertClient({
           )}
         </div>
       )}
+
+      {tab === 'Dealer Audit' && <DealerAuditDashboard audit={audit} />}
 
       {/* Upgrade */}
       {PAYMENTS_ENABLED && tab === 'Upgrade' && (

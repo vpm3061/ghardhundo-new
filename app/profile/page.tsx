@@ -6,6 +6,7 @@ import ProfileClient from './ProfileClient'
 import DigitalVipPass from '@/components/DigitalVipPass'
 import type { Metadata } from 'next'
 import type { Property } from '@/lib/supabase/types'
+import { hideOwnerContact } from '@/lib/property-privacy'
 
 export const metadata: Metadata = { title: 'My Profile' }
 
@@ -41,7 +42,7 @@ export default async function ProfilePage() {
 
   const savedProperties = (savedRaw || []).map(r => {
     const prop = Array.isArray(r.properties) ? r.properties[0] : r.properties
-    return prop as Property | null
+    return prop ? hideOwnerContact(prop as Property) : null
   }).filter(Boolean) as Property[]
 
   return (

@@ -11,6 +11,7 @@ import AIQuestionnaire from '@/components/AIQuestionnaire'
 import PhoneModal from '@/components/PhoneModal'
 import BannerAd from '@/components/BannerAd'
 import type { Property } from '@/lib/supabase/types'
+import { hideOwnerContact } from '@/lib/property-privacy'
 
 export default async function HomePage() {
   const supabase = await createClient()
@@ -152,7 +153,10 @@ export default async function HomePage() {
           </div>
           {properties && properties.length > 0 ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {(properties as Property[]).map(p => <PropertyCard key={p.id} property={p} userId={userId ?? undefined} />)}
+              {(properties as Property[]).map(raw => {
+                const p = hideOwnerContact(raw)
+                return <PropertyCard key={p.id} property={p} userId={userId ?? undefined} />
+              })}
             </div>
           ) : (
             <div className="text-center py-20 bg-[#FAFAF9] rounded-2xl border border-[#E5E7EB]">
