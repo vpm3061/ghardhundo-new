@@ -26,13 +26,12 @@ export default async function ExpertPage() {
     redirect('/list-property')
   }
 
-  const [{ data: profile }, { data: properties }, { data: subData }, { data: partnerData }] = await Promise.all([
+  const [{ data: profile }, { data: properties }, { data: subData }] = await Promise.all([
     supabase.from('profiles')
-      .select('full_name, email, phone, whatsapp_number, avatar_url, role, is_partner, verification_status, city, experience_years, rera_number')
+      .select('full_name, email, phone, whatsapp_number, avatar_url, role, verification_status, city, experience_years, rera_number')
       .eq('id', user.id).single(),
     supabase.from('properties').select('*').eq('listed_by', user.id).order('created_at', { ascending: false }),
     supabase.from('expert_subscriptions').select('plan, status, expires_at').eq('expert_id', user.id).eq('status', 'Active').limit(1),
-    supabase.from('partner_applications').select('status, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1),
   ])
 
   const propIds = (properties || []).map(p => p.id)
@@ -116,8 +115,6 @@ export default async function ExpertPage() {
           isSubscribed={!!(subData && subData.length > 0)}
           activePlan={subData?.[0]?.plan ?? null}
           planExpiry={subData?.[0]?.expires_at ?? null}
-          isPartner={profile?.is_partner ?? false}
-          partnerAppStatus={(partnerData?.[0]?.status as string | null) ?? null}
           analytics={analytics}
         />
       </main>

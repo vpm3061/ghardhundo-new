@@ -45,12 +45,10 @@ type Props = {
   isSubscribed: boolean
   activePlan: string | null
   planExpiry: string | null
-  isPartner: boolean
-  partnerAppStatus: string | null
   analytics: Analytics
 }
 
-const TABS = ['My Listings', 'My Leads', 'Analytics', 'Upgrade', 'Sell with Orenzaa'] as const
+const TABS = ['My Listings', 'My Leads', 'Analytics', 'Upgrade'] as const
 type Tab = typeof TABS[number]
 
 const TIER_BADGE: Record<string, { label: string; className: string }> = {
@@ -65,13 +63,11 @@ const fmt = (n: number) =>
 export default function ExpertClient({
   userId, fullName, email, phone, whatsappNumber, avatarUrl, verificationStatus,
   city, experienceYears, reraNumber,
-  properties, leads, isSubscribed, activePlan, planExpiry, isPartner, partnerAppStatus, analytics,
+  properties, leads, isSubscribed, activePlan, planExpiry, analytics,
 }: Props) {
   const router = useRouter()
   const [authLoading, setAuthLoading] = useState(true)
   const [tab, setTab] = useState<Tab>('My Listings')
-  const [applying, setApplying] = useState(false)
-  const [applied, setApplied] = useState(false)
   const [verifStatus, setVerifStatus] = useState(verificationStatus)
   const [verifApplying, setVerifApplying] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -92,14 +88,6 @@ export default function ExpertClient({
       <div className="animate-spin w-8 h-8 border-2 border-orange-400 border-t-transparent rounded-full" />
     </div>
   )
-
-  const applyPartner = async () => {
-    setApplying(true)
-    const supabase = createClient()
-    await supabase.from('partner_applications').insert({ user_id: userId, status: 'pending' })
-    setApplied(true)
-    setApplying(false)
-  }
 
   const applyVerification = async () => {
     setVerifApplying(true)
@@ -440,88 +428,6 @@ export default function ExpertClient({
         </div>
       )}
 
-      {/* Sell with Orenzaa */}
-      {tab === 'Sell with Orenzaa' && (
-        <div>
-          {isPartner ? (
-            <div className="bg-green-50 border border-green-200 rounded-2xl p-8 text-center">
-              <div className="text-4xl mb-3">🤝</div>
-              <h2 className="font-heading text-xl font-800 text-[#111827] mb-2">You&apos;re an Orenzaa Partner!</h2>
-              <p className="text-sm text-[#6B7280] max-w-sm mx-auto">
-                You have full partner access. List properties, earn 55% on closures, and get priority leads.
-              </p>
-              <div className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-100 text-green-700 text-sm font-700">
-                ✅ Partner Status Active
-              </div>
-            </div>
-          ) : partnerAppStatus === 'pending' || applied ? (
-            <div className="bg-orange-50 border border-orange-200 rounded-2xl p-8 text-center">
-              <div className="text-4xl mb-3">⏳</div>
-              <h2 className="font-heading text-xl font-800 text-[#111827] mb-2">Application Under Review</h2>
-              <p className="text-sm text-[#6B7280] max-w-sm mx-auto">
-                Our team will review your application within 2 business days. We&apos;ll notify you via WhatsApp.
-              </p>
-              <a
-                href="https://wa.me/919643693090?text=Hi, I applied to become an Orenzaa partner. Can you update me on the status?"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-700 transition-all"
-                style={{ background: 'rgba(37,211,102,0.08)', border: '1px solid rgba(37,211,102,0.25)', color: '#25D366' }}
-              >
-                WhatsApp for Update
-              </a>
-            </div>
-          ) : partnerAppStatus === 'rejected' ? (
-            <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
-              <div className="text-4xl mb-3">❌</div>
-              <h2 className="font-heading text-xl font-800 text-[#111827] mb-2">Application Not Approved</h2>
-              <p className="text-sm text-[#6B7280] max-w-sm mx-auto">
-                Your application was not approved at this time. Contact us on WhatsApp for more details.
-              </p>
-              <a
-                href="https://wa.me/919643693090?text=Hi, my Orenzaa partner application was rejected. Can you help?"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-700 transition-all"
-                style={{ background: 'rgba(37,211,102,0.08)', border: '1px solid rgba(37,211,102,0.25)', color: '#25D366' }}
-              >
-                Contact Support
-              </a>
-            </div>
-          ) : (
-            <div>
-              <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 mb-6">
-                <h2 className="font-heading text-2xl font-800 text-[#111827] mb-2">Become an Orenzaa Partner</h2>
-                <p className="text-[#6B7280] mb-6">
-                  Join our network of verified property experts. Earn 55% on every deal you close through Orenzaa.
-                </p>
-                <ul className="grid sm:grid-cols-2 gap-3 mb-8">
-                  {[
-                    'Earn 55% on every closed deal',
-                    'Access to premium buyer leads',
-                    'Orenzaa verified partner badge',
-                    'Priority listing placement',
-                    'Dedicated relationship manager',
-                    'Training & support',
-                  ].map(f => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-[#374151]">
-                      <span className="text-[#FB923C]">✓</span> {f}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={applyPartner}
-                  disabled={applying}
-                  className="px-8 py-3.5 rounded-xl text-white font-700 text-sm disabled:opacity-60 transition-all"
-                  style={{ background: 'linear-gradient(135deg, #FB923C, #F59E0B)' }}
-                >
-                  {applying ? 'Submitting…' : 'Apply to Become a Partner →'}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   )
 }
