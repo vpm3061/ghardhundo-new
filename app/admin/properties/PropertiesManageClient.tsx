@@ -213,7 +213,6 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
       description: data.description || '',
       amenities: parsedAmenities,
       youtube_url: data.youtube_url || '',
-      instagram_url: data.instagram_url || '',
       plot_area_sqyard: data.plot_area_sqyard != null ? String(data.plot_area_sqyard) : '',
       monthly_rent: data.monthly_rent != null ? String(data.monthly_rent) : '',
       commercial_type: data.commercial_type || '',
