@@ -332,7 +332,9 @@ export default function PropertiesClient({
             </div>
           ) : (
             <div className="text-center py-20 bg-white border border-[#E5E7EB] rounded-2xl">
-              <div className="text-5xl mb-4">ðŸ”</div>
+              <div className="mb-4 flex justify-center text-slate-400" aria-hidden="true">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="10.8" cy="10.8" r="6.3" /><path d="m16 16 4.2 4.2" /></svg>
+              </div>
               <h3 className="font-heading text-xl font-700 mb-2 text-[#111827]">No properties found</h3>
               <p className="text-[#6B7280] text-sm mb-5">Try adjusting your filters or search terms</p>
               {isFiltered && (
