@@ -35,7 +35,7 @@ export default function DigitalVipPass({ pass }: { pass: VipPass }) {
         </section>}
         <p className="mt-4 border-t border-orange-200 pt-3 text-xs font-semibold text-slate-700">Mapped under Orenzaa Partner Network</p>
         <p className="mt-2 text-xs text-slate-600">Your request is saved. Our team will confirm the visit time.</p>
-        <p className="mt-3 text-[10px] leading-relaxed text-slate-600">Orenzaa is an aggregator, not a developer, property owner or title guarantor. It has no financial or legal liability for property disputes; verify all transactions independently.<br /><span lang="hi">ओरेन्ज़ा एक तकनीक-सक्षम रियल एस्टेट एग्रीगेटर है, डेवलपर, संपत्ति का मालिक या टाइटल गारंटर नहीं। संपत्ति विवादों के लिए ओरेन्ज़ा की कोई वित्तीय या कानूनी देयता नहीं है। सभी लेन-देन की स्वतंत्र रूप से जाँच करें।</span></p>
+        <p className="mt-3 text-[10px] leading-relaxed text-slate-600">Orenzaa is an aggregator, not a developer, property owner or title guarantor. It has no financial or legal liability for property disputes; verify all transactions independently.</p>
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <a href={`/api/vip-pass/${encodeURIComponent(pass.id)}/pdf`} className="rounded-xl bg-slate-700 px-3 py-3 text-center text-sm font-semibold text-white">Download PDF</a>
