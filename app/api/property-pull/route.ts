@@ -1,7 +1,7 @@
 ﻿import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 
-const PROMPT = (content: string) => `You are a real-estate data extractor for Indian properties. Extract details from the input below and return ONLY a valid JSON object â€” no markdown, no explanation, no extra text.
+const PROMPT = (content: string) => `You are a real-estate data extractor for Indian properties. Extract details from the input below and return ONLY a valid JSON object — no markdown, no explanation, no extra text.
 
 Return this exact schema (use null for any missing field):
 {
@@ -12,7 +12,7 @@ Return this exact schema (use null for any missing field):
   "title": "Project / property name",
   "builder": "Builder or developer name",
   "sector": "Sector, locality or area name",
-  "locality": "Same as sector â€” locality or area name",
+  "locality": "Same as sector — locality or area name",
   "city": "Actual city name anywhere in India",
   "price_min": 5000000,
   "price_max": 5000000,
@@ -37,10 +37,10 @@ Rules:
 - For high-value commercial/luxury leases, put the monthly rent in monthly_rent and leave price_min/price_max null. For sale listings, use price_min/price_max and leave monthly_rent null. Land is sale-only.
 - plot_area_sqyard is a plain number in square yards, only relevant when property_category is "plot".
 - commercial_type only applies when property_category is "commercial".
-- bhk must be a comma-separated string of numbers only, e.g. "2,3" or "3,4" â€” leave null for plot/commercial.
+- bhk must be a comma-separated string of numbers only, e.g. "2,3" or "3,4" — leave null for plot/commercial.
 - amenities must be a comma-separated string from: Swimming Pool, Club House, Gym, 24hr Security, Power Backup, Parking, Garden, Kids Zone.
 - status must be exactly one of the three values above, or null.
-- confidence is an integer 0â€“100 reflecting how complete and certain the extraction is.
+- confidence is an integer 0–100 reflecting how complete and certain the extraction is.
 
 Input:
 ${content}`

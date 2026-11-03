@@ -138,6 +138,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
     parking: form.parking,
     amenities: form.amenities.length > 0 ? form.amenities : null,
     youtube_url: form.youtube_url || null,
+    instagram_url: form.instagram_url || null,
     tags: form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : null,
     floor_plan: form.floor_plan || null,
     plot_area_sqyard: form.plot_area_sqyard ? parseFloat(form.plot_area_sqyard) : null,
@@ -207,7 +208,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
       }),
     }).catch(() => {})
 
-    toast.success('Welcome to Orenzaa! ðŸŽ‰')
+    toast.success('Welcome to Orenzaa! 🎉')
     setRegSaving(false)
     setRegSuccess(true)
     setTimeout(() => router.push('/expert'), 2000)
@@ -244,7 +245,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
         ))}
       </div>
 
-      {/* STEP 0 â€” payment gate (only reached when not already an authorized expert/builder) */}
+      {/* STEP 0 — payment gate (only reached when not already an authorized expert/builder) */}
       {step === 0 && (
         <div>
           <h1 className="font-heading text-2xl sm:text-3xl font-800 text-center mb-2" style={{ color: '#111827' }}>
@@ -252,49 +253,49 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
           </h1>
           <p className="text-center text-sm mb-8" style={{ color: '#6B7280' }}>Become a Property Expert on Orenzaa</p>
           <div className="max-w-sm mx-auto glass p-6" style={{ border: '2px solid rgba(251,146,60,0.4)', background: 'rgba(251,146,60,0.04)' }}>
-            <div className="text-4xl mb-3">ðŸ¤</div>
+            <div className="text-4xl mb-3">🤝</div>
             <h2 className="font-heading text-xl font-800 mb-2" style={{ color: '#111827' }}>Property Expert</h2>
             <ul className="text-sm space-y-1.5 mb-5" style={{ color: '#6B7280' }}>
-              <li>âœ… {PAYMENTS_ENABLED ? 'â‚¹49 one-time â€” lifetime access' : 'Free registration â€” no payment needed'}</li>
-              <li>âœ… {PAYMENTS_ENABLED ? '5 free property listings' : 'Unlimited free property listings for now'}</li>
-              <li>âœ… AI-scored buyer leads HOTðŸ”¥ WARMðŸŒ¡ï¸ COLDâ„ï¸</li>
-              <li>âœ… WhatsApp Status Card for each property</li>
-              <li>âœ… Orenzaa Verified Expert badge</li>
-              <li>âœ… WhatsApp alerts on new leads</li>
-              <li>âœ… Expert dashboard with analytics</li>
+              <li>✅ {PAYMENTS_ENABLED ? '₹49 one-time — lifetime access' : 'Free registration — no payment needed'}</li>
+              <li>✅ {PAYMENTS_ENABLED ? '5 free property listings' : 'Unlimited free property listings for now'}</li>
+              <li>✅ AI-scored buyer leads HOT🔥 WARM🌡️ COLD❄️</li>
+              <li>✅ WhatsApp Status Card for each property</li>
+              <li>✅ Orenzaa Verified Expert badge</li>
+              <li>✅ WhatsApp alerts on new leads</li>
+              <li>✅ Expert dashboard with analytics</li>
             </ul>
             {PAYMENTS_ENABLED ? <RazorpayButton
               amount={49}
               plan="expert-registration"
               role="expert"
-              label="Pay â‚¹49 & Start Listing â†’"
+              label="Pay ₹49 & Start Listing →"
               onVerified={() => setStep('register')}
               redirectTo={false}
               className="btn-accent w-full"
             /> : (
               <button type="button" onClick={() => setStep('register')} className="btn-accent w-full">
-                Start Listing for Free â†’
+                Start Listing for Free →
               </button>
             )}
           </div>
         </div>
       )}
 
-      {/* STEP 'register' â€” post-payment expert registration form */}
+      {/* STEP 'register' — post-payment expert registration form */}
       {step === 'register' && (
         <div className="max-w-md mx-auto">
           {regSuccess ? (
             <div className="text-center py-12">
-              <div className="text-5xl mb-3">ðŸŽ‰</div>
+              <div className="text-5xl mb-3">🎉</div>
               <h1 className="text-2xl font-bold text-[#111827]">Welcome to Orenzaa!</h1>
-              <p className="text-[#6B7280] mt-1">Taking you to your dashboardâ€¦</p>
+              <p className="text-[#6B7280] mt-1">Taking you to your dashboard…</p>
             </div>
           ) : (
             <>
               <div className="text-center mb-6">
-                <div className="text-5xl mb-3">âœ…</div>
+                <div className="text-5xl mb-3">✅</div>
                 <h1 className="text-2xl font-bold text-[#111827]">{PAYMENTS_ENABLED ? 'Payment Successful!' : 'Register for Free'}</h1>
-                <p className="text-[#6B7280] mt-1">Ab apni details bharo â€” almost done!</p>
+                <p className="text-[#6B7280] mt-1">Ab apni details bharo — almost done!</p>
               </div>
 
               <form onSubmit={handleRegister} className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-4">
@@ -380,7 +381,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
 
                 <button type="submit" disabled={regSaving} suppressHydrationWarning
                   className="w-full py-4 bg-[#FB923C] hover:bg-[#F59E0B] text-white font-bold rounded-xl disabled:opacity-50 text-base">
-                  {regSaving ? 'Setting up your account...' : 'Complete Registration & Go to Dashboard â†’'}
+                  {regSaving ? 'Setting up your account...' : 'Complete Registration & Go to Dashboard →'}
                 </button>
               </form>
             </>
@@ -388,7 +389,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
         </div>
       )}
 
-      {/* STEP 1 â€” property type */}
+      {/* STEP 1 — property type */}
       {step === 1 && (
         <div>
           <h1 className="font-heading text-2xl font-800 text-center mb-2" style={{ color: '#111827' }}>What are you listing?</h1>
@@ -405,18 +406,18 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
           </div>
           {!alreadyAuthorized && (
             <button onClick={() => setStep(0)} suppressHydrationWarning
-              className="mt-6 text-sm" style={{ color: '#6B7280' }}>â† Back</button>
+              className="mt-6 text-sm" style={{ color: '#6B7280' }}>← Back</button>
           )}
         </div>
       )}
 
-      {/* STEP 2 â€” form + submit (payment already done, if it was needed) */}
+      {/* STEP 2 — form + submit (payment already done, if it was needed) */}
       {step === 2 && pillar && (
         <div className="glass p-5 flex flex-col gap-4">
           <PillarFields form={form} persona={persona} setF={setF} toggleArr={toggleArr} pillar={pillar} />
 
           <div>
-            <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Original property photos (2â€“4)</label>
+            <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Original property photos (2–4)</label>
             <p className="mb-2 text-xs text-slate-500">Upload clean, actual site photos only. No posters, 3D renders, graphics, contact details or watermarks. Listings stay hidden until Orenzaa visually reviews the photos.</p>
             <PhotoUpload photos={form.photos} setPhotos={v => setF('photos', v)} maxFiles={4} />
           </div>
@@ -433,6 +434,13 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
 
           <textarea className="input-dark text-sm resize-none" rows={3} placeholder="Description"
             value={form.description} onChange={e => setF('description', e.target.value)} suppressHydrationWarning />
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <input className="input-dark text-sm" type="url" placeholder="YouTube video URL (optional)"
+              value={form.youtube_url} onChange={e => setF('youtube_url', e.target.value)} />
+            <input className="input-dark text-sm" type="url" placeholder="Instagram post or Reel URL (optional)"
+              value={form.instagram_url} onChange={e => setF('instagram_url', e.target.value)} />
+          </div>
 
           <div>
             <label className="text-xs font-700 uppercase tracking-wider mb-2 block" style={{ color: '#9CA3AF' }}>Contact preference</label>
@@ -458,10 +466,10 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
           <div className="flex gap-3">
             <button onClick={() => setStep(1)} suppressHydrationWarning
               className="px-5 py-2.5 rounded-xl text-sm font-700" style={{ border: '1px solid rgba(0,0,0,0.06)', color: '#6B7280' }}>
-              â† Back
+              ← Back
             </button>
             <button onClick={handleSubmit} disabled={saving} suppressHydrationWarning className="btn-accent flex-1 disabled:opacity-50">
-              {saving ? 'Listingâ€¦' : '+ List My Property'}
+              {saving ? 'Listing…' : '+ List My Property'}
             </button>
           </div>
         </div>

@@ -22,6 +22,18 @@ import { isUUID } from '@/lib/is-uuid'
 import { SITE_URL, jsonLd } from '@/lib/seo'
 import { hideOwnerContact } from '@/lib/property-privacy'
 
+function getInstagramEmbedUrl(value: string | null | undefined) {
+  if (!value) return null
+  try {
+    const url = new URL(value)
+    if (!['instagram.com', 'www.instagram.com', 'm.instagram.com'].includes(url.hostname)) return null
+    const match = url.pathname.match(/^\/(p|reel|tv)\/([A-Za-z0-9_-]+)/)
+    return match ? `https://www.instagram.com/${match[1]}/${match[2]}/embed` : null
+  } catch {
+    return null
+  }
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params
   if (!isUUID(id)) return { title: 'Property not found', robots: { index: false } }
@@ -40,9 +52,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (!property) return { title: 'Property not found', robots: { index: false } }
 
   const priceText = property.listing_intent === 'rent' || property.property_category === 'rental'
-    ? property.monthly_rent ? `â‚¹${Number(property.monthly_rent).toLocaleString('en-IN')}/month` : 'Rent on request'
+    ? property.monthly_rent ? `₹${Number(property.monthly_rent).toLocaleString('en-IN')}/month` : 'Rent on request'
     : property.price_min
-    ? `â‚¹${Math.round(Number(property.price_min) / 100000)} Lakh`
+    ? `₹${Math.round(Number(property.price_min) / 100000)} Lakh`
     : 'Price on request'
 
   const bhkText = property.bhk?.length
@@ -55,7 +67,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     : 'Commercial Property')
 
   const place = property.locality || property.sector || ''
-  const title = `${bhkText}${typeText} in ${place} ${property.city || ''} â€” ${priceText}`.replace(/\s+/g, ' ').trim()
+  const title = `${bhkText}${typeText} in ${place} ${property.city || ''} — ${priceText}`.replace(/\s+/g, ' ').trim()
 
   const description = `${bhkText}${typeText} for ${property.listing_intent === 'rent' || property.property_category === 'rental' ? 'rent' : 'sale'} in ${place} ${property.city || ''}. ${priceText}. ${property.rera_number ? 'RERA: ' + property.rera_number + '.' : ''} ${property.description?.substring(0, 100) || ''} Contact on Orenzaa.`.replace(/\s+/g, ' ').trim()
 
@@ -108,8 +120,8 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
     'New Launch':         { bg: 'rgba(251,146,60,0.08)', color: '#FB923C', border: 'rgba(251,146,60,0.25)' },
   }
 
-  const fmt = (n: number) => n >= 1e7 ? `â‚¹${(n/1e7).toFixed(1)}Cr` : n >= 1e5 ? `â‚¹${(n/1e5).toFixed(0)}L` : `â‚¹${n}`
-  const priceStr = p.price_min && p.price_max ? `${fmt(p.price_min)} â€“ ${fmt(p.price_max)}`
+  const fmt = (n: number) => n >= 1e7 ? `₹${(n/1e7).toFixed(1)}Cr` : n >= 1e5 ? `₹${(n/1e5).toFixed(0)}L` : `₹${n}`
+  const priceStr = p.price_min && p.price_max ? `${fmt(p.price_min)} – ${fmt(p.price_max)}`
     : p.price_min ? `From ${fmt(p.price_min)}` : 'Price on request'
 
   const sc = p.status ? statusConfig[p.status] : null
@@ -144,12 +156,12 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                 )}
                 {p.is_featured && (
                   <span className="text-xs font-800 px-3 py-1 rounded-full bg-orange-50 text-[#FB923C] border border-orange-200">
-                    â­ Featured
+                    ⭐ Featured
                   </span>
                 )}
                 {p.rera_number && (
                   <span className="text-xs px-3 py-1 rounded-full text-[#22C55E] bg-green-50 border border-green-100">
-                    {p.orenzaa_verified ? 'âœ“ Orenzaa Verified & RERA Tagged' : 'RERA Number Listed'}: {p.rera_number}
+                    {p.orenzaa_verified ? '✓ Orenzaa Verified & RERA Tagged' : 'RERA Number Listed'}: {p.rera_number}
                   </span>
                 )}
               </div>
@@ -167,7 +179,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                 </div>
               </div>
               <p className="text-[#6B7280] text-sm">
-                {[p.builder, p.sector, p.city].filter(Boolean).join(' Â· ')}
+                {[p.builder, p.sector, p.city].filter(Boolean).join(' · ')}
               </p>
             </div>
 
@@ -209,7 +221,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                   {p.amenities.map(a => (
                     <div key={a} className="flex items-center gap-2.5 text-sm text-[#374151] bg-[#FAFAF9] border border-[#E5E7EB] rounded-xl px-3 py-2.5">
                       <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-orange-50 text-[#FB923C]">
-                        âœ“
+                        ✓
                       </span>
                       <span>{a}</span>
                     </div>
@@ -220,7 +232,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
 
             {/* YouTube embed */}
             {p.youtube_url && (() => {
-              const ytId = p.youtube_url.match(/(?:v=|youtu\.be\/|embed\/)([A-Za-z0-9_-]{11})/)?.[1]
+              const ytId = p.youtube_url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/)?.[1]
               return ytId ? (
                 <div className="mb-5">
                   <h2 className="font-heading text-lg font-700 mb-3 text-[#111827]">Project Video</h2>
@@ -237,10 +249,27 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
               ) : null
             })()}
 
+            {getInstagramEmbedUrl(p.instagram_url) && (
+              <section className="mb-5">
+                <h2 className="font-heading text-lg font-700 mb-3 text-[#111827]">Instagram Post / Reel</h2>
+                <div className="mx-auto w-full max-w-[540px] overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white">
+                  <iframe
+                    src={getInstagramEmbedUrl(p.instagram_url)!}
+                    title="Property Instagram post or reel"
+                    loading="lazy"
+                    allow="clipboard-write; encrypted-media; picture-in-picture; web-share"
+                    allowFullScreen
+                    className="block w-full border-0"
+                    style={{ height: 650 }}
+                  />
+                </div>
+              </section>
+            )}
+
             {/* Offers */}
             <OffersDisplay offers={offers} />
 
-            {/* Hashtags â€” clickable */}
+            {/* Hashtags — clickable */}
             {allTags.length > 0 && (
               <div className="mb-5">
                 <h2 className="font-heading text-sm font-700 mb-3 uppercase tracking-wider text-[#9CA3AF]">Tags</h2>
@@ -260,10 +289,10 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
             <EMICalculator defaultAmount={p.price_min || 5000000} />
           </div>
 
-          {/* Right â€” sticky form */}
+          {/* Right — sticky form */}
           <div className="lg:col-span-1">
             <div className="sticky top-20">
-              <div role="note" className="mb-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm leading-relaxed text-amber-950">âš ï¸ <strong>Buyer Safety Advisory:</strong> Conduct independent legal title and registry verification before paying any advance token money. Orenzaa does not collect property payments; pay the dealer or builder directly.</div>
+              <div role="note" className="mb-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm leading-relaxed text-amber-950">⚠️ <strong>Buyer Safety Advisory:</strong> Conduct independent legal title and registry verification before paying any advance token money. Orenzaa does not collect property payments; pay the dealer or builder directly.</div>
               <VisitBookingModal userId={user?.id ?? null} propertyId={p.id} propertyTitle={p.title} />
               <LeadForm userId={user?.id ?? null} propertyId={p.id} propertyTitle={p.title} />
               <div className="mt-4">

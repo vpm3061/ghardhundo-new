@@ -22,10 +22,10 @@ const BUDGET_OPTIONS = [
   { label: '₹5Cr+', min: 50000000, max: Infinity },
 ]
 const SORT_OPTIONS = [
-  { value: 'featured',   label: 'â­ Featured' },
+  { value: 'featured',   label: '⭐ Featured' },
   { value: 'newest',     label: 'Newest'       },
-  { value: 'price_asc',  label: 'Price â†‘'      },
-  { value: 'price_desc', label: 'Price â†“'      },
+  { value: 'price_asc',  label: 'Price ↑'      },
+  { value: 'price_desc', label: 'Price ↓'      },
 ] as const
 type SortOption = typeof SORT_OPTIONS[number]['value']
 
@@ -211,7 +211,7 @@ export default function PropertiesClient({
             width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
-          <input type="text" placeholder="Search by name, builder, cityâ€¦"
+          <input type="text" placeholder="Search by name, builder, city…"
             className="input-dark pl-10 text-sm"
             value={f.search}
             onChange={e => setF(p => ({ ...p, search: e.target.value }))}
@@ -237,7 +237,7 @@ export default function PropertiesClient({
         {isFiltered && (
           <button onClick={() => setF(DEFAULT)} suppressHydrationWarning
             className="hidden sm:flex items-center gap-1 text-sm text-[#6B7280] hover:text-[#111827] whitespace-nowrap px-3 transition-colors">
-            âœ• Clear
+            ✕ Clear
           </button>
         )}
       </div>
@@ -284,37 +284,37 @@ export default function PropertiesClient({
               {f.type !== 'all' && (
                 <button onClick={() => setF(p => ({ ...p, type: 'all' }))} suppressHydrationWarning
                   className="flex items-center gap-1 text-xs px-3 py-1 rounded-full font-600 bg-orange-50 text-[#FB923C] border border-orange-200">
-                  {TYPE_OPTIONS.find(t => t.id === f.type)?.label} âœ•
+                  {TYPE_OPTIONS.find(t => t.id === f.type)?.label} ✕
                 </button>
               )}
               {f.tag && (
                 <button onClick={() => setF(p => ({ ...p, tag: '' }))} suppressHydrationWarning
                   className="flex items-center gap-1 text-xs px-3 py-1 rounded-full font-600 bg-orange-50 text-[#FB923C] border border-orange-200">
-                  #{f.tag} âœ•
+                  #{f.tag} ✕
                 </button>
               )}
               {f.cities.map(c => (
                 <button key={c} onClick={() => toggle('cities', c)} suppressHydrationWarning
                   className="flex items-center gap-1 text-xs px-3 py-1 rounded-full font-600 bg-orange-50 text-[#FB923C] border border-orange-200">
-                  {c} âœ•
+                  {c} ✕
                 </button>
               ))}
               {f.bhk.map(b => (
                 <button key={b} onClick={() => toggle('bhk', b)} suppressHydrationWarning
                   className="flex items-center gap-1 text-xs px-3 py-1 rounded-full font-600 bg-orange-50 text-[#FB923C] border border-orange-200">
-                  {b} BHK âœ•
+                  {b} BHK ✕
                 </button>
               ))}
               {f.budget !== null && (
                 <button onClick={() => setF(p => ({ ...p, budget: null }))} suppressHydrationWarning
                   className="flex items-center gap-1 text-xs px-3 py-1 rounded-full font-600 bg-orange-50 text-[#FB923C] border border-orange-200">
-                  {BUDGET_OPTIONS[f.budget].label} âœ•
+                  {BUDGET_OPTIONS[f.budget].label} ✕
                 </button>
               )}
               {f.status.map(s => (
                 <button key={s} onClick={() => toggle('status', s)} suppressHydrationWarning
                   className="flex items-center gap-1 text-xs px-3 py-1 rounded-full font-600 bg-orange-50 text-[#FB923C] border border-orange-200">
-                  {s} âœ•
+                  {s} ✕
                 </button>
               ))}
             </div>

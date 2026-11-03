@@ -39,6 +39,7 @@ function toWizardForm(p: Property): WizardForm {
     parking: p.parking ?? false,
     amenities: p.amenities ?? [],
     youtube_url: p.youtube_url ?? '',
+    instagram_url: p.instagram_url ?? '',
     tags: (p.tags ?? []).join(', '),
     floor_plan: p.floor_plan ?? '',
     plot_area_sqyard: p.plot_area_sqyard != null ? String(p.plot_area_sqyard) : '',
@@ -133,6 +134,7 @@ export default function PropertyEditClient({ property }: { property: Property })
       parking: form.parking,
       amenities: form.amenities.length > 0 ? form.amenities : null,
       youtube_url: form.youtube_url || null,
+      instagram_url: form.instagram_url || null,
       tags: form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : null,
       floor_plan: form.floor_plan || null,
       plot_area_sqyard: form.plot_area_sqyard ? parseFloat(form.plot_area_sqyard) : null,
@@ -184,7 +186,7 @@ export default function PropertyEditClient({ property }: { property: Property })
         </div>
 
         {!usesMonthlyRent && (
-          <input className="input-dark text-sm" placeholder="Price (â‚¹) *" type="number"
+          <input className="input-dark text-sm" placeholder="Price (₹) *" type="number"
             value={form.price_min} onChange={e => setF('price_min', e.target.value)} suppressHydrationWarning />
         )}
 
@@ -192,6 +194,13 @@ export default function PropertyEditClient({ property }: { property: Property })
 
         <textarea className="input-dark text-sm resize-none" rows={3} placeholder="Description"
           value={form.description} onChange={e => setF('description', e.target.value)} suppressHydrationWarning />
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <input className="input-dark text-sm" type="url" placeholder="YouTube video URL (optional)"
+            value={form.youtube_url} onChange={e => setF('youtube_url', e.target.value)} />
+          <input className="input-dark text-sm" type="url" placeholder="Instagram post or Reel URL (optional)"
+            value={form.instagram_url} onChange={e => setF('instagram_url', e.target.value)} />
+        </div>
 
         <div>
           <label className="text-xs font-700 uppercase tracking-wider mb-2 block" style={{ color: '#9CA3AF' }}>Contact preference</label>
@@ -223,10 +232,10 @@ export default function PropertyEditClient({ property }: { property: Property })
         <div className="flex gap-3">
           <button onClick={() => router.push('/expert')} suppressHydrationWarning
             className="px-5 py-2.5 rounded-xl text-sm font-700" style={{ border: '1px solid rgba(0,0,0,0.06)', color: '#6B7280' }}>
-            â† Cancel
+            ← Cancel
           </button>
           <button onClick={handleSave} disabled={saving} suppressHydrationWarning className="btn-accent flex-1 disabled:opacity-50">
-            {saving ? 'Savingâ€¦' : 'Save Changes'}
+            {saving ? 'Saving…' : 'Save Changes'}
           </button>
         </div>
       </div>

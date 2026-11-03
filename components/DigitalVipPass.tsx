@@ -7,7 +7,7 @@ export default function DigitalVipPass({ pass }: { pass: VipPass }) {
     const escape = (s: string) => s.replace(/[<>&"']/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' }[c]!))
     const lines = passMessage(pass).split('\n').slice(1).flatMap(line => line.match(/.{1,62}/gu) || [''])
     const height = Math.max(650, 200 + lines.length * 50)
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="${height}" viewBox="0 0 1080 ${height}"><rect width="1080" height="${height}" rx="32" fill="#fff7ed"/><rect width="1080" height="110" rx="32" fill="#2b3f59"/><text x="48" y="70" font-family="Arial" font-size="38" fill="#ffffff">ORENZAA Ãƒâ€šÃ‚Â· DIGITAL VIP PASS</text>${lines.map((line, i) => `<text x="48" y="${175 + i * 50}" font-family="Arial" font-size="25" fill="#2b3f59">${escape(line)}</text>`).join('')}</svg>`
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="${height}" viewBox="0 0 1080 ${height}"><rect width="1080" height="${height}" rx="32" fill="#fff7ed"/><rect width="1080" height="110" rx="32" fill="#2b3f59"/><text x="48" y="70" font-family="Arial" font-size="38" fill="#ffffff">ORENZAA · DIGITAL VIP PASS</text>${lines.map((line, i) => `<text x="48" y="${175 + i * 50}" font-family="Arial" font-size="25" fill="#2b3f59">${escape(line)}</text>`).join('')}</svg>`
     const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }))
     const link = document.createElement('a')
     link.href = url; link.download = `${pass.id}.svg`; link.click()
@@ -26,10 +26,10 @@ export default function DigitalVipPass({ pass }: { pass: VipPass }) {
         {pass.costBreakdown && <section className="mt-4 rounded-xl border border-orange-200 bg-white p-3">
           <h4 className="text-sm font-bold text-slate-800">On-Road Valuation Breakdown</h4>
           <dl className="mt-2 space-y-1 text-xs text-slate-600">
-            <div className="flex justify-between gap-3"><dt>Base price</dt><dd>{pass.costBreakdown.base == null ? 'Pending quote' : `ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹${pass.costBreakdown.base.toLocaleString('en-IN')}`}</dd></div>
-            <div className="flex justify-between gap-3"><dt>Stamp duty / registry</dt><dd>{pass.costBreakdown.stampDuty == null ? 'Pending quote' : `ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹${pass.costBreakdown.stampDuty.toLocaleString('en-IN')}`}</dd></div>
-            <div className="flex justify-between gap-3"><dt>Legal fees</dt><dd>{pass.costBreakdown.legalFees == null ? 'Pending quote' : `ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹${pass.costBreakdown.legalFees.toLocaleString('en-IN')}`}</dd></div>
-            <div className="flex justify-between gap-3 border-t border-slate-200 pt-1 font-bold text-slate-800"><dt>Estimated total</dt><dd>{pass.costBreakdown.onRoad == null ? 'Pending full quote' : `ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹${pass.costBreakdown.onRoad.toLocaleString('en-IN')}`}</dd></div>
+            <div className="flex justify-between gap-3"><dt>Base price</dt><dd>{pass.costBreakdown.base == null ? 'Pending quote' : `₹${pass.costBreakdown.base.toLocaleString('en-IN')}`}</dd></div>
+            <div className="flex justify-between gap-3"><dt>Stamp duty / registry</dt><dd>{pass.costBreakdown.stampDuty == null ? 'Pending quote' : `₹${pass.costBreakdown.stampDuty.toLocaleString('en-IN')}`}</dd></div>
+            <div className="flex justify-between gap-3"><dt>Legal fees</dt><dd>{pass.costBreakdown.legalFees == null ? 'Pending quote' : `₹${pass.costBreakdown.legalFees.toLocaleString('en-IN')}`}</dd></div>
+            <div className="flex justify-between gap-3 border-t border-slate-200 pt-1 font-bold text-slate-800"><dt>Estimated total</dt><dd>{pass.costBreakdown.onRoad == null ? 'Pending full quote' : `₹${pass.costBreakdown.onRoad.toLocaleString('en-IN')}`}</dd></div>
           </dl>
           <p className="mt-2 text-[10px] text-slate-500">Listing estimates only. Verify final written charges with the seller.</p>
         </section>}

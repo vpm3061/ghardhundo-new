@@ -11,8 +11,19 @@ const AMENITIES = ['Swimming Pool', 'Club House', 'Gym', '24hr Security', 'Power
 const STATUSES  = ['Under Construction', 'Ready to Move', 'New Launch']
 
 function youtubeEmbedUrl(url: string) {
-  const id = url.match(/(?:v=|youtu\.be\/|embed\/)([A-Za-z0-9_-]{11})/)?.[1]
+  const id = url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/)?.[1]
   return id ? `https://www.youtube.com/embed/${id}` : null
+}
+
+function instagramEmbedUrl(value: string) {
+  try {
+    const url = new URL(value)
+    if (!['instagram.com', 'www.instagram.com', 'm.instagram.com'].includes(url.hostname)) return null
+    const match = url.pathname.match(/^\/(p|reel|tv)\/([A-Za-z0-9_-]+)/)
+    return match ? `https://www.instagram.com/${match[1]}/${match[2]}/embed` : null
+  } catch {
+    return null
+  }
 }
 
 export default function EditPropertyPage() {
@@ -38,6 +49,7 @@ export default function EditPropertyPage() {
     possession_date:  '',
     description:      '',
     youtube_url:      '',
+    instagram_url:    '',
     floor_plan:   '',
     amenities:        [] as string[],
     tags:             '',
@@ -75,6 +87,7 @@ export default function EditPropertyPage() {
         possession_date: data.possession_date ?? '',
         description:     data.description     ?? '',
         youtube_url:     data.youtube_url     ?? '',
+        instagram_url:   data.instagram_url   ?? '',
         floor_plan:  data.floor_plan  ?? '',
         amenities:       Array.isArray(data.amenities) ? data.amenities : [],
         tags:            Array.isArray(data.tags) ? data.tags.join(', ') : '',
@@ -106,6 +119,7 @@ export default function EditPropertyPage() {
       possession_date: form.possession_date,
       description:     form.description,
       youtube_url:     form.youtube_url,
+      instagram_url:   form.instagram_url,
       amenities:       form.amenities,
       tags:            form.tags ? form.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
       is_active:       form.is_active,
@@ -196,6 +210,17 @@ export default function EditPropertyPage() {
           <div className="rounded-xl overflow-hidden" style={{ aspectRatio: '16/9' }}>
             <iframe src={embedUrl} className="w-full h-full" allowFullScreen title="Preview" />
           </div>
+        )}
+        <input
+          type="url"
+          placeholder="Instagram post or Reel URL (optional)"
+          value={form.instagram_url}
+          onChange={e => setF('instagram_url', e.target.value)}
+          className="w-full rounded-xl px-4 py-3 text-sm"
+          style={{ background: '#F5F5F4', border: '1px solid rgba(255,255,255,0.1)', color: '#111827', outline: 'none' }}
+        />
+        {instagramEmbedUrl(form.instagram_url) && (
+          <iframe src={instagramEmbedUrl(form.instagram_url)!} className="w-full rounded-xl border-0" style={{ height: 600 }} title="Instagram post or Reel preview" />
         )}
       </section>
 

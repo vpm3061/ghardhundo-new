@@ -91,9 +91,6 @@ export default function FlatFields({ form, persona, setF, toggleArr }: WizardFie
           setPhotos={v => setF('floor_plan', v[0] || '')} maxFiles={1} />
       </div>
 
-      <input className="input-dark text-sm" placeholder="YouTube URL (optional)"
-        value={form.youtube_url} onChange={e => setF('youtube_url', e.target.value)} suppressHydrationWarning />
-
       <input className="input-dark text-sm" placeholder="Tags (comma separated: Metro nearby, Garden facing)"
         value={form.tags} onChange={e => setF('tags', e.target.value)} suppressHydrationWarning />
     </div>

@@ -47,6 +47,7 @@ export type Property = {
   photos: string[] | null
   floor_plan: string | null
   youtube_url: string | null
+  instagram_url?: string | null
   tags: string[] | null
   amenities: string[] | null
   is_active: boolean
