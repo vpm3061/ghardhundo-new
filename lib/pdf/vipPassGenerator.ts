@@ -1,4 +1,4 @@
-import type { VipPass } from '@/lib/trust'
+import { microMarketCode, type VipPass } from '@/lib/trust'
 
 function pdfString(value: string) {
   return value.normalize('NFKD').replace(/[^\x20-\x7E]/g, '').replace(/([\\()])/g, '\\$1')
@@ -9,7 +9,8 @@ export function generateVipPassPdf(pass: VipPass): Uint8Array {
   const lines = [
     `Pass ID: ${pass.id}`, `Client: ${pass.name}`,
     `Phone: ${pass.maskedPhone || '****'}`, `Project: ${pass.project}`,
-    'Micro-market: Prayagraj', `Requested visit date: ${pass.visitDate}`,
+    `Micro-market code: ${microMarketCode(pass.microMarket)} (${pass.microMarket || 'As listed'})`, `Requested visit date: ${pass.visitDate}`,
+    ...(pass.urgencyTimeline ? [`Preferred visit window: ${pass.urgencyTimeline.replaceAll('_', ' ')}`] : []),
     'Tagging validity: 180 days from visit',
     ...(pass.purpose ? [`Purpose: ${pass.purpose}`] : []),
     ...(pass.costBreakdown ? [

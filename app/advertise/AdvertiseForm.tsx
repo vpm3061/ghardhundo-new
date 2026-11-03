@@ -2,7 +2,6 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
-const CITIES = ['Lucknow', 'Noida', 'Greater Noida', 'Ayodhya', 'Ghaziabad', 'Other']
 const PACKAGES = ['Property Page Banner', 'Search Page Banner', 'Homepage Banner', 'CPL Package', 'Not sure yet']
 
 const BLANK = { name: '', company: '', phone: '', city: '', package: '', message: '' }
@@ -55,11 +54,8 @@ export default function AdvertiseForm() {
       <div className="grid sm:grid-cols-2 gap-4">
         <input className="w-full border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FB923C]"
           placeholder="Phone number *" type="tel" value={form.phone} onChange={e => setF('phone', e.target.value)} suppressHydrationWarning />
-        <select className="w-full border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FB923C]"
-          value={form.city} onChange={e => setF('city', e.target.value)} suppressHydrationWarning>
-          <option value="">Select City</option>
-          {CITIES.map(c => <option key={c}>{c}</option>)}
-        </select>
+        <input className="w-full border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FB923C]"
+          placeholder="City or market (optional)" value={form.city} onChange={e => setF('city', e.target.value)} suppressHydrationWarning />
       </div>
       <select className="w-full border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FB923C]"
         value={form.package} onChange={e => setF('package', e.target.value)} suppressHydrationWarning>

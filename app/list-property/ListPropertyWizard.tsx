@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import PropertyLocationFields from '@/components/PropertyLocationFields'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -12,7 +12,7 @@ import PillarFields from '@/components/wizard/PillarFields'
 import { BLANK_WIZARD_FORM, type WizardForm, type Persona, type PropertyPillar } from '@/components/wizard/types'
 
 const EXPERIENCE_OPTIONS = ['0-1 year', '1-3 years', '3-5 years', '5-10 years', '10+ years']
-const SPECIALIZATIONS = ['Residential Flats', 'Plots', 'Rental', 'Commercial', 'All types']
+const SPECIALIZATIONS = ['Luxury Residential', 'Approved Gated Plots', 'Prime Commercial', 'Institutional Assets', 'All types']
 
 type RegForm = {
   full_name: string
@@ -35,10 +35,10 @@ const BLANK_REG_FORM: RegForm = {
 }
 
 const PROPERTY_TYPES: { id: PropertyPillar; icon: string; label: string }[] = [
-  { id: 'residential', icon: '🏠', label: 'Residential' },
-  { id: 'commercial', icon: '🏢', label: 'Commercial' },
-  { id: 'industrial', icon: '🏭', label: 'Industrial' },
-  { id: 'land', icon: '📐', label: 'Land & Plots' },
+  { id: 'residential', icon: '🏠', label: 'Luxury Residential' },
+  { id: 'commercial', icon: '🏢', label: 'Prime Commercial' },
+  { id: 'institutional', icon: '🏭', label: 'Institutional Assets' },
+  { id: 'land', icon: '📐', label: 'Approved Gated Plots' },
 ]
 
 type Props = {
@@ -89,6 +89,9 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
     if (!form.city) return 'City select karo'
     if (!form.locality.trim()) return 'Locality / area required hai'
     if (usesMonthlyRent ? !form.monthly_rent : !form.price_min) return 'Price required hai'
+    if (usesMonthlyRent && pillar === 'land') return 'Land and plot listings are sale-only'
+    if (!usesMonthlyRent && Number(form.price_min) < 5000000) return 'Sale listings must start at ₹50 Lakhs'
+    if (usesMonthlyRent && Number(form.monthly_rent) < 50000) return 'Luxury and high-value leases must be at least ₹50,000 per month'
     if (!usesMonthlyRent && (!form.stamp_duty_estimate || !form.legal_fees_estimate)) return 'Stamp duty and legal fee estimates required hain (enter 0 if none)'
     if (form.photos.length < 2 || form.photos.length > 4) return '2 se 4 original property photos upload karo'
     if (!form.owner_contact.trim()) return 'Contact number required hai'
@@ -117,7 +120,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
     photos: form.photos.length > 0 ? form.photos : null,
     contact_preference: form.contact_preference,
     owner_contact: form.owner_contact || null,
-    property_category: pillar === 'residential' ? (form.intent === 'rent' ? 'rental' : 'flat') : pillar === 'land' ? 'plot' : 'commercial',
+    property_category: pillar === 'residential' ? 'flat' : pillar === 'land' ? 'plot' : 'commercial',
     listing_type: persona,
     created_by: userId,
     listed_by: userId,
@@ -149,7 +152,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
     tenant_preference: form.tenant_preference || null,
     gender_preference: form.gender_preference || null,
     pets_allowed: form.pets_allowed,
-    commercial_type: pillar === 'commercial' || pillar === 'industrial' ? form.property_subtype : null,
+    commercial_type: pillar === 'commercial' || pillar === 'institutional' ? form.property_subtype : null,
     power_load: form.power_load || null,
     frontage_width: form.frontage_width ? parseFloat(form.frontage_width) : null,
   })
@@ -204,7 +207,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
       }),
     }).catch(() => {})
 
-    toast.success('Welcome to Orenzaa! 🎉')
+    toast.success('Welcome to Orenzaa! ðŸŽ‰')
     setRegSaving(false)
     setRegSuccess(true)
     setTimeout(() => router.push('/expert'), 2000)
@@ -241,7 +244,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
         ))}
       </div>
 
-      {/* STEP 0 — payment gate (only reached when not already an authorized expert/builder) */}
+      {/* STEP 0 â€” payment gate (only reached when not already an authorized expert/builder) */}
       {step === 0 && (
         <div>
           <h1 className="font-heading text-2xl sm:text-3xl font-800 text-center mb-2" style={{ color: '#111827' }}>
@@ -249,49 +252,49 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
           </h1>
           <p className="text-center text-sm mb-8" style={{ color: '#6B7280' }}>Become a Property Expert on Orenzaa</p>
           <div className="max-w-sm mx-auto glass p-6" style={{ border: '2px solid rgba(251,146,60,0.4)', background: 'rgba(251,146,60,0.04)' }}>
-            <div className="text-4xl mb-3">🤝</div>
+            <div className="text-4xl mb-3">ðŸ¤</div>
             <h2 className="font-heading text-xl font-800 mb-2" style={{ color: '#111827' }}>Property Expert</h2>
             <ul className="text-sm space-y-1.5 mb-5" style={{ color: '#6B7280' }}>
-              <li>✅ {PAYMENTS_ENABLED ? '₹49 one-time — lifetime access' : 'Free registration — no payment needed'}</li>
-              <li>✅ {PAYMENTS_ENABLED ? '5 free property listings' : 'Unlimited free property listings for now'}</li>
-              <li>✅ AI-scored buyer leads HOT🔥 WARM🌡️ COLD❄️</li>
-              <li>✅ WhatsApp Status Card for each property</li>
-              <li>✅ Orenzaa Verified Expert badge</li>
-              <li>✅ WhatsApp alerts on new leads</li>
-              <li>✅ Expert dashboard with analytics</li>
+              <li>âœ… {PAYMENTS_ENABLED ? 'â‚¹49 one-time â€” lifetime access' : 'Free registration â€” no payment needed'}</li>
+              <li>âœ… {PAYMENTS_ENABLED ? '5 free property listings' : 'Unlimited free property listings for now'}</li>
+              <li>âœ… AI-scored buyer leads HOTðŸ”¥ WARMðŸŒ¡ï¸ COLDâ„ï¸</li>
+              <li>âœ… WhatsApp Status Card for each property</li>
+              <li>âœ… Orenzaa Verified Expert badge</li>
+              <li>âœ… WhatsApp alerts on new leads</li>
+              <li>âœ… Expert dashboard with analytics</li>
             </ul>
             {PAYMENTS_ENABLED ? <RazorpayButton
               amount={49}
               plan="expert-registration"
               role="expert"
-              label="Pay ₹49 & Start Listing →"
+              label="Pay â‚¹49 & Start Listing â†’"
               onVerified={() => setStep('register')}
               redirectTo={false}
               className="btn-accent w-full"
             /> : (
               <button type="button" onClick={() => setStep('register')} className="btn-accent w-full">
-                Start Listing for Free →
+                Start Listing for Free â†’
               </button>
             )}
           </div>
         </div>
       )}
 
-      {/* STEP 'register' — post-payment expert registration form */}
+      {/* STEP 'register' â€” post-payment expert registration form */}
       {step === 'register' && (
         <div className="max-w-md mx-auto">
           {regSuccess ? (
             <div className="text-center py-12">
-              <div className="text-5xl mb-3">🎉</div>
+              <div className="text-5xl mb-3">ðŸŽ‰</div>
               <h1 className="text-2xl font-bold text-[#111827]">Welcome to Orenzaa!</h1>
-              <p className="text-[#6B7280] mt-1">Taking you to your dashboard…</p>
+              <p className="text-[#6B7280] mt-1">Taking you to your dashboardâ€¦</p>
             </div>
           ) : (
             <>
               <div className="text-center mb-6">
-                <div className="text-5xl mb-3">✅</div>
+                <div className="text-5xl mb-3">âœ…</div>
                 <h1 className="text-2xl font-bold text-[#111827]">{PAYMENTS_ENABLED ? 'Payment Successful!' : 'Register for Free'}</h1>
-                <p className="text-[#6B7280] mt-1">Ab apni details bharo — almost done!</p>
+                <p className="text-[#6B7280] mt-1">Ab apni details bharo â€” almost done!</p>
               </div>
 
               <form onSubmit={handleRegister} className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-4">
@@ -336,7 +339,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
                   <datalist id="registration-cities">
                     {REGISTRATION_CITIES.map(city => <option key={city.value} value={city.value} label={city.label} />)}
                   </datalist>
-                  <p id="registration-city-help" className="mt-1 text-xs text-[#6B7280]">Uttar Pradesh aur Delhi NCR ki city search karein. Naam na mile toh apni city likh sakte hain.</p>
+                  <p id="registration-city-help" className="mt-1 text-xs text-[#6B7280]">Enter your city or town anywhere in India. Suggestions are optional.</p>
                 </div>
 
                 <div>
@@ -377,7 +380,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
 
                 <button type="submit" disabled={regSaving} suppressHydrationWarning
                   className="w-full py-4 bg-[#FB923C] hover:bg-[#F59E0B] text-white font-bold rounded-xl disabled:opacity-50 text-base">
-                  {regSaving ? 'Setting up your account...' : 'Complete Registration & Go to Dashboard →'}
+                  {regSaving ? 'Setting up your account...' : 'Complete Registration & Go to Dashboard â†’'}
                 </button>
               </form>
             </>
@@ -385,7 +388,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
         </div>
       )}
 
-      {/* STEP 1 — property type */}
+      {/* STEP 1 â€” property type */}
       {step === 1 && (
         <div>
           <h1 className="font-heading text-2xl font-800 text-center mb-2" style={{ color: '#111827' }}>What are you listing?</h1>
@@ -402,18 +405,18 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
           </div>
           {!alreadyAuthorized && (
             <button onClick={() => setStep(0)} suppressHydrationWarning
-              className="mt-6 text-sm" style={{ color: '#6B7280' }}>← Back</button>
+              className="mt-6 text-sm" style={{ color: '#6B7280' }}>â† Back</button>
           )}
         </div>
       )}
 
-      {/* STEP 2 — form + submit (payment already done, if it was needed) */}
+      {/* STEP 2 â€” form + submit (payment already done, if it was needed) */}
       {step === 2 && pillar && (
         <div className="glass p-5 flex flex-col gap-4">
           <PillarFields form={form} persona={persona} setF={setF} toggleArr={toggleArr} pillar={pillar} />
 
           <div>
-            <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Original property photos (2–4)</label>
+            <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Original property photos (2â€“4)</label>
             <p className="mb-2 text-xs text-slate-500">Upload clean, actual site photos only. No posters, 3D renders, graphics, contact details or watermarks. Listings stay hidden until Orenzaa visually reviews the photos.</p>
             <PhotoUpload photos={form.photos} setPhotos={v => setF('photos', v)} maxFiles={4} />
           </div>
@@ -455,10 +458,10 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
           <div className="flex gap-3">
             <button onClick={() => setStep(1)} suppressHydrationWarning
               className="px-5 py-2.5 rounded-xl text-sm font-700" style={{ border: '1px solid rgba(0,0,0,0.06)', color: '#6B7280' }}>
-              ← Back
+              â† Back
             </button>
             <button onClick={handleSubmit} disabled={saving} suppressHydrationWarning className="btn-accent flex-1 disabled:opacity-50">
-              {saving ? 'Listing…' : '+ List My Property'}
+              {saving ? 'Listingâ€¦' : '+ List My Property'}
             </button>
           </div>
         </div>

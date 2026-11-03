@@ -7,7 +7,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'AI Property Match',
-  description: 'Answer 5 questions and get matched with the property matching your preferences in Lucknow or Noida.',
+  description: 'Answer 5 questions and get matched with premium properties across India.',
 }
 
 export default async function AIMatchPage() {

@@ -1,8 +1,8 @@
-'use client'
+﻿'use client'
 import { useState } from 'react'
 
 export type PullResult = {
-  property_pillar?: 'residential' | 'commercial' | 'industrial' | 'land' | null
+  property_pillar?: 'residential' | 'commercial' | 'institutional' | 'land' | null
   listing_intent?: 'sale' | 'rent' | null
   property_subtype?: string | null
   property_category?: string | null
@@ -52,7 +52,7 @@ function ConfidenceBadge({ score }: { score: number }) {
   const color = score >= 80 ? '#22C55E' : score >= 55 ? '#F59E0B' : '#EF4444'
   const bg    = score >= 80 ? 'rgba(16,185,129,0.1)' : score >= 55 ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.1)'
   const border= score >= 80 ? 'rgba(16,185,129,0.3)' : score >= 55 ? 'rgba(245,158,11,0.3)' : 'rgba(239,68,68,0.3)'
-  const label = score >= 80 ? 'High confidence' : score >= 55 ? 'Medium confidence — please verify' : 'Low confidence — review carefully'
+  const label = score >= 80 ? 'High confidence' : score >= 55 ? 'Medium confidence â€” please verify' : 'Low confidence â€” review carefully'
   return (
     <div className="flex items-center gap-2 text-xs px-3 py-2 rounded-xl"
       style={{ background: bg, border: `1px solid ${border}`, color }}>
@@ -60,7 +60,7 @@ function ConfidenceBadge({ score }: { score: number }) {
         <polyline points="20,6 9,17 4,12"/>
       </svg>
       <span className="font-700">{score}% confident</span>
-      <span style={{ color: '#6B7280' }}>— {label}</span>
+      <span style={{ color: '#6B7280' }}>â€” {label}</span>
     </div>
   )
 }
@@ -117,7 +117,7 @@ export default function PropertyPull({ onFill }: { onFill: (data: PullResult) =>
         <div>
           <p className="font-heading font-700 text-sm" style={{ color: '#111827' }}>AI Property Extractor</p>
           <p className="text-xs" style={{ color: '#6B7280' }}>
-            Paste a URL, brochure text, WhatsApp message — Claude fills all fields
+            Paste a URL, brochure text, WhatsApp message â€” Claude fills all fields
           </p>
         </div>
       </div>
@@ -127,7 +127,7 @@ export default function PropertyPull({ onFill }: { onFill: (data: PullResult) =>
         <textarea
           className="input-dark text-sm w-full resize-none"
           style={{ minHeight: '110px' }}
-          placeholder={`Paste anything:\n• https://99acres.com/listing/...\n• "Shalimar Mannat, 2/3 BHK, Sector 3 Lucknow, ₹35L–₹45L, RERA UP123, possession Dec 2026"\n• Copy-paste from any brochure or WhatsApp`}
+          placeholder={`Paste anything:\nâ€¢ https://99acres.com/listing/...\nâ€¢ "Shalimar Mannat, 2/3 BHK, Sector 3 Lucknow, â‚¹35Lâ€“â‚¹45L, RERA UP123, possession Dec 2026"\nâ€¢ Copy-paste from any brochure or WhatsApp`}
           value={input}
           onChange={e => { setInput(e.target.value); setError(''); setResult(null) }}
           disabled={loading}
@@ -147,7 +147,7 @@ export default function PropertyPull({ onFill }: { onFill: (data: PullResult) =>
                   <circle cx="12" cy="12" r="9" strokeOpacity="0.25"/>
                   <path d="M12 3a9 9 0 019 9"/>
                 </svg>
-                Extracting…
+                Extractingâ€¦
               </>
             ) : (
               <>
@@ -196,17 +196,17 @@ export default function PropertyPull({ onFill }: { onFill: (data: PullResult) =>
             <div className="rounded-xl p-3"
               style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(0,0,0,0.05)' }}>
               <p className="text-[10px] font-700 uppercase tracking-wider mb-2" style={{ color: '#9CA3AF' }}>
-                {filledFields.length} fields extracted — form auto-filled ↓
+                {filledFields.length} fields extracted â€” form auto-filled â†“
               </p>
               <div className="flex flex-wrap gap-x-4 gap-y-1">
                 {filledFields.map(([k, label]) => (
                   <span key={k} className="text-xs flex items-center gap-1" style={{ color: '#6B7280' }}>
-                    <span style={{ color: '#22C55E' }}>✓</span> {label}
+                    <span style={{ color: '#22C55E' }}>âœ“</span> {label}
                   </span>
                 ))}
                 {result.possession_date && (
                   <span className="text-xs flex items-center gap-1" style={{ color: '#6B7280' }}>
-                    <span style={{ color: '#F59E0B' }}>📅</span> {result.possession_date}
+                    <span style={{ color: '#F59E0B' }}>ðŸ“…</span> {result.possession_date}
                   </span>
                 )}
               </div>

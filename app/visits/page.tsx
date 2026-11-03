@@ -16,7 +16,7 @@ export default async function VisitsPage() {
   if (!user) redirect('/login?redirect=/visits')
 
   const [{ data: passes, error }, { data: savedRows }] = await Promise.all([
-    supabase.from('vip_passes').select('pass_id,buyer_name,buyer_phone_masked,property_id,visit_timestamp,tagging_valid_until,purpose,urgency_timeline,base_price_amount,stamp_duty_amount,legal_fees_amount,leads(project_name)')
+    supabase.from('vip_passes').select('pass_id,buyer_name,buyer_phone_masked,property_id,visit_timestamp,tagging_valid_until,purpose,urgency_timeline,base_price_amount,stamp_duty_amount,legal_fees_amount,micro_market,leads(project_name)')
       .eq('buyer_user_id', user.id).gt('tagging_valid_until', new Date().toISOString()).order('created_at', { ascending: false }).limit(50),
     supabase.from('saved_properties').select('properties(*)').eq('user_id', user.id).order('created_at', { ascending: false }),
   ])
@@ -39,6 +39,7 @@ export default async function VisitsPage() {
           const legalFees = pass.legal_fees_amount == null ? null : Number(pass.legal_fees_amount)
           return <DigitalVipPass key={pass.pass_id} pass={{
             id: pass.pass_id, name: pass.buyer_name, project: leadData?.project_name || 'Property visit',
+            microMarket: pass.micro_market || 'As listed',
             visitDate: pass.visit_timestamp.slice(0, 10), maskedPhone: `+91 XXXXX-${pass.buyer_phone_masked.slice(-4)}`,
             purpose: pass.purpose || undefined,
             urgencyTimeline: pass.urgency_timeline || undefined,

@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 const configuredUrl = new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.orenzaa.com')
 if (configuredUrl.hostname === 'orenzaa.com') configuredUrl.hostname = 'www.orenzaa.com'
 export const SITE_URL = configuredUrl.origin
-export const SITE_DESCRIPTION = 'Explore flats, plots, rental homes and commercial properties in Lucknow, Noida, Greater Noida and Ayodhya with Orenzaa.'
+export const SITE_DESCRIPTION = 'India’s exclusive high-ticket PropTech discovery platform for verified luxury residences, approved gated enclaves, prime commercial spaces and institutional assets.'
 
 export function pageMetadata(title: string, description: string, path: string): Metadata {
   const url = `${SITE_URL}${path}`

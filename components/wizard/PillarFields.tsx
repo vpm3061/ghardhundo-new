@@ -3,14 +3,14 @@
 import type { PropertyPillar, WizardFieldProps } from './types'
 
 const PILLAR_TYPES: Record<PropertyPillar, string[]> = {
-  residential: ['House', '2BHK Apartment', '3BHK Apartment', 'Independent Villa', 'Studio Apartment', 'PG / Co-Living'],
-  commercial: ['Corporate Office', 'Retail Shop', 'High-Street Outlet', 'Mall Space', 'Showroom'],
-  industrial: ['Warehouse / Godown', 'Factory', 'Cold Storage', 'Logistics Hub'],
-  land: ['Residential Gated Plot', 'Commercial Enclave', 'Agricultural Land', 'Raw Land'],
+  residential: ['3BHK Apartment', '4BHK Apartment', 'Penthouse', 'Independent Villa', 'Gated Estate'],
+  commercial: ['Corporate Office Floor', 'High-Street Retail Outlet', 'Showroom'],
+  institutional: ['Warehouse', 'Logistics Park', 'Cold Storage'],
+  land: ['PDA / RERA Approved Township', 'Gated Commercial Enclave', 'Development Land'],
 }
 
 const labelFor: Record<PropertyPillar, string> = {
-  residential: 'Home type', commercial: 'Commercial space type', industrial: 'Industrial facility type', land: 'Land type',
+  residential: 'Luxury home type', commercial: 'Prime commercial space type', institutional: 'Institutional asset type', land: 'Approved land type',
 }
 
 function Choice({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
@@ -30,7 +30,7 @@ export default function PillarFields({ form, setF, pillar }: WizardFieldProps & 
       <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-orange-800">Listing intent</h3>
       <div className="flex flex-wrap gap-2">
         <Choice active={form.intent === 'sale'} onClick={() => setF('intent', 'sale')}>FOR SALE</Choice>
-        <Choice active={form.intent === 'rent'} onClick={() => setF('intent', 'rent')}>FOR RENT / LEASE</Choice>
+        {pillar !== 'land' && <Choice active={form.intent === 'rent'} onClick={() => setF('intent', 'rent')}>FOR RENT / LEASE</Choice>}
       </div>
     </section>
 
@@ -43,7 +43,7 @@ export default function PillarFields({ form, setF, pillar }: WizardFieldProps & 
 
     {form.intent === 'sale' ? <div className="grid gap-3 sm:grid-cols-2">
       <label className="text-xs text-slate-600">Base property price (₹) *
-        <input className="input-dark mt-1 w-full text-sm" type="number" min="1" value={form.price_min} onChange={e => setF('price_min', e.target.value)} />
+        <input className="input-dark mt-1 w-full text-sm" type="number" min="5000000" value={form.price_min} onChange={e => setF('price_min', e.target.value)} />
       </label>
       <label className="text-xs text-slate-600">Stamp duty / registry estimate (₹) *
         <input className="input-dark mt-1 w-full text-sm" type="number" min="0" value={form.stamp_duty_estimate} onChange={e => setF('stamp_duty_estimate', e.target.value)} />
@@ -57,7 +57,7 @@ export default function PillarFields({ form, setF, pillar }: WizardFieldProps & 
       </div>
     </div> : <div className="grid gap-3 sm:grid-cols-2">
       <label className="text-xs text-slate-600">Monthly rent / lease amount (₹) *
-        <input className="input-dark mt-1 w-full text-sm" type="number" min="1" value={form.monthly_rent} onChange={e => setF('monthly_rent', e.target.value)} />
+        <input className="input-dark mt-1 w-full text-sm" type="number" min="50000" value={form.monthly_rent} onChange={e => setF('monthly_rent', e.target.value)} />
       </label>
       <label className="text-xs text-slate-600">Security deposit amount (₹)
         <input className="input-dark mt-1 w-full text-sm" type="number" min="0" value={form.security_deposit_amount} onChange={e => setF('security_deposit_amount', e.target.value)} />
@@ -83,7 +83,7 @@ export default function PillarFields({ form, setF, pillar }: WizardFieldProps & 
       </label>
     </div>}
 
-    {(pillar === 'residential' || pillar === 'commercial' || pillar === 'industrial') && <div className="grid gap-3 sm:grid-cols-2">
+    {(pillar === 'residential' || pillar === 'commercial' || pillar === 'institutional') && <div className="grid gap-3 sm:grid-cols-2">
       <label className="text-xs text-slate-600">Built-up / super area (sq. ft.)
         <input className="input-dark mt-1 w-full text-sm" type="number" min="0" value={form.super_area} onChange={e => setF('super_area', e.target.value)} />
       </label>
@@ -92,7 +92,7 @@ export default function PillarFields({ form, setF, pillar }: WizardFieldProps & 
       </label>
     </div>}
 
-    {pillar === 'industrial' && <div className="grid gap-3 sm:grid-cols-2">
+    {pillar === 'institutional' && <div className="grid gap-3 sm:grid-cols-2">
       <label className="text-xs text-slate-600">Power load
         <input className="input-dark mt-1 w-full text-sm" maxLength={80} placeholder="e.g. 100 KW" value={form.power_load} onChange={e => setF('power_load', e.target.value)} />
       </label>

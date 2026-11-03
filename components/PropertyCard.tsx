@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import WhatsAppButton from './WhatsAppButton'
@@ -7,14 +7,14 @@ import { createClient } from '@/lib/supabase/client'
 import type { Property } from '@/lib/supabase/types'
 
 const AMENITY_ICONS: Record<string, string> = {
-  'Swimming Pool': '🏊',
-  'Gym':           '🏋️',
-  '24hr Security': '🔒',
-  'Parking':       '🅿️',
-  'Club House':    '🏛️',
-  'Power Backup':  '⚡',
-  'Garden':        '🌿',
-  'Kids Zone':     '🎠',
+  'Swimming Pool': 'ðŸŠ',
+  'Gym':           'ðŸ‹ï¸',
+  '24hr Security': 'ðŸ”’',
+  'Parking':       'ðŸ…¿ï¸',
+  'Club House':    'ðŸ›ï¸',
+  'Power Backup':  'âš¡',
+  'Garden':        'ðŸŒ¿',
+  'Kids Zone':     'ðŸŽ ',
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -25,10 +25,10 @@ const STATUS_LABEL: Record<string, string> = {
 
 function getPriceDisplay(property: Property): string {
   if (property.listing_intent === 'rent' || property.property_category === 'rental') {
-    return `₹${Number(property.monthly_rent || 0).toLocaleString('en-IN')}/mo`
+    return `â‚¹${Number(property.monthly_rent || 0).toLocaleString('en-IN')}/mo`
   }
   if (property.price_min) {
-    return `₹${Math.round(Number(property.price_min) / 100000)}L`
+    return `â‚¹${Math.round(Number(property.price_min) / 100000)}L`
   }
   return 'Price on request'
 }
@@ -36,10 +36,10 @@ function getPriceDisplay(property: Property): string {
 function getSubtitle(property: Property): string {
   const place = property.locality || property.city || ''
   const pillar = property.property_pillar || (property.property_category === 'plot' ? 'land' : property.property_category === 'commercial' ? 'commercial' : 'residential')
-  if (pillar === 'land') return `${property.plot_area_sqyard || ''} ${property.land_area_unit || 'sq. yard'} · ${place}`
-  if (pillar === 'commercial' || pillar === 'industrial') return `${property.super_area || ''} sqft · ${place}`
+  if (pillar === 'land') return `${property.plot_area_sqyard || ''} ${property.land_area_unit || 'sq. yard'} Â· ${place}`
+  if (pillar === 'commercial' || pillar === 'institutional') return `${property.super_area || ''} sqft Â· ${place}`
   const bhk = Array.isArray(property.bhk) ? property.bhk[0] : property.bhk
-  return `${bhk ? `${bhk} BHK` : property.property_subtype || 'Residential'} · ${place}`
+  return `${bhk ? `${bhk} BHK` : property.property_subtype || 'Residential'} Â· ${place}`
 }
 
 export default function PropertyCard({ property, userId, savedIds }: { property: Property; userId?: string; savedIds?: Set<string> }) {
@@ -99,12 +99,12 @@ export default function PropertyCard({ property, userId, savedIds }: { property:
         <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5">
           {property.is_featured && (
             <span className="text-[10px] font-800 tracking-wider px-2.5 py-1 rounded-full bg-[#FB923C] text-white">
-              ⭐ FEATURED
+              â­ FEATURED
             </span>
           )}
           {property.rera_number && (
             <span className="text-[10px] font-700 px-2.5 py-1 rounded-full bg-white/90 text-[#22C55E] border border-green-100">
-              {property.orenzaa_verified ? '✓ Orenzaa Verified & RERA Tagged' : 'RERA Number Listed'}
+              {property.orenzaa_verified ? 'âœ“ Orenzaa Verified & RERA Tagged' : 'RERA Number Listed'}
             </span>
           )}
         </div>
@@ -125,9 +125,9 @@ export default function PropertyCard({ property, userId, savedIds }: { property:
           {price}
         </p>
 
-        {/* Subtitle — BHK/area + location, per property type */}
+        {/* Subtitle â€” BHK/area + location, per property type */}
         <p className="text-xs mb-2 flex items-center gap-1 truncate text-[#6B7280]">
-          <span className="shrink-0">📍</span>
+          <span className="shrink-0">ðŸ“</span>
           <span className="truncate">{subtitle}</span>
         </p>
 

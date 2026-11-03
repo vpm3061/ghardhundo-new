@@ -26,8 +26,8 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   keywords: [
-    'property in Lucknow', 'flats in Noida', 'plots in Greater Noida', 'RERA verified property',
-    '2BHK Lucknow', 'buy flat Noida', 'property dealer Lucknow', 'real estate UP', 'Orenzaa',
+    'luxury property India', 'high-ticket real estate India', 'approved gated plots', 'prime commercial property',
+    'institutional assets', 'private VIP property visits', 'Orenzaa',
   ],
   openGraph: {
     title: 'Orenzaa — REAL ESTATE AND PROPTECH',

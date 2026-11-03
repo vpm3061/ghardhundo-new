@@ -2,9 +2,9 @@ import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import MobileNav from '@/components/MobileNav'
 import AdvertiseForm from './AdvertiseForm'
-import { pageMetadata } from '@/lib/seo'
+import { pageMetadata, SITE_DESCRIPTION } from '@/lib/seo'
 
-export const metadata = pageMetadata('Advertise Your Real Estate Business', 'Explore property advertising and lead generation options for builders and real estate businesses in Lucknow, Noida and Ayodhya.', '/advertise')
+export const metadata = pageMetadata('Reach Premium Property Buyers Across India', SITE_DESCRIPTION, '/advertise')
 
 const PACKAGES = [
   { name: 'Property Page Banner', price: '₹10,000/month', desc: 'Shown on every property detail page' },
@@ -13,7 +13,7 @@ const PACKAGES = [
 ]
 
 const WHY = [
-  { icon: '🎯', title: 'Targeted UP buyers', desc: 'Reach active buyers in Lucknow, Noida & Ayodhya specifically.' },
+  { icon: '🎯', title: 'Nationwide discovery', desc: 'Reach premium property buyers across India.' },
   { icon: '🤖', title: 'AI qualified leads', desc: 'Our team uses AI scores to prioritise enquiries and coordinate visits.' },
   { icon: '💰', title: 'Affordable rates', desc: 'No agency mark-ups — pay directly for placement or per lead.' },
   { icon: '📊', title: 'Real-time analytics', desc: 'Track views, clicks and leads on your campaign as it runs.' },
@@ -31,10 +31,10 @@ export default function AdvertisePage() {
               Advertise on <span className="text-[#FB923C]">Orenzaa</span>
             </h1>
             <p className="text-lg text-[#6B7280] max-w-2xl mx-auto">
-              Reach active property buyers in Lucknow, Noida &amp; Ayodhya
+              Reach premium property buyers across India
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3 mt-8 text-sm">
-              {['10,000+ Monthly Visitors', 'Lucknow & Noida Focus', 'AI Qualified Buyers'].map(s => (
+              {['Nationwide discovery', 'Premium buyer interest', 'AI Qualified Enquiries'].map(s => (
                 <span key={s} className="px-4 py-2 rounded-full bg-orange-50 border border-orange-200 text-[#FB923C] font-600">
                   {s}
                 </span>

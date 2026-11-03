@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import PropertyLocationFields from '@/components/PropertyLocationFields'
 import { useState, useTransition } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -36,10 +36,9 @@ const STATUS_OPTIONS: { value: FormStatus; label: string }[] = [
   { value: 'New Launch',         label: 'New Launch' },
 ]
 const PROPERTY_TYPES: { id: Category; icon: string; label: string }[] = [
-  { id: 'flat',       icon: '🏠', label: 'Residential' },
-  { id: 'plot',       icon: '📐', label: 'Land & Plots' },
-  { id: 'rental',     icon: '🏠', label: 'Residential' },
-  { id: 'commercial', icon: '🏢', label: 'Commercial / Industrial' },
+  { id: 'flat',       icon: 'ðŸ ', label: 'Residential' },
+  { id: 'plot',       icon: 'ðŸ“', label: 'Land & Plots' },
+  { id: 'commercial', icon: 'ðŸ¢', label: 'Commercial / Institutional' },
 ]
 
 function toFormState(p: Property): FormState {
@@ -192,7 +191,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
     const validCategories: Category[] = ['flat', 'plot', 'rental', 'commercial']
     const parsedCategory = validCategories.includes(data.property_category as Category)
       ? (data.property_category as Category) : 'flat'
-    const parsedPillar: PropertyPillar = ['residential', 'commercial', 'industrial', 'land'].includes(data.property_pillar || '')
+    const parsedPillar: PropertyPillar = ['residential', 'commercial', 'institutional', 'land'].includes(data.property_pillar || '')
       ? data.property_pillar as PropertyPillar
       : parsedCategory === 'plot' ? 'land' : parsedCategory === 'commercial' ? 'commercial' : 'residential'
 
@@ -250,7 +249,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
         photos: form.photos.length ? form.photos : null,
         contact_preference: form.contact_preference,
         owner_contact: form.owner_contact || null,
-        property_category: pillar === 'land' ? 'plot' : pillar === 'commercial' || pillar === 'industrial' ? 'commercial' : usesMonthlyRent ? 'rental' : 'flat',
+      property_category: pillar === 'land' ? 'plot' : pillar === 'commercial' || pillar === 'institutional' ? 'commercial' : 'flat',
         property_pillar: pillar,
         listing_intent: form.intent,
         property_subtype: form.property_subtype || null,
@@ -359,7 +358,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
         </button>
       </div>
 
-      {/* ── Modal ── */}
+      {/* â”€â”€ Modal â”€â”€ */}
       {showForm && (
         <div className="modal-overlay"
           onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}>
@@ -374,7 +373,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
               </h3>
               <button onClick={() => setShowForm(false)} suppressHydrationWarning
                 className="w-8 h-8 flex items-center justify-center rounded-lg"
-                style={{ border: '1px solid rgba(0,0,0,0.05)', color: '#6B7280' }}>✕</button>
+                style={{ border: '1px solid rgba(0,0,0,0.05)', color: '#6B7280' }}>âœ•</button>
             </div>
 
             {/* Body */}
@@ -385,8 +384,8 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
               <div>
                 <SectionLabel>Property Pillar</SectionLabel>
                 <div className="grid grid-cols-2 gap-2">
-                  {([['residential','Residential'],['commercial','Commercial'],['industrial','Industrial'],['land','Land & Plots']] as [PropertyPillar,string][]).map(([pillarId,label]) => (
-                    <button key={pillarId} type="button" onClick={() => { setF('pillar', pillarId); setF('property_subtype', ''); setCategory(pillarId === 'land' ? 'plot' : pillarId === 'residential' ? (form.intent === 'rent' ? 'rental' : 'flat') : 'commercial') }} suppressHydrationWarning
+                  {([['residential','Residential'],['commercial','Commercial'],['institutional','Institutional'],['land','Land & Plots']] as [PropertyPillar,string][]).map(([pillarId,label]) => (
+                    <button key={pillarId} type="button" onClick={() => { setF('pillar', pillarId); setF('property_subtype', ''); setCategory(pillarId === 'land' ? 'plot' : pillarId === 'residential' ? 'flat' : 'commercial') }} suppressHydrationWarning
                       className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-600 border transition-all"
                       style={pillar === pillarId
                         ? { background: 'rgba(251,146,60,0.15)', color: '#FB923C', borderColor: 'rgba(251,146,60,0.5)' }
@@ -425,7 +424,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
                 </div>
               </div>
 
-              {/* Status — flat only */}
+              {/* Status â€” flat only */}
               {pillar === 'residential' && (
                 <div>
                   <SectionLabel>Status</SectionLabel>
@@ -437,18 +436,18 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
                 </div>
               )}
 
-              {/* Pricing — hidden when rental/commercial-for-rent, those collect monthly rent in their own section */}
+              {/* Pricing â€” hidden when rental/commercial-for-rent, those collect monthly rent in their own section */}
               {!usesMonthlyRent && (
                 <div>
                   <SectionLabel>Pricing</SectionLabel>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-xs mb-1 block" style={{ color: '#9CA3AF' }}>Min Price (₹)</label>
+                      <label className="text-xs mb-1 block" style={{ color: '#9CA3AF' }}>Min Price (â‚¹)</label>
                       <input className="input-dark text-sm" placeholder="e.g. 4500000" type="number"
                         value={form.price_min} onChange={e => setF('price_min', e.target.value)} suppressHydrationWarning />
                     </div>
                     <div>
-                      <label className="text-xs mb-1 block" style={{ color: '#9CA3AF' }}>Max Price (₹)</label>
+                      <label className="text-xs mb-1 block" style={{ color: '#9CA3AF' }}>Max Price (â‚¹)</label>
                       <input className="input-dark text-sm" placeholder="e.g. 8500000" type="number"
                         value={form.price_max} onChange={e => set('price_max', e.target.value)} suppressHydrationWarning />
                     </div>
@@ -460,13 +459,13 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
               <div>
                 <SectionLabel>Description</SectionLabel>
                 <textarea className="input-dark text-sm min-h-[90px] resize-none"
-                  placeholder="Describe the project — location, possession date, key features…"
+                  placeholder="Describe the project â€” location, possession date, key featuresâ€¦"
                   value={form.description} onChange={e => setF('description', e.target.value)} suppressHydrationWarning />
               </div>
 
               <div><PillarFields form={form} pillar={pillar} persona="builder" setF={setF} toggleArr={toggleArr} /></div>
 
-              {/* ── Photos ── */}
+              {/* â”€â”€ Photos â”€â”€ */}
               <div>
                 <SectionLabel>Original site photos (2-4)</SectionLabel>
                 <PhotoUpload photos={form.photos} setPhotos={urls => set('photos', urls)} maxFiles={4} />
@@ -476,7 +475,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
                 </label>
               </div>
 
-              {/* ── Special Offers ── */}
+              {/* â”€â”€ Special Offers â”€â”€ */}
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <SectionLabel>Special Offers</SectionLabel>
@@ -501,7 +500,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
                             value={offer.title} onChange={e => setOffer(i, 'title', e.target.value)} suppressHydrationWarning />
                           <button type="button" onClick={() => removeOffer(i)} suppressHydrationWarning
                             className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg"
-                            style={{ border: '1px solid rgba(0,0,0,0.05)', color: '#9CA3AF' }}>✕</button>
+                            style={{ border: '1px solid rgba(0,0,0,0.05)', color: '#9CA3AF' }}>âœ•</button>
                         </div>
                         <textarea className="input-dark text-sm resize-none" rows={2}
                           placeholder="Offer description (optional)"
@@ -540,7 +539,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
                     style={{ background: '#111827', transform: form.is_featured ? 'translateX(16px)' : 'translateX(0)' }} />
                 </div>
                 <span className="text-sm" style={{ color: '#6B7280' }}>
-                  {form.is_featured ? '⭐ Featured listing' : 'Not featured'}
+                  {form.is_featured ? 'â­ Featured listing' : 'Not featured'}
                 </span>
                 <input type="checkbox" className="sr-only" checked={form.is_featured}
                   onChange={e => set('is_featured', e.target.checked)} />
@@ -549,7 +548,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
               {/* Actions */}
               <div className="flex gap-2 pt-1 pb-2">
                 <button type="submit" disabled={isPending} className="btn-accent flex-1 disabled:opacity-50" suppressHydrationWarning>
-                  {isPending ? 'Saving…' : editId ? 'Update Property' : 'Add Property'}
+                  {isPending ? 'Savingâ€¦' : editId ? 'Update Property' : 'Add Property'}
                 </button>
                 <button type="button" onClick={() => setShowForm(false)} suppressHydrationWarning
                   className="flex-1 py-2.5 rounded-xl text-sm font-600 transition-all"
@@ -562,11 +561,11 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
         </div>
       )}
 
-      {/* ── Property list ── */}
+      {/* â”€â”€ Property list â”€â”€ */}
       <div className="space-y-2">
         {properties.length === 0 ? (
           <div className="text-center py-14 glass">
-            <div className="text-4xl mb-3">🏗️</div>
+            <div className="text-4xl mb-3">ðŸ—ï¸</div>
             <p className="text-sm" style={{ color: '#6B7280' }}>
               No properties yet. Click <strong style={{ color: '#111827' }}>+ Add Manually</strong> to get started.
             </p>
@@ -580,7 +579,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
                   {p.photos?.[0] ? (
                     <img src={p.photos[0]} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-lg" style={{ color: '#9CA3AF' }}>🏢</div>
+                    <div className="w-full h-full flex items-center justify-center text-lg" style={{ color: '#9CA3AF' }}>ðŸ¢</div>
                   )}
                 </div>
                 <div className="min-w-0">
@@ -593,7 +592,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
                     {p.is_featured && (
                       <span className="text-xs font-700 px-1.5 py-0.5 rounded"
                         style={{ background: 'rgba(245,158,11,0.12)', color: '#F59E0B', border: '1px solid rgba(245,158,11,0.3)' }}>
-                        ⭐ Featured
+                        â­ Featured
                       </span>
                     )}
                     {!p.is_active && (
@@ -605,8 +604,8 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
                   </div>
                   <div className="text-xs mt-0.5 flex flex-wrap gap-1.5" style={{ color: '#6B7280' }}>
                     {p.city && <span>{p.city}</span>}
-                    {p.status && <><span>·</span><span>{p.status}</span></>}
-                    {p.bhk?.length ? <><span>·</span><span>{p.bhk.join('/')} BHK</span></> : null}
+                    {p.status && <><span>Â·</span><span>{p.status}</span></>}
+                    {p.bhk?.length ? <><span>Â·</span><span>{p.bhk.join('/')} BHK</span></> : null}
                   </div>
                 </div>
               </div>

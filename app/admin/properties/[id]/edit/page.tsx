@@ -276,7 +276,7 @@ export default function EditPropertyPage() {
 
         <div>
           <label className="block text-xs mb-1" style={{ color: '#6B7280' }}>Tags (comma separated)</label>
-          <input type="text" placeholder="2BHK, Lucknow, RERA, ReadyToMove"
+          <input type="text" placeholder="3/4 BHK, city, RERA, Ready to Move"
             value={form.tags}
             onChange={e => setF('tags', e.target.value)}
             className="w-full rounded-xl px-4 py-3 text-sm"

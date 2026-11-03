@@ -1,6 +1,5 @@
-'use client'
+﻿'use client'
 import { useState, useMemo, useEffect } from 'react'
-import PropertyLocationOptions from '@/components/PropertyLocationOptions'
 import PropertyCard from '@/components/PropertyCard'
 import type { Property } from '@/lib/supabase/types'
 import { createClient } from '@/lib/supabase/client'
@@ -10,25 +9,23 @@ const TYPE_OPTIONS = [
   { id: 'all', label: 'All properties' },
   { id: 'residential', label: 'Residential' },
   { id: 'commercial', label: 'Commercial' },
-  { id: 'industrial', label: 'Industrial' },
+  { id: 'institutional', label: 'Institutional' },
   { id: 'land', label: 'Land & Plots' },
 ] as const
 type TypeOption = typeof TYPE_OPTIONS[number]['id']
 
-const BHK_OPTIONS = ['1', '2', '3', '4']
+const BHK_OPTIONS = ['3', '4']
 const STATUS_OPTIONS = ['Ready to Move', 'Under Construction', 'New Launch'] as const
 const BUDGET_OPTIONS = [
-  { label: 'Under ₹40L',  min: 0,        max: 4000000  },
-  { label: '₹40L–₹60L',  min: 4000000,  max: 6000000  },
-  { label: '₹60L–₹80L',  min: 6000000,  max: 8000000  },
-  { label: '₹80L–₹1Cr',  min: 8000000,  max: 10000000 },
-  { label: '₹1Cr+',       min: 10000000, max: Infinity  },
+  { label: '₹50L–₹1Cr', min: 5000000, max: 10000000 },
+  { label: '₹1Cr–₹5Cr', min: 10000000, max: 50000000 },
+  { label: '₹5Cr+', min: 50000000, max: Infinity },
 ]
 const SORT_OPTIONS = [
-  { value: 'featured',   label: '⭐ Featured' },
+  { value: 'featured',   label: 'â­ Featured' },
   { value: 'newest',     label: 'Newest'       },
-  { value: 'price_asc',  label: 'Price ↑'      },
-  { value: 'price_desc', label: 'Price ↓'      },
+  { value: 'price_asc',  label: 'Price â†‘'      },
+  { value: 'price_desc', label: 'Price â†“'      },
 ] as const
 type SortOption = typeof SORT_OPTIONS[number]['value']
 
@@ -56,12 +53,19 @@ export default function PropertiesClient({
   properties,
   userId,
   initialTag = '',
+  initialSearch = '',
+  initialBhk = '',
+  initialBudget = '',
 }: {
   properties: Property[]
   userId?: string
   initialTag?: string
+  initialSearch?: string
+  initialBhk?: string
+  initialBudget?: string
 }) {
-  const [f, setF] = useState<Filters>({ ...DEFAULT, tag: initialTag })
+  const parsedBudget = /^\d+$/.test(initialBudget) && Number(initialBudget) < BUDGET_OPTIONS.length ? Number(initialBudget) : null
+  const [f, setF] = useState<Filters>({ ...DEFAULT, tag: initialTag, search: initialSearch, bhk: ['3', '4'].includes(initialBhk) ? [initialBhk] : [], budget: parsedBudget })
   const [showFilters, setShowFilters] = useState(false)
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set())
 
@@ -133,7 +137,7 @@ export default function PropertiesClient({
               onClick={() => setF(p => ({
                 ...p,
                 type: opt.id,
-                bhk: (opt.id === 'rental' || opt.id === 'plot') ? [] : p.bhk,
+                bhk: opt.id === 'land' ? [] : p.bhk,
               }))}>
               {opt.label}
             </Chip>
@@ -146,7 +150,8 @@ export default function PropertiesClient({
           City / District
           <select className="input-dark text-sm mt-2 font-normal normal-case" value=""
             onChange={e => { if (e.target.value && !f.cities.includes(e.target.value)) toggle('cities', e.target.value) }}>
-            <PropertyLocationOptions />
+            <option value="">Select City / Micro-market</option>
+            {[...new Set(properties.map(p => p.city).filter((city): city is string => !!city))].sort().map(city => <option key={city} value={city}>{city}</option>)}
           </select>
         </label>
         <div className="flex flex-wrap gap-2">
@@ -157,7 +162,7 @@ export default function PropertiesClient({
       {[
         { label: 'BHK',    items: BHK_OPTIONS,                                  key: 'bhk'    as const, labelFn: (b: string) => `${b} BHK` },
         { label: 'Status', items: STATUS_OPTIONS as unknown as string[],         key: 'status' as const },
-      ].filter(({ key }) => !(key === 'bhk' && (f.type === 'rental' || f.type === 'plot')))
+      ].filter(({ key }) => !(key === 'bhk' && f.type === 'land'))
       .map(({ label, items, key, labelFn }) => (
         <div key={label}>
           <p className="text-xs text-[#9CA3AF] font-700 uppercase tracking-wider mb-2">{label}</p>
@@ -206,7 +211,7 @@ export default function PropertiesClient({
             width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
-          <input type="text" placeholder="Search by name, builder, city…"
+          <input type="text" placeholder="Search by name, builder, cityâ€¦"
             className="input-dark pl-10 text-sm"
             value={f.search}
             onChange={e => setF(p => ({ ...p, search: e.target.value }))}
@@ -232,7 +237,7 @@ export default function PropertiesClient({
         {isFiltered && (
           <button onClick={() => setF(DEFAULT)} suppressHydrationWarning
             className="hidden sm:flex items-center gap-1 text-sm text-[#6B7280] hover:text-[#111827] whitespace-nowrap px-3 transition-colors">
-            ✕ Clear
+            âœ• Clear
           </button>
         )}
       </div>
@@ -279,37 +284,37 @@ export default function PropertiesClient({
               {f.type !== 'all' && (
                 <button onClick={() => setF(p => ({ ...p, type: 'all' }))} suppressHydrationWarning
                   className="flex items-center gap-1 text-xs px-3 py-1 rounded-full font-600 bg-orange-50 text-[#FB923C] border border-orange-200">
-                  {TYPE_OPTIONS.find(t => t.id === f.type)?.label} ✕
+                  {TYPE_OPTIONS.find(t => t.id === f.type)?.label} âœ•
                 </button>
               )}
               {f.tag && (
                 <button onClick={() => setF(p => ({ ...p, tag: '' }))} suppressHydrationWarning
                   className="flex items-center gap-1 text-xs px-3 py-1 rounded-full font-600 bg-orange-50 text-[#FB923C] border border-orange-200">
-                  #{f.tag} ✕
+                  #{f.tag} âœ•
                 </button>
               )}
               {f.cities.map(c => (
                 <button key={c} onClick={() => toggle('cities', c)} suppressHydrationWarning
                   className="flex items-center gap-1 text-xs px-3 py-1 rounded-full font-600 bg-orange-50 text-[#FB923C] border border-orange-200">
-                  {c} ✕
+                  {c} âœ•
                 </button>
               ))}
               {f.bhk.map(b => (
                 <button key={b} onClick={() => toggle('bhk', b)} suppressHydrationWarning
                   className="flex items-center gap-1 text-xs px-3 py-1 rounded-full font-600 bg-orange-50 text-[#FB923C] border border-orange-200">
-                  {b} BHK ✕
+                  {b} BHK âœ•
                 </button>
               ))}
               {f.budget !== null && (
                 <button onClick={() => setF(p => ({ ...p, budget: null }))} suppressHydrationWarning
                   className="flex items-center gap-1 text-xs px-3 py-1 rounded-full font-600 bg-orange-50 text-[#FB923C] border border-orange-200">
-                  {BUDGET_OPTIONS[f.budget].label} ✕
+                  {BUDGET_OPTIONS[f.budget].label} âœ•
                 </button>
               )}
               {f.status.map(s => (
                 <button key={s} onClick={() => toggle('status', s)} suppressHydrationWarning
                   className="flex items-center gap-1 text-xs px-3 py-1 rounded-full font-600 bg-orange-50 text-[#FB923C] border border-orange-200">
-                  {s} ✕
+                  {s} âœ•
                 </button>
               ))}
             </div>
@@ -327,7 +332,7 @@ export default function PropertiesClient({
             </div>
           ) : (
             <div className="text-center py-20 bg-white border border-[#E5E7EB] rounded-2xl">
-              <div className="text-5xl mb-4">🔍</div>
+              <div className="text-5xl mb-4">ðŸ”</div>
               <h3 className="font-heading text-xl font-700 mb-2 text-[#111827]">No properties found</h3>
               <p className="text-[#6B7280] text-sm mb-5">Try adjusting your filters or search terms</p>
               {isFiltered && (

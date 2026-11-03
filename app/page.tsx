@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { pageMetadata, SITE_URL, SITE_DESCRIPTION, jsonLd } from '@/lib/seo'
 
-export const metadata = pageMetadata('Properties in Lucknow, Noida & Ayodhya', SITE_DESCRIPTION, '/')
+export const metadata = pageMetadata('India’s Exclusive High-Ticket PropTech Discovery Platform', SITE_DESCRIPTION, '/')
 import Navbar from '@/components/Navbar'
 import ZeroSpamBadge from '@/components/ZeroSpamBadge'
 import MobileNav from '@/components/MobileNav'
@@ -52,14 +52,14 @@ export default async function HomePage() {
         <div className="max-w-5xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-orange-50 border border-orange-200 rounded-full px-4 py-1.5 text-sm text-orange-600 font-medium mb-8">
             <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
-            AI-Powered Property Platform
+            Verified Premium Properties Starting ₹50 Lakhs+
           </div>
           <h1 className="text-5xl md:text-7xl font-heading font-800 text-[#111827] leading-tight mb-6">
-            Find Where<br />
-            <span className="text-[#FB923C]">Life Belongs.</span>
+            India’s Exclusive<br />
+            <span className="text-[#FB923C]">High-Ticket PropTech Discovery Platform</span>
           </h1>
           <p className="text-xl text-[#6B7280] max-w-2xl mx-auto mb-10 leading-relaxed">
-            Explore homes, plots, apartments and commercial properties in Lucknow, Noida, Greater Noida and Ayodhya. Compare listings and find a property that fits your needs.
+            Verified Luxury Apartments, Premium Gated Enclaves &amp; Prime Commercial Spaces — Delivered via Private VIP Site Visit Passes.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/properties" className="px-8 py-4 bg-[#FB923C] hover:bg-[#F59E0B] text-white font-semibold rounded-xl transition-all shadow-lg shadow-orange-200">
@@ -76,32 +76,23 @@ export default async function HomePage() {
       {/* Search bar */}
       <section className="bg-[#FAFAF9] py-10 px-6 border-y border-[#E5E7EB]">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-2 flex gap-2 flex-wrap md:flex-nowrap">
-            <select className="flex-1 px-4 py-3 text-[#374151] bg-transparent border-r border-[#E5E7EB] outline-none text-sm min-w-0">
-              <option>All Cities</option>
-              <option>Lucknow</option>
-              <option>Noida</option>
-              <option>Greater Noida</option>
-              <option>Ayodhya</option>
+          <form action="/properties" className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-2 flex gap-2 flex-wrap md:flex-nowrap">
+            <input name="search" aria-label="City or micro-market" placeholder="Any city or micro-market" className="flex-1 min-w-0 px-4 py-3 text-[#374151] bg-transparent border-r border-[#E5E7EB] outline-none text-sm" />
+            <select name="bhk" className="flex-1 px-4 py-3 text-[#374151] bg-transparent border-r border-[#E5E7EB] outline-none text-sm min-w-0">
+              <option value="">Any BHK</option>
+              <option value="3">3 BHK</option>
+              <option value="4">4+ BHK / Penthouse</option>
             </select>
-            <select className="flex-1 px-4 py-3 text-[#374151] bg-transparent border-r border-[#E5E7EB] outline-none text-sm min-w-0">
-              <option>Any BHK</option>
-              <option>1 BHK</option>
-              <option>2 BHK</option>
-              <option>3 BHK</option>
-              <option>4+ BHK</option>
+            <select name="budget" className="flex-1 px-4 py-3 text-[#374151] bg-transparent border-r border-[#E5E7EB] outline-none text-sm min-w-0">
+              <option value="">Any Budget</option>
+              <option value="0">₹50L – ₹1Cr</option>
+              <option value="1">₹1Cr – ₹5Cr</option>
+              <option value="2">₹5Cr+</option>
             </select>
-            <select className="flex-1 px-4 py-3 text-[#374151] bg-transparent border-r border-[#E5E7EB] outline-none text-sm min-w-0">
-              <option>Any Budget</option>
-              <option>Under ₹40L</option>
-              <option>₹40L – ₹60L</option>
-              <option>₹60L – ₹1Cr</option>
-              <option>₹1Cr+</option>
-            </select>
-            <Link href="/properties" className="px-6 py-3 bg-[#FB923C] hover:bg-[#F59E0B] text-white font-semibold rounded-xl transition-all whitespace-nowrap">
+            <button type="submit" className="px-6 py-3 bg-[#FB923C] hover:bg-[#F59E0B] text-white font-semibold rounded-xl transition-all whitespace-nowrap">
               Search Properties
-            </Link>
-          </div>
+            </button>
+          </form>
         </div>
       </section>
 
@@ -196,9 +187,9 @@ export default async function HomePage() {
           <h2 className="text-3xl font-heading font-800 text-[#111827] text-center mb-12">What Our Buyers Say</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { name: 'Rahul S.', city: 'Lucknow', text: 'Found my dream 3BHK in 2 weeks. The AI matching was spot on.', rating: 5 },
-              { name: 'Priya M.', city: 'Noida', text: 'Zero pressure. The team guided me through the entire process.', rating: 5 },
-              { name: 'Amit K.', city: 'Ayodhya', text: 'RERA verified listing gave me confidence. Great experience!', rating: 5 },
+              { name: 'Rahul S.', city: 'Verified Buyer', text: 'Found a premium 3BHK in two weeks. The property matching was spot on.', rating: 5 },
+              { name: 'Priya M.', city: 'Verified Buyer', text: 'Zero pressure. The team guided me through the entire process.', rating: 5 },
+              { name: 'Amit K.', city: 'Verified Buyer', text: 'The listing details gave me confidence to do my independent checks.', rating: 5 },
             ].map(t => (
               <div key={t.name} className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm">
                 <div className="flex gap-0.5 mb-4">{'⭐'.repeat(t.rating)}</div>

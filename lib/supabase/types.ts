@@ -1,4 +1,4 @@
-export type Profile = {
+﻿export type Profile = {
   id: string
   email: string | null
   phone: string | null
@@ -20,7 +20,7 @@ export type Profile = {
 }
 
 export type PropertyCategory = 'flat' | 'plot' | 'rental' | 'commercial'
-export type PropertyPillar = 'residential' | 'commercial' | 'industrial' | 'land'
+export type PropertyPillar = 'residential' | 'commercial' | 'institutional' | 'land'
 export type ListingIntent = 'sale' | 'rent'
 
 export type Property = {

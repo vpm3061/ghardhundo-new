@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+﻿import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
@@ -40,22 +40,22 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (!property) return { title: 'Property not found', robots: { index: false } }
 
   const priceText = property.listing_intent === 'rent' || property.property_category === 'rental'
-    ? property.monthly_rent ? `₹${Number(property.monthly_rent).toLocaleString('en-IN')}/month` : 'Rent on request'
+    ? property.monthly_rent ? `â‚¹${Number(property.monthly_rent).toLocaleString('en-IN')}/month` : 'Rent on request'
     : property.price_min
-    ? `₹${Math.round(Number(property.price_min) / 100000)} Lakh`
+    ? `â‚¹${Math.round(Number(property.price_min) / 100000)} Lakh`
     : 'Price on request'
 
   const bhkText = property.bhk?.length
     ? `${Array.isArray(property.bhk) ? property.bhk[0] : property.bhk} BHK `
     : ''
 
-  const typeText = property.property_subtype || (property.property_pillar === 'residential' ? 'Residential Property' : property.property_pillar === 'industrial' ? 'Industrial Property' : property.property_pillar === 'land' ? 'Land / Plot' : property.property_category === 'flat' ? 'Flat'
+  const typeText = property.property_subtype || (property.property_pillar === 'residential' ? 'Residential Property' : property.property_pillar === 'institutional' ? 'Institutional Property' : property.property_pillar === 'land' ? 'Land / Plot' : property.property_category === 'flat' ? 'Flat'
     : property.property_category === 'plot' ? 'Plot'
     : property.property_category === 'rental' ? 'Rental'
     : 'Commercial Property')
 
   const place = property.locality || property.sector || ''
-  const title = `${bhkText}${typeText} in ${place} ${property.city || ''} — ${priceText}`.replace(/\s+/g, ' ').trim()
+  const title = `${bhkText}${typeText} in ${place} ${property.city || ''} â€” ${priceText}`.replace(/\s+/g, ' ').trim()
 
   const description = `${bhkText}${typeText} for ${property.listing_intent === 'rent' || property.property_category === 'rental' ? 'rent' : 'sale'} in ${place} ${property.city || ''}. ${priceText}. ${property.rera_number ? 'RERA: ' + property.rera_number + '.' : ''} ${property.description?.substring(0, 100) || ''} Contact on Orenzaa.`.replace(/\s+/g, ' ').trim()
 
@@ -108,8 +108,8 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
     'New Launch':         { bg: 'rgba(251,146,60,0.08)', color: '#FB923C', border: 'rgba(251,146,60,0.25)' },
   }
 
-  const fmt = (n: number) => n >= 1e7 ? `₹${(n/1e7).toFixed(1)}Cr` : n >= 1e5 ? `₹${(n/1e5).toFixed(0)}L` : `₹${n}`
-  const priceStr = p.price_min && p.price_max ? `${fmt(p.price_min)} – ${fmt(p.price_max)}`
+  const fmt = (n: number) => n >= 1e7 ? `â‚¹${(n/1e7).toFixed(1)}Cr` : n >= 1e5 ? `â‚¹${(n/1e5).toFixed(0)}L` : `â‚¹${n}`
+  const priceStr = p.price_min && p.price_max ? `${fmt(p.price_min)} â€“ ${fmt(p.price_max)}`
     : p.price_min ? `From ${fmt(p.price_min)}` : 'Price on request'
 
   const sc = p.status ? statusConfig[p.status] : null
@@ -144,12 +144,12 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                 )}
                 {p.is_featured && (
                   <span className="text-xs font-800 px-3 py-1 rounded-full bg-orange-50 text-[#FB923C] border border-orange-200">
-                    ⭐ Featured
+                    â­ Featured
                   </span>
                 )}
                 {p.rera_number && (
                   <span className="text-xs px-3 py-1 rounded-full text-[#22C55E] bg-green-50 border border-green-100">
-                    {p.orenzaa_verified ? '✓ Orenzaa Verified & RERA Tagged' : 'RERA Number Listed'}: {p.rera_number}
+                    {p.orenzaa_verified ? 'âœ“ Orenzaa Verified & RERA Tagged' : 'RERA Number Listed'}: {p.rera_number}
                   </span>
                 )}
               </div>
@@ -167,7 +167,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                 </div>
               </div>
               <p className="text-[#6B7280] text-sm">
-                {[p.builder, p.sector, p.city].filter(Boolean).join(' · ')}
+                {[p.builder, p.sector, p.city].filter(Boolean).join(' Â· ')}
               </p>
             </div>
 
@@ -209,7 +209,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                   {p.amenities.map(a => (
                     <div key={a} className="flex items-center gap-2.5 text-sm text-[#374151] bg-[#FAFAF9] border border-[#E5E7EB] rounded-xl px-3 py-2.5">
                       <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-orange-50 text-[#FB923C]">
-                        ✓
+                        âœ“
                       </span>
                       <span>{a}</span>
                     </div>
@@ -240,7 +240,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
             {/* Offers */}
             <OffersDisplay offers={offers} />
 
-            {/* Hashtags — clickable */}
+            {/* Hashtags â€” clickable */}
             {allTags.length > 0 && (
               <div className="mb-5">
                 <h2 className="font-heading text-sm font-700 mb-3 uppercase tracking-wider text-[#9CA3AF]">Tags</h2>
@@ -260,10 +260,10 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
             <EMICalculator defaultAmount={p.price_min || 5000000} />
           </div>
 
-          {/* Right — sticky form */}
+          {/* Right â€” sticky form */}
           <div className="lg:col-span-1">
             <div className="sticky top-20">
-              <div role="note" className="mb-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm leading-relaxed text-amber-950">⚠️ <strong>Buyer Safety Advisory:</strong> Conduct independent legal title and registry verification before paying any advance token money. Orenzaa does not collect property payments; pay the dealer or builder directly.</div>
+              <div role="note" className="mb-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm leading-relaxed text-amber-950">âš ï¸ <strong>Buyer Safety Advisory:</strong> Conduct independent legal title and registry verification before paying any advance token money. Orenzaa does not collect property payments; pay the dealer or builder directly.</div>
               <VisitBookingModal userId={user?.id ?? null} propertyId={p.id} propertyTitle={p.title} />
               <LeadForm userId={user?.id ?? null} propertyId={p.id} propertyTitle={p.title} />
               <div className="mt-4">

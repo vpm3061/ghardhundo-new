@@ -8,7 +8,7 @@ import { indiaToday, type VipPass } from '@/lib/trust'
 const PURPOSE_OPTIONS = [
   ['Self Use', 'Buying for yourself or family'],
   ['Long-Term Investment ROI', 'Long-term investment'],
-  ['Rental Income', 'Looking for rental income'],
+  ['Commercial Yield', 'Commercial yield or lease income'],
 ] as const
 const URGENCY_OPTIONS = [
   ['today_tomorrow', '🔥 Today / Tomorrow', 'Priority lock slot'],

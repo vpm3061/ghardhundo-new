@@ -8,10 +8,10 @@ import type { Property } from '@/lib/supabase/types'
 import { pageMetadata, SITE_DESCRIPTION } from '@/lib/seo'
 import { hideOwnerContact } from '@/lib/property-privacy'
 
-export const metadata = pageMetadata('Flats, Plots & Rentals in Lucknow and Noida', SITE_DESCRIPTION, '/properties')
+export const metadata = pageMetadata('Discover Premium Properties Across India', SITE_DESCRIPTION, '/properties')
 
-export default async function PropertiesPage({ searchParams }: { searchParams: Promise<{ tag?: string }> }) {
-  const { tag } = await searchParams
+export default async function PropertiesPage({ searchParams }: { searchParams: Promise<{ tag?: string; search?: string; bhk?: string; budget?: string }> }) {
+  const { tag, search, bhk, budget } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -38,7 +38,7 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
         <div className="mb-6">
           <BannerAd position="properties_top" />
         </div>
-        <PropertiesClient properties={(properties || []).map(p => hideOwnerContact(p as Property))} userId={user?.id} initialTag={tag || ''} />
+        <PropertiesClient properties={(properties || []).map(p => hideOwnerContact(p as Property))} userId={user?.id} initialTag={tag || ''} initialSearch={search || ''} initialBhk={bhk || ''} initialBudget={budget || ''} />
       </main>
       <MobileNav />
     </>

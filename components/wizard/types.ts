@@ -70,7 +70,7 @@ export const BLANK_WIZARD_FORM: WizardForm = {
 
 export type Persona = 'builder' | 'expert'
 export type Category = 'flat' | 'plot' | 'rental' | 'commercial'
-export type PropertyPillar = 'residential' | 'commercial' | 'industrial' | 'land'
+export type PropertyPillar = 'residential' | 'commercial' | 'institutional' | 'land'
 export type ListingIntent = 'sale' | 'rent'
 
 export interface WizardFieldProps {

@@ -1,12 +1,18 @@
-export type VipPass = {
+﻿export type VipPass = {
   id: string
   name: string
   project: string
+  microMarket?: string
   visitDate: string
   maskedPhone?: string
   costBreakdown?: { base: number | null; stampDuty: number | null; legalFees: number | null; onRoad: number | null }
   purpose?: string
   urgencyTimeline?: string
+}
+
+export function microMarketCode(value = 'As listed') {
+  const slug = value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24)
+  return slug || 'MARKET-UNSPECIFIED'
 }
 
 export function indiaToday(now = new Date()): string {
@@ -44,7 +50,7 @@ export function validateLead(input: unknown, now = new Date()) {
   }
   if (data.disclaimer_accepted !== true) throw new Error('Please accept the buyer safety and independent legal checks notice')
   const purpose = text('purpose')
-  if (!purpose || !['Self Use', 'Long-Term Investment ROI', 'Rental Income'].includes(purpose)) {
+  if (!purpose || !['Self Use', 'Long-Term Investment ROI', 'Commercial Yield'].includes(purpose)) {
     throw new Error('Choose the purpose of your property search')
   }
   const urgencyTimeline = text('urgency_timeline')
@@ -67,7 +73,7 @@ export function validateLead(input: unknown, now = new Date()) {
 
 export function passMessage(pass: VipPass) {
   const costs = pass.costBreakdown
-  return `ORENZAA DIGITAL VIP SITE VISIT PASS\nClient: ${pass.name}\n${pass.maskedPhone ? `Buyer phone: ${pass.maskedPhone}\n` : ''}Project: ${pass.project}\nMicro-market: Prayagraj\nPass ID: ${pass.id}\nRequested visit date: ${pass.visitDate}\n${pass.purpose ? `Purpose: ${pass.purpose}\n` : ''}${costs ? `Base price: ${costs.base == null ? 'Awaiting quote' : `INR ${costs.base.toLocaleString('en-IN')}`}\nStamp duty / registry: ${costs.stampDuty == null ? 'Awaiting quote' : `INR ${costs.stampDuty.toLocaleString('en-IN')}`}\nLegal fees: ${costs.legalFees == null ? 'Awaiting quote' : `INR ${costs.legalFees.toLocaleString('en-IN')}`}\nEstimated on-road total: ${costs.onRoad == null ? 'Pending full quote' : `INR ${costs.onRoad.toLocaleString('en-IN')}`}\n` : ''}Buyer Safety Advisory: Independently verify legal title and registry before paying any advance token money.\nOrenzaa is a technology-enabled property aggregator, not a developer, property owner, or title guarantor. It does not hold financial or legal liability for property disputes. Verify every transaction independently.\nओरेन्ज़ा केवल तकनीक-सक्षम एग्रीगेटर है, संपत्ति का मालिक या टाइटल गारंटर नहीं। संपत्ति विवादों की कोई वित्तीय या कानूनी देयता ओरेन्ज़ा की नहीं है। सभी लेन-देन की स्वतंत्र रूप से जाँच करें।\nOrenzaa does not collect property booking funds. Pay the dealer or builder directly.\nOur team will confirm the visit time.`
+  return `ORENZAA DIGITAL VIP SITE VISIT PASS\nClient: ${pass.name}\n${pass.maskedPhone ? `Buyer phone: ${pass.maskedPhone}\n` : ''}Project: ${pass.project}\nMicro-market code: ${microMarketCode(pass.microMarket)} (${pass.microMarket || 'As listed'})\nPass ID: ${pass.id}\nRequested visit date: ${pass.visitDate}\n${pass.urgencyTimeline ? `Preferred visit window: ${pass.urgencyTimeline.replaceAll('_', ' ')}\n` : ''}${pass.purpose ? `Purpose: ${pass.purpose}\n` : ''}${costs ? `Base price: ${costs.base == null ? 'Awaiting quote' : `INR ${costs.base.toLocaleString('en-IN')}`}\nStamp duty / registry: ${costs.stampDuty == null ? 'Awaiting quote' : `INR ${costs.stampDuty.toLocaleString('en-IN')}`}\nLegal fees: ${costs.legalFees == null ? 'Awaiting quote' : `INR ${costs.legalFees.toLocaleString('en-IN')}`}\nEstimated on-road total: ${costs.onRoad == null ? 'Pending full quote' : `INR ${costs.onRoad.toLocaleString('en-IN')}`}\n` : ''}Buyer Safety Advisory: Independently verify legal title and registry before paying any advance token money.\nOrenzaa is a technology-enabled property aggregator, not a developer, property owner, or title guarantor. It does not hold financial or legal liability for property disputes. Verify every transaction independently.\nओरेन्ज़ा संपत्ति विवादों के लिए उत्तरदायी नहीं है। सभी लेन-देन की स्वतंत्र जाँच करें।\nOrenzaa does not collect property booking funds. Pay the dealer or builder directly.\nOur team will confirm the visit time.`
 }
 
 export function priceBreakdown(values: {

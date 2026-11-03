@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import PropertyLocationFields from '@/components/PropertyLocationFields'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -109,7 +109,7 @@ export default function PropertyEditClient({ property }: { property: Property })
       security_deposit_amount: form.security_deposit_amount ? parseFloat(form.security_deposit_amount) : null,
       advance_terms: form.advance_terms || null,
       lease_duration_months: form.lease_duration_months ? parseInt(form.lease_duration_months) : null,
-      property_category: pillar === 'land' ? 'plot' : pillar === 'commercial' || pillar === 'industrial' ? 'commercial' : usesMonthlyRent ? 'rental' : 'flat',
+      property_category: pillar === 'land' ? 'plot' : pillar === 'commercial' || pillar === 'institutional' ? 'commercial' : 'flat',
       monthly_rent: usesMonthlyRent && form.monthly_rent ? parseFloat(form.monthly_rent) : null,
       title: form.title,
       city: form.city || null,
@@ -185,7 +185,7 @@ export default function PropertyEditClient({ property }: { property: Property })
         </div>
 
         {!usesMonthlyRent && (
-          <input className="input-dark text-sm" placeholder="Price (₹) *" type="number"
+          <input className="input-dark text-sm" placeholder="Price (â‚¹) *" type="number"
             value={form.price_min} onChange={e => setF('price_min', e.target.value)} suppressHydrationWarning />
         )}
 
@@ -224,10 +224,10 @@ export default function PropertyEditClient({ property }: { property: Property })
         <div className="flex gap-3">
           <button onClick={() => router.push('/expert')} suppressHydrationWarning
             className="px-5 py-2.5 rounded-xl text-sm font-700" style={{ border: '1px solid rgba(0,0,0,0.06)', color: '#6B7280' }}>
-            ← Cancel
+            â† Cancel
           </button>
           <button onClick={handleSave} disabled={saving} suppressHydrationWarning className="btn-accent flex-1 disabled:opacity-50">
-            {saving ? 'Saving…' : 'Save Changes'}
+            {saving ? 'Savingâ€¦' : 'Save Changes'}
           </button>
         </div>
       </div>
