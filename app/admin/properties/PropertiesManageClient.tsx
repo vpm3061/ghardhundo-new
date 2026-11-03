@@ -249,7 +249,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
         photos: form.photos.length ? form.photos : null,
         contact_preference: form.contact_preference,
         owner_contact: form.owner_contact || null,
-      property_category: pillar === 'land' ? 'plot' : pillar === 'commercial' || pillar === 'institutional' ? 'commercial' : 'flat',
+        property_category: pillar === 'land' ? 'plot' : pillar === 'commercial' || pillar === 'institutional' ? 'commercial' : 'flat',
         property_pillar: pillar,
         listing_intent: form.intent,
         property_subtype: form.property_subtype || null,
@@ -290,7 +290,6 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
         registry_done: form.registry_done,
         boundary_wall: form.boundary_wall,
         // rental
-        monthly_rent: form.monthly_rent ? parseFloat(form.monthly_rent) : null,
         deposit_months: form.deposit_months ? parseInt(form.deposit_months) : null,
         available_from: form.available_from || null,
         tenant_preference: form.tenant_preference || null,
