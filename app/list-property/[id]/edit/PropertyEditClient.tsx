@@ -141,7 +141,6 @@ export default function PropertyEditClient({ property }: { property: Property })
       facing: form.facing || null,
       registry_done: form.registry_done,
       boundary_wall: form.boundary_wall,
-      monthly_rent: form.monthly_rent ? parseFloat(form.monthly_rent) : null,
       deposit_months: form.deposit_months ? parseInt(form.deposit_months) : null,
       available_from: form.available_from || null,
       tenant_preference: form.tenant_preference || null,
