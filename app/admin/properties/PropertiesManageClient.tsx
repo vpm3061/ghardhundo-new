@@ -119,9 +119,9 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
   const [showForm, setShowForm] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
   const [category, setCategory] = useState<Category | null>(null)
-  const pillar = (form.pillar || 'residential') as PropertyPillar
   const [mediaReviewed, setMediaReviewed] = useState(false)
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
+  const pillar = (form.pillar || 'residential') as PropertyPillar
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
