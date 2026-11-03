@@ -1,22 +1,9 @@
 import type { Metadata, Viewport } from 'next'
 import { SITE_URL, SITE_DESCRIPTION } from '@/lib/seo'
-import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister'
 import { Toaster } from 'react-hot-toast'
 import Footer from '@/components/Footer'
-
-const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-})
-
-const jakarta = Plus_Jakarta_Sans({
-  variable: '--font-plus-jakarta-sans',
-  subsets: ['latin'],
-  weight: ['600', '700', '800'],
-})
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -68,7 +55,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jakarta.variable}`}>
+    <html lang="en">
       <head>
         <script
           async

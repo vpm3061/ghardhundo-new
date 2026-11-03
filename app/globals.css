@@ -18,8 +18,8 @@
   --color-text-4: #9CA3AF;
   --color-border: #E5E7EB;
   --color-border-strong: #D1D5DB;
-  --font-heading: var(--font-plus-jakarta-sans);
-  --font-body: var(--font-inter);
+  --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -29,13 +29,13 @@ html { background: #FFFFFF; color: #111827; scroll-behavior: smooth; }
 body {
   background: #FAFAF9;
   color: #111827;
-  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-plus-jakarta-sans), 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 /* ─── Scrollbar ──────────────────────────────── */
@@ -90,7 +90,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
-  font-family: var(--font-inter), sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 .input-dark:focus {
   border-color: #FB923C;
@@ -109,7 +109,7 @@ h1, h2, h3, h4, h5, h6 {
   border: none;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: var(--font-plus-jakarta-sans), sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   box-shadow: 0 4px 16px rgba(251,146,60,0.25);
   letter-spacing: 0.01em;
 }
@@ -129,7 +129,7 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid #FED7AA;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: var(--font-plus-jakarta-sans), sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 .btn-outline:hover {
   background: #FFF7ED;
