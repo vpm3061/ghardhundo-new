@@ -1,7 +1,5 @@
-import type { NearbyCategory } from '@/lib/nearby-data'
-
 export default function NearbyInfo({ nearby }: { city?: string | null; nearby?: Record<string, unknown> | null }) {
-  const categories: NearbyCategory[] = []
+  const categories: { icon: string; label: string; items: { name: string; distance: string }[] }[] = []
   const metro = nearby?.metro
   const railway = nearby?.railway_station
   const toItems = (value: unknown) => Array.isArray(value)
