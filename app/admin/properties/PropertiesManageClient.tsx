@@ -249,7 +249,7 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
         description: form.description || null,
         photos: form.photos.length ? form.photos : null,
         contact_preference: form.contact_preference,
-        owner_contact: form.owner_contact || null,
+        owner_contact: null,
         property_category: pillar === 'land' ? 'plot' : pillar === 'commercial' || pillar === 'institutional' ? 'commercial' : 'flat',
         property_pillar: pillar,
         listing_intent: form.intent,

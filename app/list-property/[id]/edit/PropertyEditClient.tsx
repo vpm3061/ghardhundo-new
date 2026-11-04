@@ -120,7 +120,7 @@ export default function PropertyEditClient({ property }: { property: Property })
       description: form.description || null,
       photos: form.photos.length > 0 ? form.photos : null,
       contact_preference: form.contact_preference,
-      owner_contact: form.owner_contact || null,
+        owner_contact: null,
       is_active: isActive,
       bhk: form.bhk.length > 0 ? form.bhk : null,
       floor_number: form.floor_number ? parseInt(form.floor_number) : null,

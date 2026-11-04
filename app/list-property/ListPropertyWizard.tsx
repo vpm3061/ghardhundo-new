@@ -119,7 +119,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
     description: form.description || null,
     photos: form.photos.length > 0 ? form.photos : null,
     contact_preference: form.contact_preference,
-    owner_contact: form.owner_contact || null,
+    owner_contact: null,
     property_category: pillar === 'residential' ? 'flat' : pillar === 'land' ? 'plot' : 'commercial',
     listing_type: persona,
     created_by: userId,
@@ -160,7 +160,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
 
   const insertProperty = async () => {
     const supabase = createClient()
-    return supabase.from('properties').insert(buildPayload())
+    return supabase.from('properties').insert(buildPayload()).select('id').single()
   }
 
   const toggleSpecialization = (val: string) =>
@@ -226,9 +226,20 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
         body: JSON.stringify({ role: 'builder' }),
       })
     }
-    const { error } = await insertProperty()
+    const { data: inserted, error } = await insertProperty()
     setSaving(false)
     if (error) { setMsg(error.message); return }
+    if (form.owner_contact.trim()) {
+      const supabase = createClient()
+      const { error: contactError } = await supabase.rpc('set_my_property_contact', {
+        p_property_id: inserted.id,
+        p_owner_contact: form.owner_contact,
+      })
+      if (contactError) {
+        setMsg(`Listing created, but contact number could not be saved: ${contactError.message}`)
+        return
+      }
+    }
     router.push(persona === 'builder' ? '/builder?welcome=1' : '/expert?welcome=1')
   }
 
