@@ -54,6 +54,8 @@ export default function EditPropertyPage() {
     instagram_url:    '',
     metro_station:    '',
     metro_distance_km: '',
+    railway_station:  '',
+    railway_distance_km: '',
     floor_plan:   '',
     amenities:        [] as string[],
     tags:             '',
@@ -95,6 +97,8 @@ export default function EditPropertyPage() {
         instagram_url:   data.instagram_url   ?? '',
         metro_station: Array.isArray(data.nearby?.metro) ? data.nearby.metro[0]?.name ?? '' : '',
         metro_distance_km: Array.isArray(data.nearby?.metro) ? String(data.nearby.metro[0]?.distance ?? '').replace(/\s*km$/i, '') : '',
+        railway_station: Array.isArray(data.nearby?.railway_station) ? data.nearby.railway_station[0]?.name ?? '' : '',
+        railway_distance_km: Array.isArray(data.nearby?.railway_station) ? String(data.nearby.railway_station[0]?.distance ?? '').replace(/\s*km$/i, '') : '',
         floor_plan:  data.floor_plan  ?? '',
         amenities:       Array.isArray(data.amenities) ? data.amenities : [],
         tags:            Array.isArray(data.tags) ? data.tags.join(', ') : '',
@@ -131,9 +135,11 @@ export default function EditPropertyPage() {
       description:     form.description,
       youtube_url:     form.youtube_url,
       instagram_url:   form.instagram_url,
-      nearby: form.metro_station.trim()
-        ? { ...existingNearby, metro: [{ name: form.metro_station.trim(), distance: form.metro_distance_km.trim() ? `${form.metro_distance_km.trim()} km` : '' }] }
-        : existingNearby,
+      nearby: {
+        ...existingNearby,
+        ...(form.metro_station.trim() ? { metro: [{ name: form.metro_station.trim(), distance: form.metro_distance_km.trim() ? `${form.metro_distance_km.trim()} km` : '' }] } : {}),
+        ...(form.railway_station.trim() ? { railway_station: [{ name: form.railway_station.trim(), distance: form.railway_distance_km.trim() ? `${form.railway_distance_km.trim()} km` : '' }] } : {}),
+      },
       amenities:       form.amenities,
       tags:            form.tags ? form.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
       is_active:       form.is_active,
@@ -201,6 +207,8 @@ export default function EditPropertyPage() {
         <h2 className="font-600 text-sm" style={{ color: '#111827' }}>Metro proximity (optional)</h2>
         <input type="text" placeholder="Nearest metro station" value={form.metro_station} onChange={e => setF('metro_station', e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm" />
         <input type="number" min="0" step="0.1" placeholder="Distance in km" value={form.metro_distance_km} onChange={e => setF('metro_distance_km', e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm" />
+        <input type="text" placeholder="Nearest railway station" value={form.railway_station} onChange={e => setF('railway_station', e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm" />
+        <input type="number" min="0" step="0.1" placeholder="Railway station distance in km" value={form.railway_distance_km} onChange={e => setF('railway_distance_km', e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm" />
       </section>
 
       {/* Floor Plan */}

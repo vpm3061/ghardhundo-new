@@ -74,6 +74,8 @@ function toFormState(p: Property): FormState {
     instagram_url: p.instagram_url || '',
     metro_station: Array.isArray(p.nearby?.metro) ? String((p.nearby.metro[0] as { name?: string })?.name ?? '') : '',
     metro_distance_km: Array.isArray(p.nearby?.metro) ? String((p.nearby.metro[0] as { distance?: string })?.distance ?? '').replace(/\s*km$/i, '') : '',
+    railway_station: Array.isArray(p.nearby?.railway_station) ? String((p.nearby.railway_station[0] as { name?: string })?.name ?? '') : '',
+    railway_distance_km: Array.isArray(p.nearby?.railway_station) ? String((p.nearby.railway_station[0] as { distance?: string })?.distance ?? '').replace(/\s*km$/i, '') : '',
     tags: p.tags?.join(', ') || '',
     floor_plan: p.floor_plan || '',
     plot_area_sqyard: p.plot_area_sqyard?.toString() || '',
@@ -287,9 +289,11 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
         instagram_url: form.instagram_url || null,
         nearby: (() => {
           const existingNearby = editId ? properties.find(property => property.id === editId)?.nearby ?? {} : {}
-          return form.metro_station.trim()
-            ? { ...existingNearby, metro: [{ name: form.metro_station.trim(), distance: form.metro_distance_km.trim() ? `${form.metro_distance_km.trim()} km` : '' }] }
-            : existingNearby
+          return {
+            ...existingNearby,
+            ...(form.metro_station.trim() ? { metro: [{ name: form.metro_station.trim(), distance: form.metro_distance_km.trim() ? `${form.metro_distance_km.trim()} km` : '' }] } : {}),
+            ...(form.railway_station.trim() ? { railway_station: [{ name: form.railway_station.trim(), distance: form.railway_distance_km.trim() ? `${form.railway_distance_km.trim()} km` : '' }] } : {}),
+          }
         })(),
         tags: form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : null,
         floor_plan: form.floor_plan || null,
@@ -487,6 +491,12 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
                   value={form.metro_station} onChange={e => setF('metro_station', e.target.value)} />
                 <input className="input-dark text-sm" type="number" min="0" step="0.1" placeholder="Distance to metro (km)"
                   value={form.metro_distance_km} onChange={e => setF('metro_distance_km', e.target.value)} />
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <input className="input-dark text-sm" placeholder="Nearest railway station (optional)"
+                  value={form.railway_station} onChange={e => setF('railway_station', e.target.value)} />
+                <input className="input-dark text-sm" type="number" min="0" step="0.1" placeholder="Distance to railway station (km)"
+                  value={form.railway_distance_km} onChange={e => setF('railway_distance_km', e.target.value)} />
               </div>
 
               {/* ── Photos ── */}

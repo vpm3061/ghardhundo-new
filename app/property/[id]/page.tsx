@@ -67,11 +67,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     : property.property_category === 'plot' ? 'Plot'
     : property.property_category === 'rental' ? 'Rental'
     : 'Commercial Property')
+  const cleanTypeText = bhkText ? typeText.replace(/^\d+\s*BHK\s*/i, '') : typeText
 
   const place = property.locality || property.sector || ''
-  const title = `${bhkText}${typeText} in ${place} ${property.city || ''} — ${priceText}`.replace(/\s+/g, ' ').trim()
+  const title = `${bhkText}${cleanTypeText} in ${place} ${property.city || ''} — ${priceText}`.replace(/\s+/g, ' ').trim()
 
-  const description = `${bhkText}${typeText} for ${property.listing_intent === 'rent' || property.property_category === 'rental' ? 'rent' : 'sale'} in ${place} ${property.city || ''}. ${priceText}. ${property.rera_number ? 'RERA: ' + property.rera_number + '.' : ''} ${property.description?.substring(0, 100) || ''} Contact on Orenzaa.`.replace(/\s+/g, ' ').trim()
+  const description = `${bhkText}${cleanTypeText} for ${property.listing_intent === 'rent' || property.property_category === 'rental' ? 'rent' : 'sale'} in ${place} ${property.city || ''}. ${priceText}. ${property.rera_number ? 'RERA: ' + property.rera_number + '.' : ''} ${property.description?.substring(0, 100) || ''} Contact on Orenzaa.`.replace(/\s+/g, ' ').trim()
 
   return {
     title,
@@ -314,9 +315,11 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
               </div>
             )}
 
-            <NearbyInfo city={p.city} nearby={p.nearby} />
+            <NearbyInfo nearby={p.nearby} />
             <PriceBreakdown property={p} />
-            <EMICalculator defaultAmount={p.price_min || 5000000} />
+            {p.listing_intent !== 'rent' && p.price_min != null && p.price_min > 0 && (
+              <EMICalculator defaultAmount={p.price_min} />
+            )}
           </div>
 
           {/* Right — sticky form */}
