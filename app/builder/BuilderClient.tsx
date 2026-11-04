@@ -204,6 +204,11 @@ export default function BuilderClient({
                       {p.is_active ? 'Live' : 'Hidden'}
                     </span>
                     <StatusCard property={p} />
+                    <Link href={`/list-property/${p.id}/edit`}
+                      className="text-xs px-3 py-1 rounded-lg transition-colors"
+                      style={{ border: '1px solid rgba(0,0,0,0.06)', color: '#6B7280' }}>
+                      Edit
+                    </Link>
                     <Link href={`/property/${p.id}`}
                       className="text-xs px-3 py-1 rounded-lg transition-colors"
                       style={{ border: '1px solid rgba(0,0,0,0.06)', color: '#6B7280' }}>

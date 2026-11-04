@@ -63,6 +63,7 @@ function toWizardForm(p: Property): WizardForm {
 
 export default function PropertyEditClient({ property }: { property: Property }) {
   const router = useRouter()
+  const dashboardPath = property.listing_type === 'builder' ? '/builder' : property.listing_type === 'owner' ? '/owner/list' : '/expert'
   const [form, setForm] = useState<WizardForm>(toWizardForm(property))
   const pillar = (form.pillar || property.property_pillar || 'residential') as PropertyPillar
   const [isActive, setIsActive] = useState(property.is_active)
@@ -159,9 +160,8 @@ export default function PropertyEditClient({ property }: { property: Property })
       const { error: contactError } = await supabase.rpc('set_my_property_contact', { p_property_id: property.id, p_owner_contact: form.owner_contact })
       if (contactError) { setMsg(contactError.message); return }
     }
-    const photosChanged = JSON.stringify(form.photos) !== JSON.stringify(property.photos ?? [])
-    toast.success(photosChanged ? 'Listing updated. Photos are hidden while Orenzaa reviews them.' : 'Listing updated')
-    router.push('/expert')
+    toast.success('Listing updated successfully')
+    router.push(dashboardPath)
     router.refresh()
   }
 
@@ -230,7 +230,7 @@ export default function PropertyEditClient({ property }: { property: Property })
         {msg && <p className="text-sm" style={{ color: '#F87171' }}>{msg}</p>}
 
         <div className="flex gap-3">
-          <button onClick={() => router.push('/expert')} suppressHydrationWarning
+          <button onClick={() => router.push(dashboardPath)} suppressHydrationWarning
             className="px-5 py-2.5 rounded-xl text-sm font-700" style={{ border: '1px solid rgba(0,0,0,0.06)', color: '#6B7280' }}>
             ← Cancel
           </button>
