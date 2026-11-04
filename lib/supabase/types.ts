@@ -48,6 +48,7 @@ export type Property = {
   floor_plan: string | null
   youtube_url: string | null
   instagram_url?: string | null
+  nearby?: Record<string, unknown> | null
   tags: string[] | null
   amenities: string[] | null
   is_active: boolean

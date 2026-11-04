@@ -286,7 +286,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
               </div>
             )}
 
-            <NearbyInfo city={p.city} />
+            <NearbyInfo city={p.city} nearby={p.nearby} />
             <PriceBreakdown property={p} />
             <EMICalculator defaultAmount={p.price_min || 5000000} />
           </div>

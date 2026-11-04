@@ -31,6 +31,8 @@ export type WizardForm = {
   amenities: string[]
   youtube_url: string
   instagram_url: string
+  metro_station: string
+  metro_distance_km: string
   tags: string
   floor_plan: string
   // plot
@@ -61,7 +63,7 @@ export const BLANK_WIZARD_FORM: WizardForm = {
   contact_preference: 'both', owner_contact: '',
   bhk: [], floor_number: '', total_floors: '', super_area: '', carpet_area: '',
   furnished: '', rera_number: '', possession_date: '', age_years: '', parking: false,
-  amenities: [], youtube_url: '', instagram_url: '', tags: '', floor_plan: '',
+  amenities: [], youtube_url: '', instagram_url: '', metro_station: '', metro_distance_km: '', tags: '', floor_plan: '',
   plot_area_sqyard: '', plot_type: '', corner_plot: false, facing: '',
   registry_done: false, boundary_wall: false,
   monthly_rent: '', deposit_months: '', available_from: '',

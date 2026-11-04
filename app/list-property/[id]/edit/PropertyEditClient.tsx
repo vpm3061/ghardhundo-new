@@ -40,6 +40,8 @@ function toWizardForm(p: Property): WizardForm {
     amenities: p.amenities ?? [],
     youtube_url: p.youtube_url ?? '',
     instagram_url: p.instagram_url ?? '',
+    metro_station: Array.isArray(p.nearby?.metro) ? String((p.nearby.metro[0] as { name?: string })?.name ?? '') : '',
+    metro_distance_km: Array.isArray(p.nearby?.metro) ? String((p.nearby.metro[0] as { distance?: string })?.distance ?? '').replace(/\s*km$/i, '') : '',
     tags: (p.tags ?? []).join(', '),
     floor_plan: p.floor_plan ?? '',
     plot_area_sqyard: p.plot_area_sqyard != null ? String(p.plot_area_sqyard) : '',
@@ -136,6 +138,9 @@ export default function PropertyEditClient({ property }: { property: Property })
       amenities: form.amenities.length > 0 ? form.amenities : null,
       youtube_url: form.youtube_url || null,
       instagram_url: form.instagram_url || null,
+      nearby: form.metro_station.trim()
+        ? { ...(property.nearby ?? {}), metro: [{ name: form.metro_station.trim(), distance: form.metro_distance_km.trim() ? `${form.metro_distance_km.trim()} km` : '' }] }
+        : property.nearby ?? {},
       tags: form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : null,
       floor_plan: form.floor_plan || null,
       plot_area_sqyard: form.plot_area_sqyard ? parseFloat(form.plot_area_sqyard) : null,
@@ -200,6 +205,13 @@ export default function PropertyEditClient({ property }: { property: Property })
             value={form.youtube_url} onChange={e => setF('youtube_url', e.target.value)} />
           <input className="input-dark text-sm" type="url" placeholder="Instagram post or Reel URL (optional)"
             value={form.instagram_url} onChange={e => setF('instagram_url', e.target.value)} />
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <input className="input-dark text-sm" placeholder="Nearest metro station (optional)"
+            value={form.metro_station} onChange={e => setF('metro_station', e.target.value)} />
+          <input className="input-dark text-sm" type="number" min="0" step="0.1" placeholder="Distance to metro (km)"
+            value={form.metro_distance_km} onChange={e => setF('metro_distance_km', e.target.value)} />
         </div>
 
         <div>

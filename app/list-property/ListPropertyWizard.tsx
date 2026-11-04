@@ -139,6 +139,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
     amenities: form.amenities.length > 0 ? form.amenities : null,
     youtube_url: form.youtube_url || null,
     instagram_url: form.instagram_url || null,
+    nearby: form.metro_station.trim() ? { metro: [{ name: form.metro_station.trim(), distance: form.metro_distance_km.trim() ? `${form.metro_distance_km.trim()} km` : '' }] } : {},
     tags: form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : null,
     floor_plan: form.floor_plan || null,
     plot_area_sqyard: form.plot_area_sqyard ? parseFloat(form.plot_area_sqyard) : null,
@@ -451,6 +452,13 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
               value={form.youtube_url} onChange={e => setF('youtube_url', e.target.value)} />
             <input className="input-dark text-sm" type="url" placeholder="Instagram post or Reel URL (optional)"
               value={form.instagram_url} onChange={e => setF('instagram_url', e.target.value)} />
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <input className="input-dark text-sm" placeholder="Nearest metro station (optional)"
+              value={form.metro_station} onChange={e => setF('metro_station', e.target.value)} />
+            <input className="input-dark text-sm" type="number" min="0" step="0.1" placeholder="Distance to metro (km)"
+              value={form.metro_distance_km} onChange={e => setF('metro_distance_km', e.target.value)} />
           </div>
 
           <div>

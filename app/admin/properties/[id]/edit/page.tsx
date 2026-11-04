@@ -35,6 +35,7 @@ export default function EditPropertyPage() {
   const [loading, setLoading] = useState(true)
   const [saving,  setSaving]  = useState(false)
   const [photos,  setPhotos]  = useState<string[]>([])
+  const [existingNearby, setExistingNearby] = useState<Record<string, unknown>>({})
 
   const [form, setForm] = useState({
     title:            '',
@@ -50,6 +51,8 @@ export default function EditPropertyPage() {
     description:      '',
     youtube_url:      '',
     instagram_url:    '',
+    metro_station:    '',
+    metro_distance_km: '',
     floor_plan:   '',
     amenities:        [] as string[],
     tags:             '',
@@ -89,6 +92,8 @@ export default function EditPropertyPage() {
         description:     data.description     ?? '',
         youtube_url:     data.youtube_url     ?? '',
         instagram_url:   data.instagram_url   ?? '',
+        metro_station: Array.isArray(data.nearby?.metro) ? data.nearby.metro[0]?.name ?? '' : '',
+        metro_distance_km: Array.isArray(data.nearby?.metro) ? String(data.nearby.metro[0]?.distance ?? '').replace(/\s*km$/i, '') : '',
         floor_plan:  data.floor_plan  ?? '',
         amenities:       Array.isArray(data.amenities) ? data.amenities : [],
         tags:            Array.isArray(data.tags) ? data.tags.join(', ') : '',
@@ -97,6 +102,7 @@ export default function EditPropertyPage() {
       })
 
       setPhotos(Array.isArray(data.photos) ? data.photos : [])
+      setExistingNearby(data.nearby && typeof data.nearby === 'object' ? data.nearby : {})
       setLoading(false)
     }
     load()
@@ -121,6 +127,9 @@ export default function EditPropertyPage() {
       description:     form.description,
       youtube_url:     form.youtube_url,
       instagram_url:   form.instagram_url,
+      nearby: form.metro_station.trim()
+        ? { ...existingNearby, metro: [{ name: form.metro_station.trim(), distance: form.metro_distance_km.trim() ? `${form.metro_distance_km.trim()} km` : '' }] }
+        : existingNearby,
       amenities:       form.amenities,
       tags:            form.tags ? form.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
       is_active:       form.is_active,
@@ -182,6 +191,12 @@ export default function EditPropertyPage() {
         </h2>
         <p className="text-xs text-slate-500">Upload 2–4 clear property photos. A photo edit does not require separate admin approval.</p>
         <PhotoUpload photos={photos} setPhotos={updatePhotos} maxFiles={4} />
+      </section>
+
+      <section className="rounded-2xl p-5 space-y-3" style={{ background: '#FFFFFF', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <h2 className="font-600 text-sm" style={{ color: '#111827' }}>Metro proximity (optional)</h2>
+        <input type="text" placeholder="Nearest metro station" value={form.metro_station} onChange={e => setF('metro_station', e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm" />
+        <input type="number" min="0" step="0.1" placeholder="Distance in km" value={form.metro_distance_km} onChange={e => setF('metro_distance_km', e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm" />
       </section>
 
       {/* Floor Plan */}

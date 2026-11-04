@@ -1,9 +1,20 @@
 import { NEARBY } from '@/lib/nearby-data'
+import type { NearbyCategory } from '@/lib/nearby-data'
 
-export default function NearbyInfo({ city }: { city: string | null }) {
+export default function NearbyInfo({ city, nearby }: { city: string | null; nearby?: Record<string, unknown> | null }) {
   if (!city) return null
-  const categories = NEARBY[city]
-  if (!categories) return null
+  const categories: NearbyCategory[] = [...(NEARBY[city] ?? [])]
+  const metro = nearby?.metro
+  if (Array.isArray(metro) && metro.length) {
+    const metroIndex = categories.findIndex(category => category.label.toLowerCase() === 'metro')
+    if (metroIndex >= 0) categories.splice(metroIndex, 1)
+    categories.unshift({
+      icon: '🚇', label: 'Metro',
+      items: metro.filter((item): item is { name: string; distance?: string } => !!item && typeof item === 'object' && typeof (item as { name?: unknown }).name === 'string')
+        .map(item => ({ name: item.name, distance: item.distance || '' })),
+    })
+  }
+  if (!categories.length) return null
 
   return (
     <div className="mb-5">
