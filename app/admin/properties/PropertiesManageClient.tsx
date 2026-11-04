@@ -237,6 +237,10 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
     e.preventDefault()
     if (!form.pillar || !form.property_subtype) { toast.error('Select a property pillar and subtype'); return }
     if (form.photos.length < 2 || form.photos.length > 4) { toast.error('Add 2 to 4 original site photos'); return }
+    if (form.is_active && !mediaReviewed) {
+      toast.error('To make this listing active, first review and approve its photos')
+      return
+    }
     if (!usesMonthlyRent && (!form.stamp_duty_estimate || !form.legal_fees_estimate)) { toast.error('Add stamp duty and legal fee estimates (enter 0 if none)'); return }
     startTransition(async () => {
       const supabase = createClient()
@@ -538,6 +542,11 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
                 <input type="checkbox" className="sr-only" checked={form.is_active}
                   onChange={e => set('is_active', e.target.checked)} />
               </label>
+              {form.is_active && !mediaReviewed && (
+                <p className="-mt-2 text-xs text-amber-700">
+                  Review and approve the original site photos above before this listing can go live.
+                </p>
+              )}
 
               <label className="flex items-center gap-3 cursor-pointer">
                 <div className="w-10 h-6 rounded-full flex items-center transition-colors"
