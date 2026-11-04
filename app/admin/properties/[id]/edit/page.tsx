@@ -35,7 +35,6 @@ export default function EditPropertyPage() {
   const [loading, setLoading] = useState(true)
   const [saving,  setSaving]  = useState(false)
   const [photos,  setPhotos]  = useState<string[]>([])
-  const [mediaReviewed, setMediaReviewed] = useState(false)
 
   const [form, setForm] = useState({
     title:            '',
@@ -59,12 +58,7 @@ export default function EditPropertyPage() {
   })
 
   const setF = (k: string, v: unknown) => setForm(p => ({ ...p, [k]: v }))
-  const updatePhotos = (nextPhotos: string[]) => {
-    if (nextPhotos.length !== photos.length || nextPhotos.some((photo, index) => photo !== photos[index])) {
-      setMediaReviewed(false)
-    }
-    setPhotos(nextPhotos)
-  }
+  const updatePhotos = (nextPhotos: string[]) => setPhotos(nextPhotos)
 
   useEffect(() => {
     if (!id) return
@@ -103,7 +97,6 @@ export default function EditPropertyPage() {
       })
 
       setPhotos(Array.isArray(data.photos) ? data.photos : [])
-      setMediaReviewed(data.media_review_status === 'approved')
       setLoading(false)
     }
     load()
@@ -112,10 +105,6 @@ export default function EditPropertyPage() {
   async function handleSave() {
     if (!form.title.trim()) { toast.error('Title is required'); return }
     if (photos.length < 2 || photos.length > 4) { toast.error('Listings require 2 to 4 original site photos'); return }
-    if (form.is_active && !mediaReviewed) {
-      toast.error('Review and approve the original site photos before activating this listing')
-      return
-    }
     setSaving(true)
 
     const updateData = {
@@ -134,9 +123,9 @@ export default function EditPropertyPage() {
       instagram_url:   form.instagram_url,
       amenities:       form.amenities,
       tags:            form.tags ? form.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
-      is_active:       form.is_active && mediaReviewed,
+      is_active:       form.is_active,
       is_featured:     form.is_featured,
-      media_review_status: mediaReviewed ? 'approved' : 'pending',
+      media_review_status: 'approved',
       photos:          photos,
       floor_plan:  form.floor_plan || null,
       updated_at:      new Date().toISOString(),
@@ -191,12 +180,8 @@ export default function EditPropertyPage() {
         <h2 className="font-600 text-sm" style={{ color: '#111827' }}>
           Original site photos ({photos.length}/4)
         </h2>
-        <p className="text-xs text-slate-500">No posters, promotional graphics, 3D renders, phone overlays, or watermarks. A photo edit hides the listing until it is reviewed again.</p>
+        <p className="text-xs text-slate-500">Upload 2–4 clear property photos. A photo edit does not require separate admin approval.</p>
         <PhotoUpload photos={photos} setPhotos={updatePhotos} maxFiles={4} />
-        <label className="flex items-start gap-2 text-xs text-slate-600">
-          <input type="checkbox" checked={mediaReviewed} onChange={e => setMediaReviewed(e.target.checked)} />
-          I reviewed these original site photos and approve them for the public listing.
-        </label>
       </section>
 
       {/* Floor Plan */}
@@ -209,12 +194,6 @@ export default function EditPropertyPage() {
           maxFiles={1}
         />
       </section>
-
-      {form.is_active && !mediaReviewed && (
-        <p className="-mt-2 text-xs text-amber-700">
-          Review and approve the original site photos above before this listing can go live.
-        </p>
-      )}
 
       {/* YouTube */}
       <section className="rounded-2xl p-5 space-y-3"

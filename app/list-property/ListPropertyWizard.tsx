@@ -124,7 +124,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
     listing_type: persona,
     created_by: userId,
     listed_by: userId,
-    is_active: false,
+    is_active: true,
     is_featured: false,
     bhk: form.bhk.length > 0 ? form.bhk : null,
     floor_number: form.floor_number ? parseInt(form.floor_number) : null,
@@ -429,7 +429,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
 
           <div>
             <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Original property photos (2–4)</label>
-            <p className="mb-2 text-xs text-slate-500">Upload clean, actual site photos only. No posters, 3D renders, graphics, contact details or watermarks. Listings stay hidden until Orenzaa visually reviews the photos.</p>
+            <p className="mb-2 text-xs text-slate-500">Upload 2–4 clear property photos. Your listing goes live after you save it.</p>
             <PhotoUpload photos={form.photos} setPhotos={v => setF('photos', v)} maxFiles={4} />
           </div>
 

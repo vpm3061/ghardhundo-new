@@ -120,19 +120,17 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
   const [showForm, setShowForm] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
   const [category, setCategory] = useState<Category | null>(null)
-  const [mediaReviewed, setMediaReviewed] = useState(false)
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
   const pillar = (form.pillar || 'residential') as PropertyPillar
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
-  const openAdd = () => { setForm(EMPTY_FORM); setCategory(null); setMediaReviewed(false); setEditId(null); setShowForm(true) }
+  const openAdd = () => { setForm(EMPTY_FORM); setCategory(null); setEditId(null); setShowForm(true) }
 
   const openEdit = async (p: Property) => {
     const base = toFormState(p)
     setForm(base)
     setCategory(p.property_category)
-    setMediaReviewed(p.media_review_status === 'approved')
     setEditId(p.id)
     setShowForm(true)
 
@@ -237,10 +235,6 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
     e.preventDefault()
     if (!form.pillar || !form.property_subtype) { toast.error('Select a property pillar and subtype'); return }
     if (form.photos.length < 2 || form.photos.length > 4) { toast.error('Add 2 to 4 original site photos'); return }
-    if (form.is_active && !mediaReviewed) {
-      toast.error('To make this listing active, first review and approve its photos')
-      return
-    }
     if (!usesMonthlyRent && (!form.stamp_duty_estimate || !form.legal_fees_estimate)) { toast.error('Add stamp duty and legal fee estimates (enter 0 if none)'); return }
     startTransition(async () => {
       const supabase = createClient()
@@ -266,8 +260,8 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
         lease_duration_months: form.lease_duration_months ? parseInt(form.lease_duration_months) : null,
         listing_type: 'builder' as const,
         status: pillar === 'residential' ? ((form.status || null) as Property['status'] | null) : null,
-        is_active: form.is_active && mediaReviewed,
-        media_review_status: mediaReviewed ? 'approved' : 'pending',
+        is_active: form.is_active,
+        media_review_status: 'approved',
         is_featured: form.is_featured,
         price_min: usesMonthlyRent ? null : (form.price_min ? parseFloat(form.price_min) : null),
         monthly_rent: usesMonthlyRent && form.monthly_rent ? parseFloat(form.monthly_rent) : null,
@@ -481,10 +475,6 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
               <div>
                 <SectionLabel>Original site photos (2-4)</SectionLabel>
                 <PhotoUpload photos={form.photos} setPhotos={urls => set('photos', urls)} maxFiles={4} />
-                <label className="mt-3 flex items-start gap-2 text-xs text-slate-600">
-                  <input type="checkbox" checked={mediaReviewed} onChange={e => setMediaReviewed(e.target.checked)} />
-                  I reviewed these original site photos: no banners, flyers, 3D renders, text overlays, phone numbers, or watermarks.
-                </label>
               </div>
 
               {/* ── Special Offers ── */}
@@ -542,11 +532,6 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
                 <input type="checkbox" className="sr-only" checked={form.is_active}
                   onChange={e => set('is_active', e.target.checked)} />
               </label>
-              {form.is_active && !mediaReviewed && (
-                <p className="-mt-2 text-xs text-amber-700">
-                  Review and approve the original site photos above before this listing can go live.
-                </p>
-              )}
 
               <label className="flex items-center gap-3 cursor-pointer">
                 <div className="w-10 h-6 rounded-full flex items-center transition-colors"
