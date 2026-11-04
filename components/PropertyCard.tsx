@@ -28,7 +28,10 @@ function getPriceDisplay(property: Property): string {
     return `₹${Number(property.monthly_rent || 0).toLocaleString('en-IN')}/mo`
   }
   if (property.price_min) {
-    return `₹${Math.round(Number(property.price_min) / 100000)}L`
+    const price = Number(property.price_min)
+    return price >= 10000000
+      ? `₹${(price / 10000000).toFixed(2)} Cr`
+      : `₹${Math.round(price / 100000)}L`
   }
   return 'Price on request'
 }

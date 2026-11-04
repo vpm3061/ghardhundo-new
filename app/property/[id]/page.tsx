@@ -54,7 +54,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const priceText = property.listing_intent === 'rent' || property.property_category === 'rental'
     ? property.monthly_rent ? `₹${Number(property.monthly_rent).toLocaleString('en-IN')}/month` : 'Rent on request'
     : property.price_min
-    ? `₹${Math.round(Number(property.price_min) / 100000)} Lakh`
+    ? Number(property.price_min) >= 10000000
+      ? `₹${(Number(property.price_min) / 10000000).toFixed(2)} Cr`
+      : `₹${Math.round(Number(property.price_min) / 100000)} Lakh`
     : 'Price on request'
 
   const bhkText = property.bhk?.length
@@ -120,7 +122,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
     'New Launch':         { bg: 'rgba(251,146,60,0.08)', color: '#FB923C', border: 'rgba(251,146,60,0.25)' },
   }
 
-  const fmt = (n: number) => n >= 1e7 ? `₹${(n/1e7).toFixed(1)}Cr` : n >= 1e5 ? `₹${(n/1e5).toFixed(0)}L` : `₹${n}`
+  const fmt = (n: number) => n >= 1e7 ? `₹${(n/1e7).toFixed(2)} Cr` : n >= 1e5 ? `₹${(n/1e5).toFixed(0)}L` : `₹${n}`
   const priceStr = p.price_min && p.price_max ? `${fmt(p.price_min)} – ${fmt(p.price_max)}`
     : p.price_min ? `From ${fmt(p.price_min)}` : 'Price on request'
 
