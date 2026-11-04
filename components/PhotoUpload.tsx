@@ -8,6 +8,8 @@ interface Props {
   maxFiles?: number
 }
 
+const MAX_PHOTO_SIZE_BYTES = 5 * 1024 * 1024
+
 export default function PhotoUpload({ photos, setPhotos, maxFiles = 15 }: Props) {
   const [uploading, setUploading] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -31,8 +33,8 @@ export default function PhotoUpload({ photos, setPhotos, maxFiles = 15 }: Props)
 
     for (let i = 0; i < toUpload.length; i++) {
       const file = toUpload[i]
-      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { setError('Upload a JPG, PNG or WEBP site photograph'); continue }
-      if (file.size > 10 * 1024 * 1024) { setError(`${file.name} is too large — max 10MB`); continue }
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { setError('Only JPG/JPEG, PNG, or WEBP photos are allowed.'); continue }
+      if (file.size > MAX_PHOTO_SIZE_BYTES) { setError(`${file.name} is too large. Maximum size is 5 MB per photo.`); continue }
 
       const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
       const path = `properties/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
@@ -53,7 +55,7 @@ export default function PhotoUpload({ photos, setPhotos, maxFiles = 15 }: Props)
       setProgress(Math.round(((i + 1) / toUpload.length) * 100))
     }
 
-    setPhotos(isSingle ? newUrls.slice(0, 1) : [...photos, ...newUrls])
+    if (newUrls.length > 0) setPhotos(isSingle ? newUrls.slice(0, 1) : [...photos, ...newUrls])
     setUploading(false)
     setProgress(0)
   }
@@ -75,7 +77,7 @@ export default function PhotoUpload({ photos, setPhotos, maxFiles = 15 }: Props)
           <div className="relative w-full rounded-xl overflow-hidden"
             style={{ height: '120px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
             <img src={photos[0]} alt="" className="w-full h-full object-contain" />
-            <button type="button" onClick={() => remove(0)} suppressHydrationWarning
+            <button type="button" aria-label="Remove photo" onClick={() => remove(0)} suppressHydrationWarning
               className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-sm"
               style={{ background: 'rgba(0,0,0,0.7)', color: '#111827' }}>✕</button>
           </div>
@@ -85,7 +87,7 @@ export default function PhotoUpload({ photos, setPhotos, maxFiles = 15 }: Props)
               <div key={url + i} className="relative aspect-square rounded-xl overflow-hidden group"
                 style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <img src={url} alt="" className="w-full h-full object-cover" />
-                <button type="button" onClick={() => remove(i)} suppressHydrationWarning
+                <button type="button" aria-label={`Remove photo ${i + 1}`} onClick={() => remove(i)} suppressHydrationWarning
                   className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                   style={{ background: 'rgba(0,0,0,0.85)', color: '#111827', fontSize: '10px' }}>✕</button>
                 {i === 0 && (
@@ -112,7 +114,7 @@ export default function PhotoUpload({ photos, setPhotos, maxFiles = 15 }: Props)
         >
           {uploading ? (
             <div className="flex flex-col items-center gap-2">
-              <div className="text-xs font-600" style={{ color: '#FB923C' }}>Uploading… {progress}%</div>
+              <div className="text-xs font-600" style={{ color: '#FB923C' }}>Uploading... {progress}%</div>
               <div className="w-full h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
                 <div className="h-full rounded-full transition-all duration-300"
                   style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #FB923C, #F59E0B)' }} />
@@ -134,7 +136,7 @@ export default function PhotoUpload({ photos, setPhotos, maxFiles = 15 }: Props)
               </p>
               {!isSingle && (
                 <p className="text-[10px] mt-0.5" style={{ color: '#9CA3AF' }}>
-                  {photos.length}/{maxFiles} · JPG, PNG, WEBP · max 10MB each
+                  {photos.length}/{maxFiles} · JPG/JPEG, PNG, WEBP · max 5 MB each
                 </p>
               )}
             </>
@@ -145,7 +147,7 @@ export default function PhotoUpload({ photos, setPhotos, maxFiles = 15 }: Props)
             accept="image/jpeg,image/png,image/webp"
             multiple={!isSingle}
             className="sr-only"
-            onChange={e => uploadFiles(e.target.files)}
+            onChange={e => { void uploadFiles(e.target.files); e.currentTarget.value = '' }}
             disabled={uploading}
           />
         </div>

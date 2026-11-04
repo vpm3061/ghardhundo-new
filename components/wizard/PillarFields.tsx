@@ -20,7 +20,7 @@ function Choice({ active, onClick, children }: { active: boolean; onClick: () =>
   </button>
 }
 
-export default function PillarFields({ form, setF, pillar }: WizardFieldProps & { pillar: PropertyPillar }) {
+export default function PillarFields({ form, setF, toggleArr, pillar }: WizardFieldProps & { pillar: PropertyPillar }) {
   const basePrice = Number(form.price_min || 0)
   const stampDuty = Number(form.stamp_duty_estimate || 0)
   const legalFees = Number(form.legal_fees_estimate || 0)
@@ -90,7 +90,39 @@ export default function PillarFields({ form, setF, pillar }: WizardFieldProps & 
       <label className="text-xs text-slate-600">Floor number
         <input className="input-dark mt-1 w-full text-sm" type="number" value={form.floor_number} onChange={e => setF('floor_number', e.target.value)} />
       </label>
+      <label className="text-xs text-slate-600">Total floors in building
+        <input className="input-dark mt-1 w-full text-sm" type="number" min="1" value={form.total_floors} onChange={e => setF('total_floors', e.target.value)} />
+      </label>
+      {pillar === 'residential' && <label className="text-xs text-slate-600">Carpet area (sq. ft.)
+        <input className="input-dark mt-1 w-full text-sm" type="number" min="0" value={form.carpet_area} onChange={e => setF('carpet_area', e.target.value)} />
+      </label>}
     </div>}
+
+    {pillar === 'residential' && <div className="grid gap-3 sm:grid-cols-2">
+      <label className="text-xs text-slate-600">Property age (years, if resale)
+        <input className="input-dark mt-1 w-full text-sm" type="number" min="0" value={form.age_years} onChange={e => setF('age_years', e.target.value)} />
+      </label>
+      <label className="text-xs text-slate-600">Possession date
+        <input className="input-dark mt-1 w-full text-sm" type="date" value={form.possession_date} onChange={e => setF('possession_date', e.target.value)} />
+      </label>
+    </div>}
+
+    <label className="text-xs text-slate-600">RERA number (if applicable)
+      <input className="input-dark mt-1 w-full text-sm" maxLength={80} placeholder="Enter the registered project number"
+        value={form.rera_number} onChange={e => setF('rera_number', e.target.value)} />
+    </label>
+
+    <div className="flex flex-col gap-3">
+      <label className="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" checked={form.parking} onChange={e => setF('parking', e.target.checked)} /> Parking available</label>
+      <div>
+        <p className="mb-2 text-xs text-slate-600">Amenities (select all that apply)</p>
+        <div className="flex flex-wrap gap-2">
+          {['Lift', 'Security', 'Power Backup', 'Gym', 'Club House', 'Swimming Pool', 'Garden', 'CCTV'].map(amenity => (
+            <Choice key={amenity} active={form.amenities.includes(amenity)} onClick={() => toggleArr('amenities', amenity)}>{amenity}</Choice>
+          ))}
+        </div>
+      </div>
+    </div>
 
     {pillar === 'institutional' && <div className="grid gap-3 sm:grid-cols-2">
       <label className="text-xs text-slate-600">Power load
@@ -115,6 +147,13 @@ export default function PillarFields({ form, setF, pillar }: WizardFieldProps & 
           <option value="">Select</option>{['North', 'South', 'East', 'West'].map(x => <option key={x}>{x}</option>)}
         </select>
       </label>
+      <label className="text-xs text-slate-600">Plot classification
+        <select className="input-dark mt-1 w-full text-sm" value={form.plot_type} onChange={e => setF('plot_type', e.target.value)}>
+          <option value="">Select</option>{['Residential', 'Commercial', 'Agricultural'].map(x => <option key={x}>{x}</option>)}
+        </select>
+      </label>
+      <label className="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" checked={form.corner_plot} onChange={e => setF('corner_plot', e.target.checked)} /> Corner plot</label>
+      <label className="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" checked={form.boundary_wall} onChange={e => setF('boundary_wall', e.target.checked)} /> Boundary wall</label>
       <label className="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" checked={form.registry_done} onChange={e => setF('registry_done', e.target.checked)} /> Registry already done</label>
     </div>}
   </div>

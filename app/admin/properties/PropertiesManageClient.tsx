@@ -232,11 +232,14 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
   }
 
   const usesMonthlyRent = form.intent === 'rent'
+  const existingListingPhotos = editId ? properties.find(property => property.id === editId)?.photos ?? [] : []
+  const photosUnchanged = form.photos.length === existingListingPhotos.length && form.photos.every((photo, index) => photo === existingListingPhotos[index])
 
   const handleSubmit = (e: { preventDefault(): void }) => {
     e.preventDefault()
     if (!form.pillar || !form.property_subtype) { toast.error('Select a property pillar and subtype'); return }
-    if (form.photos.length < 2 || form.photos.length > 4) { toast.error('Add 2 to 4 original site photos'); return }
+    if (form.photos.length < 2) { toast.error('Add at least 2 original site photos'); return }
+    if (form.photos.length > 4 && !photosUnchanged) { toast.error('A changed photo set must contain 2 to 4 photos'); return }
     if (!usesMonthlyRent && (!form.stamp_duty_estimate || !form.legal_fees_estimate)) { toast.error('Add stamp duty and legal fee estimates (enter 0 if none)'); return }
     startTransition(async () => {
       const supabase = createClient()
@@ -488,8 +491,9 @@ export default function PropertiesManageClient({ properties }: { properties: Pro
 
               {/* ── Photos ── */}
               <div>
-                <SectionLabel>Original site photos (2-4)</SectionLabel>
-                <PhotoUpload photos={form.photos} setPhotos={urls => set('photos', urls)} maxFiles={4} />
+                <SectionLabel>Original site photos (2–4 for new or changed photos)</SectionLabel>
+                <p className="mb-2 text-xs text-slate-500">Existing photos stay unchanged unless you edit them. JPG/JPEG, PNG or WEBP; maximum 5 MB each.</p>
+                <PhotoUpload photos={form.photos} setPhotos={urls => set('photos', urls)} maxFiles={Math.max(4, existingListingPhotos.length)} />
               </div>
 
               {/* ── Special Offers ── */}

@@ -15,6 +15,7 @@ function toWizardForm(p: Property): WizardForm {
     pillar: p.property_pillar ?? (p.property_category === 'plot' ? 'land' : p.property_category === 'commercial' ? 'commercial' : 'residential'),
     intent: p.listing_intent ?? (p.property_category === 'rental' || p.monthly_rent != null ? 'rent' : 'sale'),
     property_subtype: p.property_subtype ?? '', land_area_unit: p.land_area_unit ?? 'sq. yard',
+    property_status: p.status ?? '',
     stamp_duty_estimate: p.stamp_duty_estimate != null ? String(p.stamp_duty_estimate) : '',
     legal_fees_estimate: p.legal_fees_estimate != null ? String(p.legal_fees_estimate) : '',
     security_deposit_amount: p.security_deposit_amount != null ? String(p.security_deposit_amount) : '',
@@ -85,6 +86,8 @@ export default function PropertyEditClient({ property }: { property: Property })
       : [...(form[k] as string[]), val])
 
   const usesMonthlyRent = form.intent === 'rent'
+  const originalPhotos = property.photos ?? []
+  const photosUnchanged = form.photos.length === originalPhotos.length && form.photos.every((photo, index) => photo === originalPhotos[index])
 
   const validate = (): string | null => {
     if (!form.title.trim()) return 'Title required hai'
@@ -92,7 +95,8 @@ export default function PropertyEditClient({ property }: { property: Property })
     if (!form.locality.trim()) return 'Locality / area required hai'
     if (usesMonthlyRent ? !form.monthly_rent : !form.price_min) return 'Price required hai'
     if (!usesMonthlyRent && (!form.stamp_duty_estimate || !form.legal_fees_estimate)) return 'Stamp duty and legal fee estimates required hain (enter 0 if none)'
-    if (form.photos.length < 2 || form.photos.length > 4) return '2 se 4 original photos upload karo'
+    if (form.photos.length < 2) return 'At least 2 original property photos are required'
+    if (form.photos.length > 4 && !photosUnchanged) return 'A changed photo set must contain 2 to 4 photos'
     if (!form.property_subtype) return 'Property subtype select karo'
     if (!form.owner_contact.trim()) return 'Contact number required hai'
     return null
@@ -107,6 +111,7 @@ export default function PropertyEditClient({ property }: { property: Property })
     const supabase = createClient()
     const { error } = await supabase.from('properties').update({
       property_pillar: pillar, listing_intent: form.intent, property_subtype: form.property_subtype,
+      status: form.property_status || null,
       land_area_unit: form.land_area_unit,
       stamp_duty_estimate: form.stamp_duty_estimate ? parseFloat(form.stamp_duty_estimate) : null,
       legal_fees_estimate: form.legal_fees_estimate ? parseFloat(form.legal_fees_estimate) : null,
@@ -177,8 +182,9 @@ export default function PropertyEditClient({ property }: { property: Property })
 
       <div className="glass p-5 flex flex-col gap-4">
         <div>
-          <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Original site photos (2-4)</label>
-          <PhotoUpload photos={form.photos} setPhotos={v => setF('photos', v)} maxFiles={4} />
+          <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Original site photos (2–4 for new or changed photos)</label>
+          <p className="mb-2 text-xs text-slate-500">Existing photos stay as-is when unchanged. JPG/JPEG, PNG or WEBP; maximum 5 MB each.</p>
+          <PhotoUpload photos={form.photos} setPhotos={v => setF('photos', v)} maxFiles={Math.max(4, originalPhotos.length)} />
         </div>
 
         <input className="input-dark text-sm" placeholder="Property title *"
@@ -196,8 +202,14 @@ export default function PropertyEditClient({ property }: { property: Property })
         )}
 
         <PillarFields form={form} pillar={pillar} persona="expert" setF={setF} toggleArr={toggleArr} />
+        <label className="text-xs text-slate-600">Construction / possession status (optional)
+          <select className="input-dark mt-1 w-full text-sm" value={form.property_status} onChange={e => setF('property_status', e.target.value)}>
+            <option value="">Select status</option>
+            {['Ready to Move', 'Under Construction', 'New Launch'].map(status => <option key={status} value={status}>{status}</option>)}
+          </select>
+        </label>
 
-        <textarea className="input-dark text-sm resize-none" rows={3} placeholder="Description"
+        <textarea className="input-dark text-sm resize-none" rows={4} maxLength={2500} placeholder="Description for buyers: layout, condition, facing, nearby facilities, possession and anything included (optional)"
           value={form.description} onChange={e => setF('description', e.target.value)} suppressHydrationWarning />
 
         <div className="grid gap-3 sm:grid-cols-2">

@@ -3,6 +3,7 @@ export type WizardForm = {
   pillar: PropertyPillar | ''
   intent: ListingIntent
   property_subtype: string
+  property_status: string
   land_area_unit: string
   stamp_duty_estimate: string
   legal_fees_estimate: string
@@ -57,7 +58,7 @@ export type WizardForm = {
 }
 
 export const BLANK_WIZARD_FORM: WizardForm = {
-  pillar: '', intent: 'sale', property_subtype: '', land_area_unit: 'sq. yard', stamp_duty_estimate: '', legal_fees_estimate: '',
+  pillar: '', intent: 'sale', property_subtype: '', property_status: '', land_area_unit: 'sq. yard', stamp_duty_estimate: '', legal_fees_estimate: '',
   security_deposit_amount: '', advance_terms: '', lease_duration_months: '',
   title: '', city: '', locality: '', price_min: '', description: '', photos: [],
   contact_preference: 'both', owner_contact: '',

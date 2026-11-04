@@ -128,6 +128,17 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
 
   const sc = p.status ? statusConfig[p.status] : null
   const allTags = generatePropertyTags(p)
+  const propertyDetails: [string, string][] = [
+    p.super_area ? ['Built-up area', `${Number(p.super_area).toLocaleString('en-IN')} sq. ft.`] : null,
+    p.carpet_area ? ['Carpet area', `${Number(p.carpet_area).toLocaleString('en-IN')} sq. ft.`] : null,
+    p.floor_number != null ? ['Floor', `${p.floor_number}${p.total_floors ? ` of ${p.total_floors}` : ''}`] : null,
+    p.furnished ? ['Furnishing', p.furnished] : null,
+    p.age_years != null ? ['Property age', `${p.age_years} years`] : null,
+    p.possession_date ? ['Possession', p.possession_date] : null,
+    p.plot_area_sqyard ? ['Plot area', `${Number(p.plot_area_sqyard).toLocaleString('en-IN')} ${p.land_area_unit || 'sq. yard'}`] : null,
+    p.facing ? ['Facing', p.facing] : null,
+    p.parking ? ['Parking', 'Available'] : null,
+  ].filter((item): item is [string, string] => item !== null)
 
   return (
     <>
@@ -192,6 +203,12 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                   <div className="text-[#9CA3AF] text-xs mb-1 uppercase tracking-wider">Price Range</div>
                   <div className="font-heading text-xl font-800 text-[#FB923C]">{priceStr}</div>
                 </div>
+                {p.property_subtype && (
+                  <div>
+                    <div className="text-[#9CA3AF] text-xs mb-1 uppercase tracking-wider">Property type</div>
+                    <div className="font-semibold text-[#111827]">{p.property_subtype}</div>
+                  </div>
+                )}
                 {p.bhk && p.bhk.length > 0 && (
                   <div>
                     <div className="text-[#9CA3AF] text-xs mb-1 uppercase tracking-wider">Configuration</div>
@@ -201,11 +218,22 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                 {p.city && (
                   <div>
                     <div className="text-[#9CA3AF] text-xs mb-1 uppercase tracking-wider">Location</div>
-                    <div className="font-700 text-[#111827]">{p.city}</div>
+                  <div className="font-700 text-[#111827]">{[p.locality, p.sector, p.city].filter(Boolean).join(', ')}</div>
                   </div>
                 )}
               </div>
             </div>
+
+            {propertyDetails.length > 0 && (
+              <section className="mb-5 rounded-2xl border border-[#E5E7EB] bg-white p-5">
+                <h2 className="mb-4 font-heading text-lg font-700 text-[#111827]">Property details</h2>
+                <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                  {propertyDetails.map(([label, value]) => (
+                    <div key={label}><dt className="text-xs uppercase tracking-wide text-[#9CA3AF]">{label}</dt><dd className="mt-1 text-sm font-semibold text-[#111827]">{value}</dd></div>
+                  ))}
+                </dl>
+              </section>
+            )}
 
             {/* Description */}
             {p.description && (

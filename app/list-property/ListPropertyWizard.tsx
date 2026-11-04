@@ -105,6 +105,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
     property_pillar: pillar,
     listing_intent: form.intent,
     property_subtype: form.property_subtype,
+    status: form.property_status || null,
     land_area_unit: pillar === 'land' ? form.land_area_unit : null,
     stamp_duty_estimate: form.intent === 'sale' && form.stamp_duty_estimate ? parseFloat(form.stamp_duty_estimate) : null,
     legal_fees_estimate: form.intent === 'sale' && form.legal_fees_estimate ? parseFloat(form.legal_fees_estimate) : null,
@@ -426,14 +427,7 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
       {/* STEP 2 — form + submit (payment already done, if it was needed) */}
       {step === 2 && pillar && (
         <div className="glass p-5 flex flex-col gap-4">
-          <PillarFields form={form} persona={persona} setF={setF} toggleArr={toggleArr} pillar={pillar} />
-
-          <div>
-            <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Original property photos (2–4)</label>
-            <p className="mb-2 text-xs text-slate-500">Upload 2–4 clear property photos. Your listing goes live after you save it.</p>
-            <PhotoUpload photos={form.photos} setPhotos={v => setF('photos', v)} maxFiles={4} />
-          </div>
-
+          <h2 className="border-b border-slate-200 pb-2 text-sm font-bold text-slate-800">1. Property name and location</h2>
           <input className="input-dark text-sm" placeholder="Property title *"
             value={form.title} onChange={e => setF('title', e.target.value)} suppressHydrationWarning />
 
@@ -443,10 +437,26 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
               value={form.locality} onChange={e => setF('locality', e.target.value)} suppressHydrationWarning />
           </div>
 
+          <h2 className="border-b border-slate-200 pb-2 pt-2 text-sm font-bold text-slate-800">2. Property type, price and features</h2>
+          <PillarFields form={form} persona={persona} setF={setF} toggleArr={toggleArr} pillar={pillar} />
+          <label className="text-xs text-slate-600">Construction / possession status (optional)
+            <select className="input-dark mt-1 w-full text-sm" value={form.property_status} onChange={e => setF('property_status', e.target.value)}>
+              <option value="">Select status</option>
+              {['Ready to Move', 'Under Construction', 'New Launch'].map(status => <option key={status} value={status}>{status}</option>)}
+            </select>
+          </label>
 
-          <textarea className="input-dark text-sm resize-none" rows={3} placeholder="Description"
+          <h2 className="border-b border-slate-200 pb-2 pt-2 text-sm font-bold text-slate-800">3. Description and photos</h2>
+          <textarea className="input-dark text-sm resize-none" rows={4} maxLength={2500} placeholder="Description for buyers: layout, condition, facing, nearby facilities, possession and anything included (optional)"
             value={form.description} onChange={e => setF('description', e.target.value)} suppressHydrationWarning />
 
+          <div>
+            <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Original property photos (2–4)</label>
+            <p className="mb-2 text-xs text-slate-500">Use clear photos of the actual property. JPG/JPEG, PNG or WEBP; maximum 5 MB each.</p>
+            <PhotoUpload photos={form.photos} setPhotos={v => setF('photos', v)} maxFiles={4} />
+          </div>
+
+          <h2 className="border-b border-slate-200 pb-2 pt-2 text-sm font-bold text-slate-800">4. Property walkthrough and nearby access</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             <input className="input-dark text-sm" type="url" placeholder="YouTube video URL (optional)"
               value={form.youtube_url} onChange={e => setF('youtube_url', e.target.value)} />

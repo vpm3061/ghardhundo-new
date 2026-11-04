@@ -35,6 +35,7 @@ export default function EditPropertyPage() {
   const [loading, setLoading] = useState(true)
   const [saving,  setSaving]  = useState(false)
   const [photos,  setPhotos]  = useState<string[]>([])
+  const [originalPhotos, setOriginalPhotos] = useState<string[]>([])
   const [existingNearby, setExistingNearby] = useState<Record<string, unknown>>({})
 
   const [form, setForm] = useState({
@@ -102,6 +103,7 @@ export default function EditPropertyPage() {
       })
 
       setPhotos(Array.isArray(data.photos) ? data.photos : [])
+      setOriginalPhotos(Array.isArray(data.photos) ? data.photos : [])
       setExistingNearby(data.nearby && typeof data.nearby === 'object' ? data.nearby : {})
       setLoading(false)
     }
@@ -110,7 +112,9 @@ export default function EditPropertyPage() {
 
   async function handleSave() {
     if (!form.title.trim()) { toast.error('Title is required'); return }
-    if (photos.length < 2 || photos.length > 4) { toast.error('Listings require 2 to 4 original site photos'); return }
+    const photosUnchanged = photos.length === originalPhotos.length && photos.every((photo, index) => photo === originalPhotos[index])
+    if (photos.length < 2) { toast.error('Listings require at least 2 original site photos'); return }
+    if (photos.length > 4 && !photosUnchanged) { toast.error('A changed photo set must contain 2 to 4 photos'); return }
     setSaving(true)
 
     const updateData = {
@@ -187,10 +191,10 @@ export default function EditPropertyPage() {
       <section className="rounded-2xl p-5 space-y-3"
         style={{ background: '#FFFFFF', border: '1px solid rgba(255,255,255,0.05)' }}>
         <h2 className="font-600 text-sm" style={{ color: '#111827' }}>
-          Original site photos ({photos.length}/4)
+          Original site photos ({photos.length}/{Math.max(4, originalPhotos.length)})
         </h2>
-        <p className="text-xs text-slate-500">Upload 2–4 clear property photos. A photo edit does not require separate admin approval.</p>
-        <PhotoUpload photos={photos} setPhotos={updatePhotos} maxFiles={4} />
+        <p className="text-xs text-slate-500">Use JPG/JPEG, PNG or WEBP, maximum 5 MB each. New or changed photo sets allow 2–4 photos; existing photo sets stay untouched unless edited.</p>
+        <PhotoUpload photos={photos} setPhotos={updatePhotos} maxFiles={Math.max(4, originalPhotos.length)} />
       </section>
 
       <section className="rounded-2xl p-5 space-y-3" style={{ background: '#FFFFFF', border: '1px solid rgba(255,255,255,0.05)' }}>
