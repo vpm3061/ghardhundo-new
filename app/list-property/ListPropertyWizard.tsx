@@ -143,6 +143,9 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
     nearby: {
       ...(form.metro_station.trim() ? { metro: [{ name: form.metro_station.trim(), distance: form.metro_distance_km.trim() ? `${form.metro_distance_km.trim()} km` : '' }] } : {}),
       ...(form.railway_station.trim() ? { railway_station: [{ name: form.railway_station.trim(), distance: form.railway_distance_km.trim() ? `${form.railway_distance_km.trim()} km` : '' }] } : {}),
+      ...(form.airport_name.trim() ? { airport: [{ name: form.airport_name.trim(), distance: form.airport_distance_km.trim() ? `${form.airport_distance_km.trim()} km` : '' }] } : {}),
+      ...(form.school_name.trim() ? { schools: [{ name: form.school_name.trim(), distance: form.school_distance_km.trim() ? `${form.school_distance_km.trim()} km` : '' }] } : {}),
+      ...(form.hospital_name.trim() ? { hospitals: [{ name: form.hospital_name.trim(), distance: form.hospital_distance_km.trim() ? `${form.hospital_distance_km.trim()} km` : '' }] } : {}),
     },
     tags: form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : null,
     floor_plan: form.floor_plan || null,
@@ -458,6 +461,11 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
             <p className="mb-2 text-xs text-slate-500">Use clear photos of the actual property. JPG/JPEG, PNG or WEBP; maximum 5 MB each.</p>
             <PhotoUpload photos={form.photos} setPhotos={v => setF('photos', v)} maxFiles={4} />
           </div>
+          <div>
+            <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Floor plan (optional)</label>
+            <p className="mb-2 text-xs text-slate-500">Add a clear floor plan image to help buyers understand the layout.</p>
+            <PhotoUpload photos={form.floor_plan ? [form.floor_plan] : []} setPhotos={v => setF('floor_plan', v[0] || '')} maxFiles={1} />
+          </div>
 
           <h2 className="border-b border-slate-200 pb-2 pt-2 text-sm font-bold text-slate-800">4. Property walkthrough and nearby access</h2>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -478,6 +486,20 @@ export default function ListPropertyWizard({ userId, initialRole, expertRegister
               value={form.railway_station} onChange={e => setF('railway_station', e.target.value)} />
             <input className="input-dark text-sm" type="number" min="0" step="0.1" placeholder="Distance to railway station (km)"
               value={form.railway_distance_km} onChange={e => setF('railway_distance_km', e.target.value)} />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <input className="input-dark text-sm" placeholder="Nearest airport (optional)"
+              value={form.airport_name} onChange={e => setF('airport_name', e.target.value)} />
+            <input className="input-dark text-sm" type="number" min="0" step="0.1" placeholder="Distance to airport (km)"
+              value={form.airport_distance_km} onChange={e => setF('airport_distance_km', e.target.value)} />
+            <input className="input-dark text-sm" placeholder="Nearby school (optional)"
+              value={form.school_name} onChange={e => setF('school_name', e.target.value)} />
+            <input className="input-dark text-sm" type="number" min="0" step="0.1" placeholder="Distance to school (km)"
+              value={form.school_distance_km} onChange={e => setF('school_distance_km', e.target.value)} />
+            <input className="input-dark text-sm" placeholder="Nearby hospital (optional)"
+              value={form.hospital_name} onChange={e => setF('hospital_name', e.target.value)} />
+            <input className="input-dark text-sm" type="number" min="0" step="0.1" placeholder="Distance to hospital (km)"
+              value={form.hospital_distance_km} onChange={e => setF('hospital_distance_km', e.target.value)} />
           </div>
 
           <div>

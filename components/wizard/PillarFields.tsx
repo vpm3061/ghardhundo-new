@@ -24,6 +24,8 @@ export default function PillarFields({ form, setF, toggleArr, pillar }: WizardFi
   const basePrice = Number(form.price_min || 0)
   const stampDuty = Number(form.stamp_duty_estimate || 0)
   const legalFees = Number(form.legal_fees_estimate || 0)
+  const hasSaleQuote = form.price_min !== '' && form.stamp_duty_estimate !== '' && form.legal_fees_estimate !== ''
+  const formatINR = (amount: number) => `₹${amount.toLocaleString('en-IN')}`
 
   return <div className="flex flex-col gap-4">
     <section className="rounded-xl border border-orange-200 bg-orange-50 p-4">
@@ -52,7 +54,7 @@ export default function PillarFields({ form, setF, toggleArr, pillar }: WizardFi
         <input className="input-dark mt-1 w-full text-sm" type="number" min="0" value={form.legal_fees_estimate} onChange={e => setF('legal_fees_estimate', e.target.value)} />
       </label>
       <div className="rounded-xl bg-slate-100 p-3 text-sm text-slate-700 sm:self-end">
-        Estimated on-road total: <strong>₹{(basePrice + stampDuty + legalFees).toLocaleString('en-IN')}</strong>
+        Estimated on-road total: <strong>{hasSaleQuote ? formatINR(basePrice + stampDuty + legalFees) : 'Complete price and charge estimates to calculate'}</strong>
         <span className="mt-1 block text-xs text-slate-500">Estimate only; confirm all amounts and legal charges independently.</span>
       </div>
     </div> : <div className="grid gap-3 sm:grid-cols-2">

@@ -124,8 +124,11 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
   }
 
   const fmt = (n: number) => n >= 1e7 ? `₹${(n/1e7).toFixed(2)} Cr` : n >= 1e5 ? `₹${(n/1e5).toFixed(0)}L` : `₹${n}`
-  const priceStr = p.price_min && p.price_max ? `${fmt(p.price_min)} – ${fmt(p.price_max)}`
-    : p.price_min ? `From ${fmt(p.price_min)}` : 'Price on request'
+  const isRental = p.listing_intent === 'rent' || p.property_category === 'rental'
+  const priceStr = isRental
+    ? p.monthly_rent ? `${fmt(p.monthly_rent)} / month` : 'Rent on request'
+    : p.price_min && p.price_max ? `${fmt(p.price_min)} – ${fmt(p.price_max)}`
+      : p.price_min ? `From ${fmt(p.price_min)}` : 'Price on request'
 
   const sc = p.status ? statusConfig[p.status] : null
   const allTags = generatePropertyTags(p)
@@ -133,12 +136,23 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
     p.super_area ? ['Built-up area', `${Number(p.super_area).toLocaleString('en-IN')} sq. ft.`] : null,
     p.carpet_area ? ['Carpet area', `${Number(p.carpet_area).toLocaleString('en-IN')} sq. ft.`] : null,
     p.floor_number != null ? ['Floor', `${p.floor_number}${p.total_floors ? ` of ${p.total_floors}` : ''}`] : null,
+    p.floor_number == null && p.total_floors != null ? ['Total floors', `${p.total_floors}`] : null,
     p.furnished ? ['Furnishing', p.furnished] : null,
     p.age_years != null ? ['Property age', `${p.age_years} years`] : null,
     p.possession_date ? ['Possession', p.possession_date] : null,
     p.plot_area_sqyard ? ['Plot area', `${Number(p.plot_area_sqyard).toLocaleString('en-IN')} ${p.land_area_unit || 'sq. yard'}`] : null,
     p.facing ? ['Facing', p.facing] : null,
     p.parking ? ['Parking', 'Available'] : null,
+    p.power_load ? ['Power load', p.power_load] : null,
+    p.frontage_width != null ? ['Loading / frontage width', `${Number(p.frontage_width).toLocaleString('en-IN')} ft.`] : null,
+    p.plot_type ? ['Plot classification', p.plot_type] : null,
+    p.corner_plot ? ['Plot position', 'Corner plot'] : null,
+    p.boundary_wall ? ['Boundary wall', 'Available'] : null,
+    p.registry_done ? ['Registry', 'Completed'] : null,
+    p.available_from ? ['Available from', p.available_from] : null,
+    p.tenant_preference && p.tenant_preference !== 'Any' ? ['Tenant preference', p.tenant_preference] : null,
+    p.gender_preference && p.gender_preference !== 'Any' ? ['Gender preference', p.gender_preference] : null,
+    p.pets_allowed ? ['Pets', 'Allowed'] : null,
   ].filter((item): item is [string, string] => item !== null)
 
   return (
@@ -201,13 +215,13 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
             <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 mb-5">
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
                 <div>
-                  <div className="text-[#9CA3AF] text-xs mb-1 uppercase tracking-wider">Price Range</div>
+                  <div className="text-[#9CA3AF] text-xs mb-1 uppercase tracking-wider">{isRental ? 'Monthly rent' : 'Price'}</div>
                   <div className="font-heading text-xl font-800 text-[#FB923C]">{priceStr}</div>
                 </div>
                 {p.property_subtype && (
                   <div>
                     <div className="text-[#9CA3AF] text-xs mb-1 uppercase tracking-wider">Property type</div>
-                    <div className="font-semibold text-[#111827]">{p.property_subtype}</div>
+                    <div className="font-semibold text-[#111827]">{p.bhk?.length ? p.property_subtype.replace(/^\d+\s*BHK\s*/i, '') : p.property_subtype}</div>
                   </div>
                 )}
                 {p.bhk && p.bhk.length > 0 && (
@@ -233,6 +247,16 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                     <div key={label}><dt className="text-xs uppercase tracking-wide text-[#9CA3AF]">{label}</dt><dd className="mt-1 text-sm font-semibold text-[#111827]">{value}</dd></div>
                   ))}
                 </dl>
+              </section>
+            )}
+
+            {p.floor_plan && (
+              <section className="mb-5 rounded-2xl border border-[#E5E7EB] bg-white p-5">
+                <h2 className="mb-3 font-heading text-lg font-700 text-[#111827]">Floor plan</h2>
+                <a href={p.floor_plan} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-xl bg-slate-50" aria-label="Open full-size floor plan">
+                  <img src={p.floor_plan} alt={`Floor plan for ${p.title}`} className="mx-auto max-h-[560px] w-full object-contain" loading="lazy" />
+                </a>
+                <a href={p.floor_plan} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm font-semibold text-orange-600">Open floor plan full size ↗</a>
               </section>
             )}
 

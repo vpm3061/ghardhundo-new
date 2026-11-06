@@ -39,7 +39,11 @@ export default function PriceBreakdown({ property }: { property: Property }) {
     ['Maintenance estimate', property.maintenance_estimate],
     ['Other disclosed charges', property.other_charges_estimate],
   ]
-  const displayedTotal = property.total_on_road_valuation ?? (isPillarListing ? null : total)
+  const hasPillarQuote = property.price_min != null && property.stamp_duty_estimate != null && property.legal_fees_estimate != null
+  const calculatedPillarTotal = hasPillarQuote
+    ? property.price_min! + property.stamp_duty_estimate! + property.legal_fees_estimate!
+    : null
+  const displayedTotal = property.total_on_road_valuation ?? (isPillarListing ? calculatedPillarTotal : total)
   const visibleRows = rows.filter(([, value]) => value != null)
   if (!visibleRows.length && displayedTotal == null) return null
 

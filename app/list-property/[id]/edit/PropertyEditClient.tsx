@@ -9,6 +9,12 @@ import PillarFields from '@/components/wizard/PillarFields'
 import type { WizardForm, PropertyPillar } from '@/components/wizard/types'
 import type { Property } from '@/lib/supabase/types'
 
+function nearbyField(property: Property, key: string, field: 'name' | 'distance') {
+  const items = property.nearby?.[key]
+  if (!Array.isArray(items) || !items[0] || typeof items[0] !== 'object') return ''
+  const value = String((items[0] as Record<string, unknown>)[field] ?? '')
+  return field === 'distance' ? value.replace(/\s*km$/i, '') : value
+}
 
 function toWizardForm(p: Property): WizardForm {
   return {
@@ -41,10 +47,11 @@ function toWizardForm(p: Property): WizardForm {
     amenities: p.amenities ?? [],
     youtube_url: p.youtube_url ?? '',
     instagram_url: p.instagram_url ?? '',
-    metro_station: Array.isArray(p.nearby?.metro) ? String((p.nearby.metro[0] as { name?: string })?.name ?? '') : '',
-    metro_distance_km: Array.isArray(p.nearby?.metro) ? String((p.nearby.metro[0] as { distance?: string })?.distance ?? '').replace(/\s*km$/i, '') : '',
-    railway_station: Array.isArray(p.nearby?.railway_station) ? String((p.nearby.railway_station[0] as { name?: string })?.name ?? '') : '',
-    railway_distance_km: Array.isArray(p.nearby?.railway_station) ? String((p.nearby.railway_station[0] as { distance?: string })?.distance ?? '').replace(/\s*km$/i, '') : '',
+    metro_station: nearbyField(p, 'metro', 'name'), metro_distance_km: nearbyField(p, 'metro', 'distance'),
+    railway_station: nearbyField(p, 'railway_station', 'name'), railway_distance_km: nearbyField(p, 'railway_station', 'distance'),
+    airport_name: nearbyField(p, 'airport', 'name'), airport_distance_km: nearbyField(p, 'airport', 'distance'),
+    school_name: nearbyField(p, 'schools', 'name'), school_distance_km: nearbyField(p, 'schools', 'distance'),
+    hospital_name: nearbyField(p, 'hospitals', 'name'), hospital_distance_km: nearbyField(p, 'hospitals', 'distance'),
     tags: (p.tags ?? []).join(', '),
     floor_plan: p.floor_plan ?? '',
     plot_area_sqyard: p.plot_area_sqyard != null ? String(p.plot_area_sqyard) : '',
@@ -149,6 +156,9 @@ export default function PropertyEditClient({ property }: { property: Property })
         ...(property.nearby ?? {}),
         ...(form.metro_station.trim() ? { metro: [{ name: form.metro_station.trim(), distance: form.metro_distance_km.trim() ? `${form.metro_distance_km.trim()} km` : '' }] } : {}),
         ...(form.railway_station.trim() ? { railway_station: [{ name: form.railway_station.trim(), distance: form.railway_distance_km.trim() ? `${form.railway_distance_km.trim()} km` : '' }] } : {}),
+        ...(form.airport_name.trim() ? { airport: [{ name: form.airport_name.trim(), distance: form.airport_distance_km.trim() ? `${form.airport_distance_km.trim()} km` : '' }] } : {}),
+        ...(form.school_name.trim() ? { schools: [{ name: form.school_name.trim(), distance: form.school_distance_km.trim() ? `${form.school_distance_km.trim()} km` : '' }] } : {}),
+        ...(form.hospital_name.trim() ? { hospitals: [{ name: form.hospital_name.trim(), distance: form.hospital_distance_km.trim() ? `${form.hospital_distance_km.trim()} km` : '' }] } : {}),
       },
       tags: form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : null,
       floor_plan: form.floor_plan || null,
@@ -189,6 +199,11 @@ export default function PropertyEditClient({ property }: { property: Property })
           <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Original site photos (2–4 for new or changed photos)</label>
           <p className="mb-2 text-xs text-slate-500">Existing photos stay as-is when unchanged. JPG/JPEG, PNG or WEBP; maximum 5 MB each.</p>
           <PhotoUpload photos={form.photos} setPhotos={v => setF('photos', v)} maxFiles={Math.max(4, originalPhotos.length)} />
+        </div>
+        <div>
+          <label className="text-xs font-700 uppercase tracking-wider mb-1.5 block" style={{ color: '#9CA3AF' }}>Floor plan (optional)</label>
+          <p className="mb-2 text-xs text-slate-500">Buyers can view this separately from property photos.</p>
+          <PhotoUpload photos={form.floor_plan ? [form.floor_plan] : []} setPhotos={v => setF('floor_plan', v[0] || '')} maxFiles={1} />
         </div>
 
         <input className="input-dark text-sm" placeholder="Property title *"
@@ -234,6 +249,14 @@ export default function PropertyEditClient({ property }: { property: Property })
             value={form.railway_station} onChange={e => setF('railway_station', e.target.value)} />
           <input className="input-dark text-sm" type="number" min="0" step="0.1" placeholder="Distance to railway station (km)"
             value={form.railway_distance_km} onChange={e => setF('railway_distance_km', e.target.value)} />
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <input className="input-dark text-sm" placeholder="Nearest airport (optional)" value={form.airport_name} onChange={e => setF('airport_name', e.target.value)} />
+          <input className="input-dark text-sm" type="number" min="0" step="0.1" placeholder="Distance to airport (km)" value={form.airport_distance_km} onChange={e => setF('airport_distance_km', e.target.value)} />
+          <input className="input-dark text-sm" placeholder="Nearby school (optional)" value={form.school_name} onChange={e => setF('school_name', e.target.value)} />
+          <input className="input-dark text-sm" type="number" min="0" step="0.1" placeholder="Distance to school (km)" value={form.school_distance_km} onChange={e => setF('school_distance_km', e.target.value)} />
+          <input className="input-dark text-sm" placeholder="Nearby hospital (optional)" value={form.hospital_name} onChange={e => setF('hospital_name', e.target.value)} />
+          <input className="input-dark text-sm" type="number" min="0" step="0.1" placeholder="Distance to hospital (km)" value={form.hospital_distance_km} onChange={e => setF('hospital_distance_km', e.target.value)} />
         </div>
 
         <div>

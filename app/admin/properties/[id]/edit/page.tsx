@@ -56,6 +56,12 @@ export default function EditPropertyPage() {
     metro_distance_km: '',
     railway_station:  '',
     railway_distance_km: '',
+    airport_name:     '',
+    airport_distance_km: '',
+    school_name:      '',
+    school_distance_km: '',
+    hospital_name:    '',
+    hospital_distance_km: '',
     floor_plan:   '',
     amenities:        [] as string[],
     tags:             '',
@@ -99,6 +105,12 @@ export default function EditPropertyPage() {
         metro_distance_km: Array.isArray(data.nearby?.metro) ? String(data.nearby.metro[0]?.distance ?? '').replace(/\s*km$/i, '') : '',
         railway_station: Array.isArray(data.nearby?.railway_station) ? data.nearby.railway_station[0]?.name ?? '' : '',
         railway_distance_km: Array.isArray(data.nearby?.railway_station) ? String(data.nearby.railway_station[0]?.distance ?? '').replace(/\s*km$/i, '') : '',
+        airport_name: Array.isArray(data.nearby?.airport) ? data.nearby.airport[0]?.name ?? '' : '',
+        airport_distance_km: Array.isArray(data.nearby?.airport) ? String(data.nearby.airport[0]?.distance ?? '').replace(/\s*km$/i, '') : '',
+        school_name: Array.isArray(data.nearby?.schools) ? data.nearby.schools[0]?.name ?? '' : '',
+        school_distance_km: Array.isArray(data.nearby?.schools) ? String(data.nearby.schools[0]?.distance ?? '').replace(/\s*km$/i, '') : '',
+        hospital_name: Array.isArray(data.nearby?.hospitals) ? data.nearby.hospitals[0]?.name ?? '' : '',
+        hospital_distance_km: Array.isArray(data.nearby?.hospitals) ? String(data.nearby.hospitals[0]?.distance ?? '').replace(/\s*km$/i, '') : '',
         floor_plan:  data.floor_plan  ?? '',
         amenities:       Array.isArray(data.amenities) ? data.amenities : [],
         tags:            Array.isArray(data.tags) ? data.tags.join(', ') : '',
@@ -139,6 +151,9 @@ export default function EditPropertyPage() {
         ...existingNearby,
         ...(form.metro_station.trim() ? { metro: [{ name: form.metro_station.trim(), distance: form.metro_distance_km.trim() ? `${form.metro_distance_km.trim()} km` : '' }] } : {}),
         ...(form.railway_station.trim() ? { railway_station: [{ name: form.railway_station.trim(), distance: form.railway_distance_km.trim() ? `${form.railway_distance_km.trim()} km` : '' }] } : {}),
+        ...(form.airport_name.trim() ? { airport: [{ name: form.airport_name.trim(), distance: form.airport_distance_km.trim() ? `${form.airport_distance_km.trim()} km` : '' }] } : {}),
+        ...(form.school_name.trim() ? { schools: [{ name: form.school_name.trim(), distance: form.school_distance_km.trim() ? `${form.school_distance_km.trim()} km` : '' }] } : {}),
+        ...(form.hospital_name.trim() ? { hospitals: [{ name: form.hospital_name.trim(), distance: form.hospital_distance_km.trim() ? `${form.hospital_distance_km.trim()} km` : '' }] } : {}),
       },
       amenities:       form.amenities,
       tags:            form.tags ? form.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
@@ -209,6 +224,12 @@ export default function EditPropertyPage() {
         <input type="number" min="0" step="0.1" placeholder="Distance in km" value={form.metro_distance_km} onChange={e => setF('metro_distance_km', e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm" />
         <input type="text" placeholder="Nearest railway station" value={form.railway_station} onChange={e => setF('railway_station', e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm" />
         <input type="number" min="0" step="0.1" placeholder="Railway station distance in km" value={form.railway_distance_km} onChange={e => setF('railway_distance_km', e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm" />
+        <input type="text" placeholder="Nearest airport" value={form.airport_name} onChange={e => setF('airport_name', e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm" />
+        <input type="number" min="0" step="0.1" placeholder="Airport distance in km" value={form.airport_distance_km} onChange={e => setF('airport_distance_km', e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm" />
+        <input type="text" placeholder="Nearby school" value={form.school_name} onChange={e => setF('school_name', e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm" />
+        <input type="number" min="0" step="0.1" placeholder="School distance in km" value={form.school_distance_km} onChange={e => setF('school_distance_km', e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm" />
+        <input type="text" placeholder="Nearby hospital" value={form.hospital_name} onChange={e => setF('hospital_name', e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm" />
+        <input type="number" min="0" step="0.1" placeholder="Hospital distance in km" value={form.hospital_distance_km} onChange={e => setF('hospital_distance_km', e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm" />
       </section>
 
       {/* Floor Plan */}

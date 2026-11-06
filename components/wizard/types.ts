@@ -36,6 +36,12 @@ export type WizardForm = {
   metro_distance_km: string
   railway_station: string
   railway_distance_km: string
+  airport_name: string
+  airport_distance_km: string
+  school_name: string
+  school_distance_km: string
+  hospital_name: string
+  hospital_distance_km: string
   tags: string
   floor_plan: string
   // plot
@@ -66,7 +72,8 @@ export const BLANK_WIZARD_FORM: WizardForm = {
   contact_preference: 'both', owner_contact: '',
   bhk: [], floor_number: '', total_floors: '', super_area: '', carpet_area: '',
   furnished: '', rera_number: '', possession_date: '', age_years: '', parking: false,
-  amenities: [], youtube_url: '', instagram_url: '', metro_station: '', metro_distance_km: '', railway_station: '', railway_distance_km: '', tags: '', floor_plan: '',
+  amenities: [], youtube_url: '', instagram_url: '', metro_station: '', metro_distance_km: '', railway_station: '', railway_distance_km: '',
+  airport_name: '', airport_distance_km: '', school_name: '', school_distance_km: '', hospital_name: '', hospital_distance_km: '', tags: '', floor_plan: '',
   plot_area_sqyard: '', plot_type: '', corner_plot: false, facing: '',
   registry_done: false, boundary_wall: false,
   monthly_rent: '', deposit_months: '', available_from: '',
